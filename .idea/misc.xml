@@ -4,6 +4,8 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/MyDocuments/Kotlin/TodoDaily/app/src/main/res/layout/activity_main.xml" value="0.27001013171225935" />
+        <entry key="..\:/MyDocuments/Kotlin/TodoDaily/app/src/main/res/layout/fragment_dashboard.xml" value="0.27001013171225935" />
+        <entry key="..\:/MyDocuments/Kotlin/TodoDaily/app/src/main/res/layout/fragment_home.xml" value="0.27178318135764945" />
       </map>
     </option>
   </component>

@@ -6,17 +6,80 @@
     android:layout_height="match_parent"
     tools:context=".ui.home.HomeFragment">
 
-    <TextView
-        android:id="@+id/text_home"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <GridView
+                android:id="@+id/mainReminders"
+                android:layout_height="200dp"
+                android:layout_width="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                android:numColumns="2"
+                />
+
+            <EditText
+                android:id="@+id/newReminderName"
+                android:layout_width="200dp"
+                android:layout_height="60dp"
+                android:text="Information Name"
+                app:layout_constraintTop_toBottomOf="@+id/mainReminders"
+                app:layout_constraintLeft_toLeftOf="parent"
+                android:padding="15dp"
+                android:inputType="text"
+                />
+
+            <Spinner
+                android:id="@+id/newReminderInput"
+                android:layout_width="150dp"
+                android:layout_height="60dp"
+                app:layout_constraintTop_toBottomOf="@+id/mainReminders"
+                app:layout_constraintLeft_toRightOf="@id/newReminderName"
+                android:padding="15dp"
+                android:spinnerMode="dropdown"
+                />
+
+            <Button
+                android:id="@+id/newReminderButton"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:text="@string/newButton"
+                android:textSize="25sp"
+
+                app:layout_constraintTop_toBottomOf="@+id/newReminderName"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"/>
+
+            <Button
+                android:id="@+id/cancelReminderButton"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:text="@string/cancelButton"
+                android:textSize="25sp"
+
+                app:layout_constraintTop_toBottomOf="@+id/newReminderName"
+                app:layout_constraintRight_toLeftOf="@id/confirmReminderButton"
+                app:layout_constraintLeft_toLeftOf="parent"/>
+
+            <Button
+                android:id="@+id/confirmReminderButton"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:text="@string/confirmButton"
+                android:textSize="25sp"
+
+                app:layout_constraintTop_toBottomOf="@+id/newReminderName"
+                app:layout_constraintLeft_toRightOf="@id/cancelReminderButton"
+                app:layout_constraintRight_toRightOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

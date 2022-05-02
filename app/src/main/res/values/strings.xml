@@ -1,6 +1,20 @@
 <resources>
     <string name="app_name">TodoDaily</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="titleHome">Home</string>
+    <string name="titleDashboard">Dashboard</string>
+    <string name="titleNotifications">Notifications</string>
+
+    <string name="newButton">+</string>
+    <string name="confirmButton">✔</string>
+    <string name="cancelButton">-</string>
+
+    <string-array name="informationFormats">
+        <item>Check box</item>
+        <item>Integer</item>
+        <item>One point decimal</item>
+        <item>Two point decimal</item>
+        <item>Decimal</item>
+        <item>Text</item>
+    </string-array>
+
 </resources>
