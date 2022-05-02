@@ -4,27 +4,34 @@ import android.R
 import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
+import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.EditText
-import androidx.core.content.ContextCompat.getSystemService
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import peter.mitchell.tododaily.databinding.FragmentHomeBinding
+import java.io.File
+import java.time.LocalDate
 
-
+@RequiresApi(Build.VERSION_CODES.O)
 class HomeFragment : Fragment() {
 
     private lateinit var _binding: FragmentHomeBinding
     private var saveInformation : SaveInformation = SaveInformation()
     private var addingNew = false
     private lateinit var imm : InputMethodManager
+
+    //val dailyInformationFile = File("${requireContext().filesDir.path}/dailyInformation.txt")
+    //val tempFile = File("${requireContext().filesDir.path}/tempDailyInformation.txt")
+    val dailyInformationFile = File("/data/data/peter.mitchell.tododaily/files/dailyInformation.txt")
+    val tempFile = File("/data/data/peter.mitchell.tododaily/files/tempDailyInformation.txt")
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -41,16 +48,20 @@ class HomeFragment : Fragment() {
         val root: View = binding.root
         imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
-        // FIXME: Remove this debugging code
-        saveInformation.addValue("input 1", "value 1", SaveInformation.InformationFormat.text)
-        saveInformation.addValue("input 2", "value 2", SaveInformation.InformationFormat.text)
-        saveInformation.addValue("input 3", "5.843", SaveInformation.InformationFormat.decimal)
+        if (saveInformation.length == 0) {
+            readDailyInformationFile()
+        }
 
         reloadReminderInput()
 
         reloadMainReminders()
         binding.mainReminders.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
-            showInputDialog(position, saveInformation.names[position]+": ")
+            if (saveInformation.formats[position] == SaveInformation.InformationFormat.checkBox) {
+                saveInformation.toggleBox(position)
+                reloadMainReminders()
+            } else {
+                showInputDialog(position, saveInformation.names[position]+": ")
+            }
         }
 
         _binding.newReminderInput.adapter = ArrayAdapter(requireContext(), R.layout.simple_list_item_1, saveInformation.informationFormatStrings)
@@ -64,7 +75,10 @@ class HomeFragment : Fragment() {
             reloadReminderInput()
         }
         _binding.confirmReminderButton.setOnClickListener {
-
+            saveInformation.addValue(_binding.newReminderName.text.toString(), saveInformation.informationFormatStringToEnum(_binding.newReminderInput.selectedItem.toString()))
+            addingNew = false
+            reloadMainReminders()
+            reloadReminderInput()
         }
 
         //ShowInputDialog("hi")
@@ -76,17 +90,21 @@ class HomeFragment : Fragment() {
         return root
     }
 
+    /** Reloads the main reminders grid */
     private fun reloadMainReminders() {
         var informationViewList = ArrayList<String>()
 
         for (i in 0 until saveInformation.length) {
-            informationViewList.add(saveInformation.names[i]+": "+saveInformation.getValue(i))
+            informationViewList.add(saveInformation.names[i]+": "+saveInformation.getDisplayValue(i))
         }
 
         val adapter = ArrayAdapter(requireContext(), R.layout.simple_list_item_1, informationViewList)
         _binding.mainReminders.adapter = adapter
+
+        saveDailyInformationFile()
     }
 
+    /** Reloads the reminders input section */
     private fun reloadReminderInput() {
         if (addingNew) {
             _binding.newReminderName.visibility = View.VISIBLE
@@ -103,19 +121,23 @@ class HomeFragment : Fragment() {
         }
     }
 
+    /** Shows the dialog to input the value
+     *
+     * @param i the index of the value
+     * @param inputText the text to ask the user
+     */
     private fun showInputDialog(i : Int, inputText : String) {
         val builder: AlertDialog.Builder = android.app.AlertDialog.Builder(requireContext())
         builder.setTitle(inputText)
 
         val input = EditText(requireContext())
         input.hint = "Enter the value"
-        // TODO: make option for -1 for check box, shouldn't show dialog, just check it
         input.inputType = saveInformation.getInputType(i)
         builder.setView(input)
 
         builder.setPositiveButton("OK", DialogInterface.OnClickListener { dialog, which ->
             imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0)
-            saveInformation.values[i] = input.text.toString()
+            saveInformation.setValue(i, input.text.toString())
             reloadMainReminders()
         })
         builder.setNegativeButton("Cancel", DialogInterface.OnClickListener { dialog, which ->
@@ -126,6 +148,75 @@ class HomeFragment : Fragment() {
         builder.show()
 
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
+    }
+
+    private fun readDailyInformationFile() {
+        if (!dailyInformationFile.exists()) {
+            return
+        } else {
+            var latestLine : String = dailyInformationFile.inputStream().bufferedReader().readLine()
+            if (latestLine.isNullOrEmpty())
+                return
+            var latestDate : LocalDate = LocalDate.parse(latestLine.split(", ")[0])
+
+            if (latestDate != LocalDate.now()) {
+                saveInformation.copySetup(dailyInformationFile.inputStream().bufferedReader().readLine())
+            } else {
+                saveInformation.fromString(dailyInformationFile.inputStream().bufferedReader().readLine())
+            }
+
+        }
+    }
+
+    /** Save the daily information
+     * note: the order is from latest to oldest because the priority of this application is fast
+     * opening and recording. So the save time is less important than read time.
+     */
+    private fun saveDailyInformationFile() {
+
+        if (!dailyInformationFile.exists()) {
+            dailyInformationFile.parentFile!!.mkdirs()
+            dailyInformationFile.createNewFile()
+            dailyInformationFile.writeText(saveInformation.toString())
+            return
+        }
+
+        if (!tempFile.exists()) {
+            tempFile.parentFile!!.mkdirs()
+            tempFile.createNewFile()
+        }
+
+        var currentWritten : Boolean = false;
+        dailyInformationFile.forEachLine {
+            if (!currentWritten) {
+                var lineDate : LocalDate = LocalDate.parse(it.split(", ")[0])
+
+                if (LocalDate.now() > lineDate) {
+                    tempFile.appendText(saveInformation.toString()+"\n")
+                    tempFile.appendText(it+"\n")
+                    currentWritten = true
+                } else if (LocalDate.now() == lineDate) {
+                    tempFile.appendText(saveInformation.toString()+"\n")
+                    currentWritten = true
+                } else {
+                    tempFile.appendText(it+"\n")
+                }
+
+            } else {
+                tempFile.appendText(it+"\n")
+            }
+
+        }
+
+
+        if (!dailyInformationFile.delete()) {
+            Toast.makeText(requireContext(),"Could not save. Permission denied.",Toast.LENGTH_SHORT).show()
+            tempFile.delete()
+            return
+        }
+
+        tempFile.renameTo(dailyInformationFile)
+
     }
 
     override fun onDestroyView() {
