@@ -203,13 +203,16 @@ class SaveInformation {
         val splitLine = str.split(", ")
         var i : Int = 0
 
-        date = LocalDate.parse(splitLine[i++])
+        //date = LocalDate.parse(splitLine[i++])
+        i++
 
         while (i+4 <= splitLine.size) {
             names.add(splitLine[i++])
             values.add("")
+            i++;
             formats.add(informationFormatStringToEnum(splitLine[i++]))
             timeRead.add(0)
+            i++;
             length++
         }
         return true

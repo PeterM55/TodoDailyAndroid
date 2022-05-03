@@ -2,10 +2,13 @@ package peter.mitchell.tododaily.ui.home
 
 import android.R
 import android.app.AlertDialog
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.content.DialogInterface
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +18,8 @@ import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.Fragment
 import peter.mitchell.tododaily.databinding.FragmentHomeBinding
 import java.io.File
@@ -67,7 +72,7 @@ class HomeFragment : Fragment() {
         _binding.newReminderInput.adapter = ArrayAdapter(requireContext(), R.layout.simple_list_item_1, saveInformation.informationFormatStrings)
 
         _binding.newReminderButton.setOnClickListener {
-            addingNew = true
+            addingNew   = true
             reloadReminderInput()
         }
         _binding.cancelReminderButton.setOnClickListener {
@@ -81,12 +86,24 @@ class HomeFragment : Fragment() {
             reloadReminderInput()
         }
 
-        //ShowInputDialog("hi")
+        /*val notificationChannel =
+            NotificationChannel("test_channel_id_55", "My Channel", NotificationManager.IMPORTANCE_DEFAULT).apply {
+                description = "Sends Alarms"
+            }
+        Log.i("CUSTOM: ", "started build")
+        var builder = NotificationCompat.Builder(requireContext(), "test_channel_id_55")
+            .setSmallIcon(R.drawable.arrow_up_float)
+            .setContentTitle("this is a test notification")
+            .setContentText("this is lots of text, what happens if I do this\n hahahah")
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+        Log.i("CUSTOM: ", "finished build")
+        with(NotificationManagerCompat.from(requireContext())) {
+            createNotificationChannel(notificationChannel)
+            notify(1, builder.build())
+        }
+        Log.i("CUSTOM: ", "sent? build")*/
 
-        /*val textView: TextView = binding.textHome
-        homeViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
-        }*/
+
         return root
     }
 
@@ -118,6 +135,8 @@ class HomeFragment : Fragment() {
             _binding.confirmReminderButton.visibility = View.GONE
             _binding.cancelReminderButton.visibility = View.GONE
             _binding.newReminderButton.visibility = View.VISIBLE
+
+            _binding.newReminderName.setText("")
         }
     }
 
