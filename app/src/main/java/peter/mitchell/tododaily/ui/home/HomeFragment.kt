@@ -1,11 +1,12 @@
 package peter.mitchell.tododaily.ui.home
 
+import android.Manifest
 import android.R
 import android.app.AlertDialog
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -18,25 +19,25 @@ import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import peter.mitchell.tododaily.*
 import peter.mitchell.tododaily.databinding.FragmentHomeBinding
 import java.io.File
 import java.time.LocalDate
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 class HomeFragment : Fragment() {
 
     private lateinit var _binding: FragmentHomeBinding
-    private var saveInformation : SaveInformation = SaveInformation()
     private var addingNew = false
-    private lateinit var imm : InputMethodManager
-
-    //val dailyInformationFile = File("${requireContext().filesDir.path}/dailyInformation.txt")
-    //val tempFile = File("${requireContext().filesDir.path}/tempDailyInformation.txt")
-    val dailyInformationFile = File("/data/data/peter.mitchell.tododaily/files/dailyInformation.txt")
-    val tempFile = File("/data/data/peter.mitchell.tododaily/files/tempDailyInformation.txt")
+    private lateinit var imm: InputMethodManager
+    private var dateList : ArrayList<String> = ArrayList()
+    private var currentDate = LocalDate.now()
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -53,26 +54,46 @@ class HomeFragment : Fragment() {
         val root: View = binding.root
         imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
+        if (!settingsRead) {
+            settingsRead = true
+            readSettings()
+        }
+
         if (saveInformation.length == 0) {
-            readDailyInformationFile()
+            readTodaysDailyInformationFile()
         }
 
-        reloadReminderInput()
+        // --- Dynamic view ---
+        val displayHeight =
+            (resources.displayMetrics.heightPixels - (61 + 47 + 47 + 42 + 60 + 50) * resources.displayMetrics.density).toInt()
 
-        reloadMainReminders()
-        binding.mainReminders.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
-            if (saveInformation.formats[position] == SaveInformation.InformationFormat.checkBox) {
-                saveInformation.toggleBox(position)
-                reloadMainReminders()
-            } else {
-                showInputDialog(position, saveInformation.names[position]+": ")
+        var params: ViewGroup.LayoutParams = _binding.mainReminders.layoutParams
+        params.height = displayHeight
+        _binding.mainReminders.layoutParams = params
+
+        _binding.newReminderName.maxWidth =
+            resources.displayMetrics.widthPixels - (230f * resources.displayMetrics.density).toInt()
+        _binding.newReminderName.maxWidth
+
+        binding.mainReminders.onItemClickListener =
+            AdapterView.OnItemClickListener { _, _, position, _ ->
+                if (saveInformation.formats[position] == SaveInformation.InformationFormat.checkBox) {
+                    saveInformation.toggleBox(position)
+                    saveDailyInformationFile()
+                    reloadMainReminders()
+                } else {
+                    showInputDialog(position, saveInformation.names[position] + ": ")
+                }
             }
-        }
 
-        _binding.newReminderInput.adapter = ArrayAdapter(requireContext(), R.layout.simple_list_item_1, saveInformation.informationFormatStrings)
+        _binding.newReminderInput.adapter = ArrayAdapter(
+            requireContext(),
+            R.layout.simple_list_item_1,
+            saveInformation.informationFormatStrings
+        )
 
         _binding.newReminderButton.setOnClickListener {
-            addingNew   = true
+            addingNew = true
             reloadReminderInput()
         }
         _binding.cancelReminderButton.setOnClickListener {
@@ -80,29 +101,35 @@ class HomeFragment : Fragment() {
             reloadReminderInput()
         }
         _binding.confirmReminderButton.setOnClickListener {
-            saveInformation.addValue(_binding.newReminderName.text.toString(), saveInformation.informationFormatStringToEnum(_binding.newReminderInput.selectedItem.toString()))
+            saveInformation.addValue(
+                _binding.newReminderName.text.toString(),
+                saveInformation.informationFormatStringToEnum(_binding.newReminderInput.selectedItem.toString())
+            )
             addingNew = false
+            saveDailyInformationFile()
             reloadMainReminders()
             reloadReminderInput()
         }
 
-        /*val notificationChannel =
-            NotificationChannel("test_channel_id_55", "My Channel", NotificationManager.IMPORTANCE_DEFAULT).apply {
-                description = "Sends Alarms"
-            }
-        Log.i("CUSTOM: ", "started build")
-        var builder = NotificationCompat.Builder(requireContext(), "test_channel_id_55")
-            .setSmallIcon(R.drawable.arrow_up_float)
-            .setContentTitle("this is a test notification")
-            .setContentText("this is lots of text, what happens if I do this\n hahahah")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-        Log.i("CUSTOM: ", "finished build")
-        with(NotificationManagerCompat.from(requireContext())) {
-            createNotificationChannel(notificationChannel)
-            notify(1, builder.build())
+        _binding.manageMainRemindersButton.setOnClickListener {
+            val intent = Intent(activity as Context, ManageDailyNotifications::class.java)
+            startActivity(intent)
         }
-        Log.i("CUSTOM: ", "sent? build")*/
 
+        _binding.exportMainRemindersButton.setOnClickListener {
+            showExportDialog()
+        }
+
+        _binding.selectPastDateSpinner.isVisible = false
+        _binding.selectPastDateButton.setOnClickListener {
+            _binding.selectPastDateButton.isVisible = false
+            _binding.selectPastDateSpinner.isVisible = true
+            reloadDateSpinner()
+        }
+
+        // this is done in onResume, which runs after onCreate
+        /*reloadReminderInput()
+        reloadMainReminders()*/
 
         return root
     }
@@ -112,13 +139,15 @@ class HomeFragment : Fragment() {
         var informationViewList = ArrayList<String>()
 
         for (i in 0 until saveInformation.length) {
-            informationViewList.add(saveInformation.names[i]+": "+saveInformation.getDisplayValue(i))
+            informationViewList.add(
+                saveInformation.names[i] + ": " + saveInformation.getDisplayValue(
+                    i
+                )
+            )
         }
 
         val adapter = ArrayAdapter(requireContext(), R.layout.simple_list_item_1, informationViewList)
         _binding.mainReminders.adapter = adapter
-
-        saveDailyInformationFile()
     }
 
     /** Reloads the reminders input section */
@@ -140,12 +169,98 @@ class HomeFragment : Fragment() {
         }
     }
 
+    private fun reloadDateSpinner() {
+
+        if (!dailyInformationFile.exists()) {
+            return
+        } else {
+
+            dateList = ArrayList()
+
+            var checkContainsFirstLine = true
+
+            dailyInformationFile.forEachLine {
+                if (it.isNullOrEmpty())
+                    return@forEachLine
+
+                val latestDate: LocalDate = LocalDate.parse(it.split(",")[0])
+                if (checkContainsFirstLine) {
+                    if (latestDate != LocalDate.now()) {
+                        dateList.add(LocalDate.now().toString())
+                    }
+                    checkContainsFirstLine = false
+                }
+                dateList.add(latestDate.toString())
+
+            }
+        }
+
+        if (dateList.size == 0)
+            dateList.add(LocalDate.now().toString())
+
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, dateList)
+        _binding.selectPastDateSpinner.adapter = adapter
+
+        _binding.selectPastDateSpinner.onItemSelectedListener = object :
+            AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                if (dateList.size == 0) {
+                    return
+                }
+
+                if (!dailyInformationFile.exists()) {
+                    return
+                } else {
+
+                    var i : Int = 0
+                    var linePosition = position
+                    var stop = false
+                    dailyInformationFile.forEachLine {
+
+                        if (!stop) {
+
+                            if (i == 0) {
+                                if (LocalDate.parse(it.split(",")[0]) != LocalDate.now()) {
+                                    if (position == 0) {
+                                        readTodaysDailyInformationFile()
+                                        reloadMainReminders()
+                                        stop = true
+                                    } else {
+                                        linePosition--
+                                        //Log.i("------", "LinePosition: $linePosition")
+                                    }
+                                }
+                            }
+
+                            if (!stop && i == linePosition) {
+                                saveInformation.fromString(it)
+                                reloadMainReminders()
+                                stop = true
+                            }
+                            i++
+                        }
+                    }
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                /*readDailyInformationFile()
+                        reloadMainReminders()*/
+            }
+        }
+    }
+
     /** Shows the dialog to input the value
      *
      * @param i the index of the value
      * @param inputText the text to ask the user
      */
-    private fun showInputDialog(i : Int, inputText : String) {
+    private fun showInputDialog(i: Int, inputText: String) {
         val builder: AlertDialog.Builder = android.app.AlertDialog.Builder(requireContext())
         builder.setTitle(inputText)
 
@@ -157,6 +272,7 @@ class HomeFragment : Fragment() {
         builder.setPositiveButton("OK", DialogInterface.OnClickListener { dialog, which ->
             imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0)
             saveInformation.setValue(i, input.text.toString())
+            saveDailyInformationFile()
             reloadMainReminders()
         })
         builder.setNegativeButton("Cancel", DialogInterface.OnClickListener { dialog, which ->
@@ -169,76 +285,137 @@ class HomeFragment : Fragment() {
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
     }
 
-    private fun readDailyInformationFile() {
+    private fun showExportDialog() {
+
+        if (!dailyInformationFile.exists()) {
+            Toast.makeText(requireContext(),"No information to export.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        MaterialAlertDialogBuilder(requireContext()).setTitle("Export?")
+            .setMessage("This will export to your external downloads folder.")
+            .setNegativeButton("Cancel") { dialog, which ->
+
+            }.setPositiveButton("Export") { dialog, which ->
+
+                if (!hasWriteStoragePermission() || !hasReadStoragePermission()) {
+                    Toast.makeText(requireContext(),"No permission.", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+
+                var exportFile = File(exportFileName)
+
+                if (exportFile.exists()) {
+                    var copyNum = 1
+                    while (true) {
+                        var tempFileName : File
+                        if (exportFile.name.contains(".")) {
+                            val extension: String = exportFile.name.substring(exportFile.name.lastIndexOf("."))
+                            val filepathMinusExtension: String = exportFile.toString().substring(0, exportFile.toString().lastIndexOf("."))
+                            tempFileName = File(filepathMinusExtension+"($copyNum)"+extension)
+                        } else {
+                            tempFileName = File(exportFile.absolutePath+"($copyNum).txt")
+                        }
+
+                        if (!tempFileName.exists()) {
+                            exportFile = tempFileName
+                            break
+                        }
+                        copyNum++
+                    }
+                }
+
+                if (!exportFile.exists()) {
+                    exportFile.parentFile!!.mkdirs()
+                    exportFile.createNewFile()
+                } else
+                    return@setPositiveButton
+
+                dailyInformationFile.forEachLine {
+                    exportFile.appendText(it+"\n")
+                }
+
+            }.show()
+    }
+
+    private fun hasWriteStoragePermission(): Boolean {
+
+        if (!(ContextCompat.checkSelfPermission(
+                requireActivity(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED)
+        ) {
+            ActivityCompat.requestPermissions(
+                requireActivity(),
+                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                101
+            )
+        }
+        return ContextCompat.checkSelfPermission(
+            requireActivity(),
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun hasReadStoragePermission(): Boolean {
+
+        if (!(ContextCompat.checkSelfPermission(
+                requireActivity(),
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED)
+        ) {
+            ActivityCompat.requestPermissions(
+                requireActivity(),
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                102
+            )
+        }
+        return ContextCompat.checkSelfPermission(
+            requireActivity(),
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun readTodaysDailyInformationFile() {
         if (!dailyInformationFile.exists()) {
             return
         } else {
-            var latestLine : String = dailyInformationFile.inputStream().bufferedReader().readLine()
+
+            var latestLine: String = dailyInformationFile.inputStream().bufferedReader().readLine()
             if (latestLine.isNullOrEmpty())
                 return
-            var latestDate : LocalDate = LocalDate.parse(latestLine.split(", ")[0])
+            var latestDate: LocalDate = LocalDate.parse(latestLine.split(",")[0])
 
             if (latestDate != LocalDate.now()) {
-                saveInformation.copySetup(dailyInformationFile.inputStream().bufferedReader().readLine())
+                saveInformation.copySetup(
+                    dailyInformationFile.inputStream().bufferedReader().readLine()
+                )
             } else {
-                saveInformation.fromString(dailyInformationFile.inputStream().bufferedReader().readLine())
+                saveInformation.fromString(
+                    dailyInformationFile.inputStream().bufferedReader().readLine()
+                )
             }
 
         }
     }
 
-    /** Save the daily information
-     * note: the order is from latest to oldest because the priority of this application is fast
-     * opening and recording. So the save time is less important than read time.
-     */
-    private fun saveDailyInformationFile() {
+    override fun onResume() {
+        super.onResume()
+        reloadReminderInput()
 
-        if (!dailyInformationFile.exists()) {
-            dailyInformationFile.parentFile!!.mkdirs()
-            dailyInformationFile.createNewFile()
-            dailyInformationFile.writeText(saveInformation.toString())
-            return
-        }
-
-        if (!tempFile.exists()) {
-            tempFile.parentFile!!.mkdirs()
-            tempFile.createNewFile()
-        }
-
-        var currentWritten : Boolean = false;
-        dailyInformationFile.forEachLine {
-            if (!currentWritten) {
-                var lineDate : LocalDate = LocalDate.parse(it.split(", ")[0])
-
-                if (LocalDate.now() > lineDate) {
-                    tempFile.appendText(saveInformation.toString()+"\n")
-                    tempFile.appendText(it+"\n")
-                    currentWritten = true
-                } else if (LocalDate.now() == lineDate) {
-                    tempFile.appendText(saveInformation.toString()+"\n")
-                    currentWritten = true
-                } else {
-                    tempFile.appendText(it+"\n")
-                }
-
-            } else {
-                tempFile.appendText(it+"\n")
+        // if the app is open overnight, and opened the next day
+        if (currentDate != LocalDate.now()) {
+            reloadDateSpinner()
+            if (!_binding.selectPastDateSpinner.isVisible) {
+                readTodaysDailyInformationFile()
             }
-
         }
 
-
-        if (!dailyInformationFile.delete()) {
-            Toast.makeText(requireContext(),"Could not save. Permission denied.",Toast.LENGTH_SHORT).show()
-            tempFile.delete()
-            return
-        }
-
-        tempFile.renameTo(dailyInformationFile)
-
+        reloadMainReminders()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
     }
+
 }

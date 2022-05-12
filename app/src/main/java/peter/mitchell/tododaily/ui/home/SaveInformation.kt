@@ -2,6 +2,7 @@ package peter.mitchell.tododaily.ui.home
 
 import android.os.Build
 import android.text.InputType
+import android.util.Log
 import androidx.annotation.RequiresApi
 import java.lang.StringBuilder
 import java.text.SimpleDateFormat
@@ -198,9 +199,17 @@ class SaveInformation {
         timeRead = ArrayList(10)
     }
 
+    public fun deleteValue(i : Int) {
+        names.removeAt(i)
+        values.removeAt(i)
+        formats.removeAt(i)
+        timeRead.removeAt(i)
+        length -= 1
+    }
+
     public fun copySetup(str : String) : Boolean {
         resetData()
-        val splitLine = str.split(", ")
+        val splitLine = str.split(",")
         var i : Int = 0
 
         //date = LocalDate.parse(splitLine[i++])
@@ -218,10 +227,121 @@ class SaveInformation {
         return true
     }
 
+    public fun moveFrom(i : Int, to : Int) {
+
+        if (i == to || i >= length || to >= length) return
+
+        var tempName = names[i]
+        var tempValue = values[i]
+        var tempFormat = formats[i]
+        var tempTimeRead = timeRead[i]
+
+        if (i < to) {
+            for (j in i .. to) {
+                Log.i("-----", "i: $i to: $to j: $j")
+                if (j < to) {
+                    names[j] = names[j+1]
+                    values[j] = values[j+1]
+                    formats[j] = formats[j+1]
+                    timeRead[j] = timeRead[j+1]
+                } else if (j == to) {
+                    names[j] = tempName
+                    values[j] = tempValue
+                    formats[j] = tempFormat
+                    timeRead[j] = tempTimeRead
+                }
+            }
+        } else if (to < i) {
+            for (j in i downTo to) {
+                if (j > to) {
+                    names[j] = names[j-1]
+                    values[j] = values[j-1]
+                    formats[j] = formats[j-1]
+                    timeRead[j] = timeRead[j-1]
+                } else if (j == to) {
+                    names[j] = tempName
+                    values[j] = tempValue
+                    formats[j] = tempFormat
+                    timeRead[j] = tempTimeRead
+                }
+            }
+        }
+
+    }
+
+    public fun moveToEnd(i : Int) {
+        var tempName = names[i]
+        names.removeAt(i)
+        var tempValue = values[i]
+        values.removeAt(i)
+        var tempFormat = formats[i]
+        formats.removeAt(i)
+        var tempTimeRead = timeRead[i]
+        timeRead.removeAt(i)
+
+        names.add(tempName)
+        values.add(tempValue)
+        formats.add(tempFormat)
+        timeRead.add(tempTimeRead)
+    }
+
     public fun fromString(str : String) : Boolean {
         resetData()
-        val splitLine = str.split(", ")
+        Log.i("SaveInformation.fromString", str)
+
         var i : Int = 0
+        var j : Int = 0
+        var readingString = false
+        var currentString = StringBuilder()
+
+        while (i < str.length) {
+
+            if (str[i] != ',' || readingString) {
+
+                if (str[i] == '\"' && currentString.isEmpty() && i+1 < str.length) {
+                    i++
+                    readingString = true
+                }
+
+                if (str[i] == '\"' && i+1 < str.length && str[i+1] == ',') {
+                    readingString = false
+                } else {
+                    currentString.append(str[i])
+                }
+
+            } else {
+
+
+                if (j == 0) {
+                    date = LocalDate.parse(currentString.toString())
+                } else if (j%5 == 1) {
+                    names.add(currentString.toString())
+                } else if (j%5 == 2) {
+
+                    /*if (currentString.length > 1 && currentString[0] == '\"' && currentString[currentString.length-1] == '\"') {
+                        currentString.removeRange(0,1)
+                        currentString.removeRange(currentString.length-1,currentString.length)
+                    }*/
+
+                    values.add(currentString.toString().replace("\"\"", "\""))
+
+                } else if (j%5 == 3) {
+                    formats.add(informationFormatStringToEnum(currentString.toString()))
+                } else if (j%5 == 4) {
+                    timeRead.add(currentString.toString().toLong())
+                    j++
+                    length++
+                }
+                j++
+                currentString.clear()
+            }
+
+            i++
+        }
+
+
+        /*val splitLine = str.split(",")
+
 
         date = LocalDate.parse(splitLine[i++])
 
@@ -231,15 +351,19 @@ class SaveInformation {
             formats.add(informationFormatStringToEnum(splitLine[i++]))
             timeRead.add(splitLine[i++].toLong())
             length++
-        }
+        }*/
         return true
     }
 
     public override fun toString() : String {
-        var returnStr : StringBuilder = StringBuilder("$date, ")
+        var returnStr : StringBuilder = StringBuilder("$date,")
 
         for (i in 0 until length) {
-            returnStr.append("${names[i]}, ${values[i]}, ${informationFormatEnumToString(formats[i])}, ${timeRead[i]}, ")
+            if (formats[i] == InformationFormat.text) {
+                returnStr.append("${names[i]},\"${values[i].replace("\"","\"\"").replace("\n"," ")}\",${informationFormatEnumToString(formats[i])},${timeRead[i]},")
+            } else {
+                returnStr.append("${names[i]},${values[i]},${informationFormatEnumToString(formats[i])},${timeRead[i]},")
+            }
         }
 
         return returnStr.toString()

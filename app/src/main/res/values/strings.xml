@@ -7,6 +7,7 @@
     <string name="newButton">+</string>
     <string name="confirmButton">✔</string>
     <string name="cancelButton">-</string>
+    <string name="manageDailyInformationButton">Manage</string>
 
     <string-array name="informationFormats">
         <item>Check box</item>

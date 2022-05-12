@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="5dp"
+    android:paddingBottom="20dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent">
+
+        <TextView
+            android:id="@+id/manageMainRemindersTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Current Titles (delete)"
+            android:textSize="20dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            />
+
+        <Button
+            android:id="@+id/toggleMainReminders"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/deleteAllMainRemindersButton"
+            android:text="▼"
+            android:textSize="15dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:layout_marginRight="10dp"
+            />
+
+        <Button
+            android:id="@+id/deleteAllMainRemindersButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:text="Delete All"
+            android:textSize="15dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            />
+
+        <GridView
+            android:id="@+id/manageMainReminders"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:numColumns="2"
+            app:layout_constraintTop_toBottomOf="@id/deleteAllMainRemindersButton"
+            app:layout_constraintLeft_toLeftOf="parent"
+            />
+
+        <TextView
+            android:id="@+id/rearrangeTitles"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Rearrange"
+            android:textSize="20dp"
+            app:layout_constraintTop_toBottomOf="@id/manageMainReminders"
+            app:layout_constraintLeft_toLeftOf="parent"
+            />
+
+        <Button
+            android:id="@+id/toggleRearrangeTitles"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/manageMainReminders"
+            app:layout_constraintRight_toRightOf="parent"
+            android:text="◀"
+            android:textSize="15dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:layout_marginRight="10dp"
+            />
+
+        <!--<Button
+            android:id="@+id/deleteAllTitlesButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/manageMainReminders"
+            app:layout_constraintRight_toRightOf="parent"
+            android:text="Delete All"
+            android:textSize="15dp"
+            />-->
+
+        <GridView
+            android:id="@+id/manageAllTitles"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:numColumns="2"
+            app:layout_constraintTop_toBottomOf="@id/toggleRearrangeTitles"
+            app:layout_constraintLeft_toLeftOf="parent"
+            />
+
+        <TextView
+            android:id="@+id/manageDatesTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Dates"
+            android:textSize="20dp"
+            app:layout_constraintTop_toBottomOf="@id/manageAllTitles"
+            app:layout_constraintLeft_toLeftOf="parent"
+            />
+
+        <Button
+            android:id="@+id/toggleManageDatesButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/manageAllTitles"
+            app:layout_constraintRight_toLeftOf="@id/toggleManageDatesVisibilityButton"
+            android:text="Toggle Delete\nMode"
+            android:textSize="11dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:layout_marginRight="10dp"
+            />
+
+        <Button
+            android:id="@+id/toggleManageDatesVisibilityButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/manageAllTitles"
+            app:layout_constraintRight_toLeftOf="@id/deleteAllDatesButton"
+            android:text="◀"
+            android:textSize="15dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:layout_marginRight="10dp"
+            />
+
+        <Button
+            android:id="@+id/deleteAllDatesButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/manageAllTitles"
+            app:layout_constraintRight_toRightOf="parent"
+            android:text="Delete All"
+            android:textSize="15dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            />
+
+        <TextView
+            android:id="@+id/toggleManageDatesText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Single delete"
+            android:textSize="16dp"
+            app:layout_constraintTop_toBottomOf="@id/deleteAllDatesButton"
+            app:layout_constraintLeft_toLeftOf="parent"
+            />
+
+        <GridView
+            android:id="@+id/manageDatesList"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:numColumns="3"
+            app:layout_constraintTop_toBottomOf="@id/toggleManageDatesText"
+            app:layout_constraintLeft_toLeftOf="parent"
+            />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
