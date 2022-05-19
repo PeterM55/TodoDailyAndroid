@@ -6,6 +6,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import kotlinx.android.synthetic.main.new_notification.*
 import peter.mitchell.tododaily.R
+import peter.mitchell.tododaily.dailyNotifications
+import peter.mitchell.tododaily.saveNotifications
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 
 class NewNotification : AppCompatActivity() {
 
@@ -27,6 +32,35 @@ class NewNotification : AppCompatActivity() {
         }
 
         newNotificationSubmitButton.setOnClickListener {
+
+            var notificationTime : LocalTime = LocalTime.of(timePicker.hour, timePicker.minute)
+
+            if (oneTimeNotification) {
+
+                //val notificationDate : LocalDate = LocalDate.of(datePicker.year, datePicker.month, datePicker.dayOfMonth)
+                val notificationDateTime : LocalDateTime = LocalDateTime.of(LocalDate.of(datePicker.year, datePicker.month, datePicker.dayOfMonth),notificationTime)
+
+                if (notificationDateTime.isBefore(LocalDateTime.now())) {
+                    return@setOnClickListener
+                }
+
+                dailyNotifications.addOneTimeNotification(
+                    notificationNameInput.text.toString(),
+                    notificationDateTime,
+                    notificationTitleInput.text.toString(),
+                    notificationDescInput.text.toString()
+                )
+            } else {
+                dailyNotifications.addDailyNotification(
+                    notificationNameInput.text.toString(),
+                    notificationTime,
+                    notificationTitleInput.text.toString(),
+                    notificationDescInput.text.toString()
+                )
+            }
+            saveNotifications()
+
+            finish()
 
         }
 

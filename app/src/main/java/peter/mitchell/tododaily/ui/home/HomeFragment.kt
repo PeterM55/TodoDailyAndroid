@@ -377,6 +377,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun readTodaysDailyInformationFile() {
+
         if (!dailyInformationFile.exists()) {
             return
         } else {

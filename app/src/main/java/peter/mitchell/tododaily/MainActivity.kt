@@ -160,7 +160,6 @@ fun readNotifications() {
 }
 
 fun saveNotifications() {
-
     if (!notificationsFile.exists()) {
         notificationsFile.parentFile!!.mkdirs()
         notificationsFile.createNewFile()

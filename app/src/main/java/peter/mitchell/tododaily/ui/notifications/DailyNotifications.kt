@@ -65,7 +65,7 @@ class DailyNotifications(context : Context) {
 
 
         //val timeToTimer = System.currentTimeMillis()+3000;
-        alarmManager.setExactAndAllowWhileIdle(
+        alarmManager.setAndAllowWhileIdle(//setExactAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
             timeToTimer,
             pendingIntent
@@ -85,6 +85,22 @@ class DailyNotifications(context : Context) {
     var oneTimeNotificationTimes : ArrayList<LocalDateTime> = ArrayList()
     var oneTimeNotificationTitles : ArrayList<String> = ArrayList()
     var oneTimeNotificationDescriptions : ArrayList<String> = ArrayList()
+
+    fun addDailyNotification(name : String, time : LocalTime, title : String, desc : String) {
+        dailyNotificationNames.add(name)
+        dailyNotificationTimes.add(time)
+        dailyNotificationTitles.add(title)
+        dailyNotificationDescriptions.add(desc)
+        dailyNotificationsLength++
+    }
+
+    fun addOneTimeNotification(name : String, time : LocalDateTime, title : String, desc : String) {
+        oneTimeNotificationNames.add(name)
+        oneTimeNotificationTimes.add(time)
+        oneTimeNotificationTitles.add(title)
+        oneTimeNotificationDescriptions.add(desc)
+        oneTimeNotificationsLength++
+    }
 
     fun totalLength() : Int {
         return dailyNotificationsLength + oneTimeNotificationsLength

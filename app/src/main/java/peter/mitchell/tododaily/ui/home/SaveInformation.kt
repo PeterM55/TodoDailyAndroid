@@ -209,7 +209,16 @@ class SaveInformation {
 
     public fun copySetup(str : String) : Boolean {
         resetData()
-        val splitLine = str.split(",")
+
+        fromString(str)
+
+        date = LocalDate.now()
+        for (i in 0 until length) {
+            values[i] = ""
+            timeRead[i] = 0
+        }
+
+        /*val splitLine = str.split(",")
         var i : Int = 0
 
         //date = LocalDate.parse(splitLine[i++])
@@ -223,7 +232,7 @@ class SaveInformation {
             timeRead.add(0)
             i++;
             length++
-        }
+        }*/
         return true
     }
 

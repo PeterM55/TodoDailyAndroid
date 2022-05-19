@@ -47,16 +47,16 @@ class NotificationsFragment : Fragment() {
         val root: View = binding.root
 
         // temporary code
-        var setTime = LocalTime.now().plusSeconds(7)
+        var setTime = LocalTime.now().plusSeconds(10)
 
         val testTime : LocalDateTime = setTime.atDate(LocalDate.now())
         val timeToTimer : Long = testTime.toEpochSecond(ZoneId.systemDefault().rules.getOffset(Instant.now()))*1000
         Toast.makeText(context, "Next alarm in: ${(timeToTimer-System.currentTimeMillis())/1000} seconds", Toast.LENGTH_SHORT).show()
 
-        Log.i("Notif Fragment 55: ","Time set to now + 15s, but set to: ${timeToTimer/1000} and current is: ${(System.currentTimeMillis())/1000}")
-        Log.i("Notif Fragment 55: ","Difference is: ${(timeToTimer-System.currentTimeMillis())/1000}")
+        //Log.i("Notif Fragment 55: ","Time set to now + 15s, but set to: ${timeToTimer/1000} and current is: ${(System.currentTimeMillis())/1000}")
+        //Log.i("Notif Fragment 55: ","Difference is: ${(timeToTimer-System.currentTimeMillis())/1000}")
 
-        //dailyNotifications.createNotification(requireContext(), setTime)
+        dailyNotifications.createNotification(requireContext(), setTime)
 
         // ----- Setup Main View -----
         if (dailyNotifications.totalLength() == 0) {
