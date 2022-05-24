@@ -199,6 +199,15 @@ class SaveInformation {
         timeRead = ArrayList(10)
     }
 
+    public fun clearValues() {
+        values = ArrayList(length+3)
+        timeRead = ArrayList(length+3)
+        for (i in 0 until length) {
+            values[i] = ""
+            timeRead[i] = 0
+        }
+    }
+
     public fun deleteValue(i : Int) {
         names.removeAt(i)
         values.removeAt(i)
