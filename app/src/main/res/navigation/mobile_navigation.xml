@@ -8,14 +8,20 @@
     <fragment
         android:id="@+id/navigation_home"
         android:name="peter.mitchell.tododaily.ui.home.HomeFragment"
-        android:label="@string/titleHome"
+        android:label="@string/titleDailyInfo"
         tools:layout="@layout/fragment_home" />
 
     <fragment
         android:id="@+id/navigation_dashboard"
         android:name="peter.mitchell.tododaily.ui.dashboard.DashboardFragment"
-        android:label="@string/titleDashboard"
+        android:label="@string/titleTodo"
         tools:layout="@layout/fragment_dashboard" />
+
+    <fragment
+        android:id="@+id/navigation_notes"
+        android:name="peter.mitchell.tododaily.ui.dashboard.DashboardFragment"
+        android:label="@string/titleListsNotepad"
+        tools:layout="@layout/fragment_notes" />
 
     <fragment
         android:id="@+id/navigation_notifications"

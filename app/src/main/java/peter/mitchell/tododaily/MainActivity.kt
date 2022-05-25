@@ -4,24 +4,23 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import peter.mitchell.tododaily.databinding.ActivityMainBinding
-import peter.mitchell.tododaily.ui.home.SaveInformation
+import peter.mitchell.tododaily.HelperClasses.SaveInformation
+import peter.mitchell.tododaily.HelperClasses.TodoLists
 import peter.mitchell.tododaily.ui.notifications.DailyNotifications
 import java.io.File
 import java.time.LocalDate
 
-@RequiresApi(Build.VERSION_CODES.O)
 var saveInformation : SaveInformation = SaveInformation()
 lateinit var dailyNotifications : DailyNotifications
+var todoLists : TodoLists? = null // only used in to-do section, but kept in memory to not have to read every time
 
 //FIXME
 //val dailyInformationFile = File("${requireContext().filesDir.path}/dailyInformation.txt")
@@ -30,6 +29,7 @@ val dailyInformationFile = File("/data/data/peter.mitchell.tododaily/files/daily
 val tempFile = File("/data/data/peter.mitchell.tododaily/files/tempDailyInformation.txt")
 val notificationsFile = File("/data/data/peter.mitchell.tododaily/files/dailyNotifications.txt")
 val settingsFile = File("/data/data/peter.mitchell.tododaily/files/settings.txt")
+val todosFile = File("/data/data/peter.mitchell.tododaily/files/todos.txt")
 //val exportFileName = "/storage/emulated/0/Download/dailyInformationExport.txt"
 val exportFileName = "${Environment.getExternalStorageDirectory().path}/${Environment.DIRECTORY_DOWNLOADS}/dailyInformationExport.csv"
 
@@ -142,6 +142,30 @@ fun saveDailyInformationFile() {
     }
 
     tempFile.renameTo(dailyInformationFile)
+}
+
+fun readTodaysDailyInformationFile() {
+
+    if (!dailyInformationFile.exists()) {
+        return
+    } else {
+
+        var latestLine: String = dailyInformationFile.inputStream().bufferedReader().readLine()
+        if (latestLine.isNullOrEmpty())
+            return
+        var latestDate: LocalDate = LocalDate.parse(latestLine.split(",")[0])
+
+        if (latestDate != LocalDate.now()) {
+            saveInformation.copySetup(
+                dailyInformationFile.inputStream().bufferedReader().readLine()
+            )
+        } else {
+            saveInformation.fromString(
+                dailyInformationFile.inputStream().bufferedReader().readLine()
+            )
+        }
+
+    }
 }
 
 /**

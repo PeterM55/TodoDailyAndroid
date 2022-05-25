@@ -9,7 +9,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,6 +24,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import peter.mitchell.tododaily.*
+import peter.mitchell.tododaily.HelperClasses.SaveInformation
 import peter.mitchell.tododaily.databinding.FragmentHomeBinding
 import java.io.File
 import java.time.LocalDate
@@ -64,12 +64,12 @@ class HomeFragment : Fragment() {
         }
 
         // --- Dynamic view ---
-        val displayHeight =
+        /*val displayHeight =
             (resources.displayMetrics.heightPixels - (61 + 47 + 47 + 42 + 60 + 50) * resources.displayMetrics.density).toInt()
 
         var params: ViewGroup.LayoutParams = _binding.mainReminders.layoutParams
         params.height = displayHeight
-        _binding.mainReminders.layoutParams = params
+        _binding.mainReminders.layoutParams = params*/
 
         _binding.newReminderName.maxWidth =
             resources.displayMetrics.widthPixels - (230f * resources.displayMetrics.density).toInt()
@@ -374,30 +374,6 @@ class HomeFragment : Fragment() {
             requireActivity(),
             Manifest.permission.READ_EXTERNAL_STORAGE
         ) == PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun readTodaysDailyInformationFile() {
-
-        if (!dailyInformationFile.exists()) {
-            return
-        } else {
-
-            var latestLine: String = dailyInformationFile.inputStream().bufferedReader().readLine()
-            if (latestLine.isNullOrEmpty())
-                return
-            var latestDate: LocalDate = LocalDate.parse(latestLine.split(",")[0])
-
-            if (latestDate != LocalDate.now()) {
-                saveInformation.copySetup(
-                    dailyInformationFile.inputStream().bufferedReader().readLine()
-                )
-            } else {
-                saveInformation.fromString(
-                    dailyInformationFile.inputStream().bufferedReader().readLine()
-                )
-            }
-
-        }
     }
 
     override fun onResume() {

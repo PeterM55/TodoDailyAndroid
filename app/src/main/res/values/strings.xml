@@ -2,7 +2,11 @@
     <string name="app_name">TodoDaily</string>
     <string name="titleHome">Home</string>
     <string name="titleDashboard">Dashboard</string>
-    <string name="titleNotifications">Notifications</string>
+
+    <string name="titleDailyInfo">Info</string>
+    <string name="titleTodo">Todo</string>
+    <string name="titleListsNotepad">Notes</string>
+    <string name="titleNotifications">Notifs</string>
 
     <string name="newButton">+</string>
     <string name="confirmButton">✔</string>

@@ -17,6 +17,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.manage_daily_information.*
 import peter.mitchell.tododaily.*
 import java.lang.NumberFormatException
+import java.time.LocalDate
 
 class ManageDailyNotifications : AppCompatActivity() {
 
@@ -30,6 +31,7 @@ class ManageDailyNotifications : AppCompatActivity() {
     var currentTitlesVisible : Boolean = true
     var rearrangeTitlesVisible : Boolean = false
     var manageDatesVisible : Boolean = false
+    var addDatesVisible : Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +43,7 @@ class ManageDailyNotifications : AppCompatActivity() {
         manageMainReminders.isVisible = currentTitlesVisible
         manageAllTitles.isVisible = rearrangeTitlesVisible
         manageDatesList.isVisible = manageDatesVisible
+        toggleManageDatesText.isVisible = manageDatesVisible
 
         if (dailyInformationFile.exists()) {
             dailyInformationFile.forEachLine {
@@ -53,34 +56,27 @@ class ManageDailyNotifications : AppCompatActivity() {
 
         toggleMainReminders.setOnClickListener {
             currentTitlesVisible = !currentTitlesVisible
-            manageMainReminders.isVisible = currentTitlesVisible
-            if (currentTitlesVisible) {
-                toggleMainReminders.setText("▼")
-            } else {
-                toggleMainReminders.setText("◀")
-            }
-            reloadDynamicView()
+            reloadVisibilities()
         }
         toggleRearrangeTitles.setOnClickListener {
             rearrangeTitlesVisible = !rearrangeTitlesVisible
-            manageAllTitles.isVisible = rearrangeTitlesVisible
-            if (rearrangeTitlesVisible) {
-                toggleRearrangeTitles.setText("▼")
-            } else {
-                toggleRearrangeTitles.setText("◀")
-            }
-            reloadDynamicView()
+            reloadVisibilities()
         }
         toggleManageDatesVisibilityButton.setOnClickListener {
             manageDatesVisible = !manageDatesVisible
-            manageDatesList.isVisible = manageDatesVisible
-            if (manageDatesVisible) {
-                toggleManageDatesVisibilityButton.setText("▼")
-            } else {
-                toggleManageDatesVisibilityButton.setText("◀")
-            }
-            reloadDynamicView()
+            reloadVisibilities()
         }
+        addDateVisibilityButton.setOnClickListener {
+            addDatesVisible = !addDatesVisible
+
+            if (addDatesVisible) {
+                currentTitlesVisible = false
+                rearrangeTitlesVisible = false
+                manageDatesVisible = false
+            }
+            reloadVisibilities()
+        }
+
 
         deleteAllMainRemindersButton.setOnClickListener {
 
@@ -122,16 +118,21 @@ class ManageDailyNotifications : AppCompatActivity() {
                         }.show()
                 }
         }
+
+        addDateButton.setOnClickListener {
+            saveInformation.clearValues()
+            saveInformation.date = LocalDate.of(addDateInput.year,addDateInput.month,addDateInput.dayOfMonth)
+            saveDailyInformationFile()
+        }
+        // end of onCreateView
     }
 
     private fun reloadDynamicView() {
         // --- Dynamic view ---
         val extraSpace = 10
-        val displayHeight = (resources.displayMetrics.heightPixels - (androidBarsSize+toolBarSize + 35 + 35 + 42 + 18 + extraSpace) * resources.displayMetrics.density).toInt()
+        var displayHeight = (resources.displayMetrics.heightPixels - (androidBarsSize+toolBarSize + 35 + 35 + 42 + 18 + extraSpace) * resources.displayMetrics.density).toInt()
 
-        manageMainReminders.isVisible = currentTitlesVisible
-        manageAllTitles.isVisible = rearrangeTitlesVisible
-        manageDatesList.isVisible = manageDatesVisible
+        if (addDatesVisible) displayHeight = 0
 
         var displaysVisible = 0
         if (currentTitlesVisible) displaysVisible++
@@ -146,13 +147,13 @@ class ManageDailyNotifications : AppCompatActivity() {
             manageMainReminders.layoutParams = params
         }
 
-        if (currentTitlesVisible) {
+        if (rearrangeTitlesVisible) {
             var params: ViewGroup.LayoutParams = manageAllTitles.layoutParams
             params.height = displayHeight/displaysVisible
             manageAllTitles.layoutParams = params
         }
 
-        if (currentTitlesVisible) {
+        if (manageDatesVisible) {
             var params: ViewGroup.LayoutParams = manageDatesList.layoutParams
             params.height = displayHeight/displaysVisible
             manageDatesList.layoutParams = params
@@ -193,6 +194,42 @@ class ManageDailyNotifications : AppCompatActivity() {
                 showSortInputDialog(position)
             }
 
+    }
+
+    private fun reloadVisibilities() {
+
+        if (addDatesVisible && (currentTitlesVisible || rearrangeTitlesVisible || manageDatesVisible)) {
+            addDatesVisible = false
+        }
+
+        manageMainReminders.isVisible = currentTitlesVisible
+        manageAllTitles.isVisible = rearrangeTitlesVisible
+        manageDatesList.isVisible = manageDatesVisible
+        toggleManageDatesText.isVisible = manageDatesVisible
+        addDateInput.isVisible = addDatesVisible
+        addDateButton.isVisible = addDatesVisible
+
+        if (currentTitlesVisible)
+            toggleMainReminders.setText("▼")
+        else
+            toggleMainReminders.setText("◀")
+
+        if (rearrangeTitlesVisible)
+            toggleRearrangeTitles.setText("▼")
+        else
+            toggleRearrangeTitles.setText("◀")
+
+        if (manageDatesVisible)
+            toggleManageDatesVisibilityButton.setText("▼")
+        else
+            toggleManageDatesVisibilityButton.setText("◀")
+
+        if (addDatesVisible)
+            addDateVisibilityButton.setText("▼")
+        else
+            addDateVisibilityButton.setText("◀")
+
+        reloadDynamicView()
     }
 
     private fun setupDates() {

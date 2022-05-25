@@ -1,4 +1,4 @@
-package peter.mitchell.tododaily.ui.home
+package peter.mitchell.tododaily.HelperClasses
 
 import android.os.Build
 import android.text.InputType
@@ -151,20 +151,20 @@ class SaveInformation {
     }
 
     public fun informationFormatStringToEnum(str : String) : InformationFormat {
-        var infoFormat : SaveInformation.InformationFormat = SaveInformation.InformationFormat.text
+        var infoFormat : InformationFormat = InformationFormat.text
 
         if (str == informationFormatStrings[0]) {
-            infoFormat = SaveInformation.InformationFormat.checkBox
+            infoFormat = InformationFormat.checkBox
         } else if (str == informationFormatStrings[1]) {
-            infoFormat = SaveInformation.InformationFormat.integer
+            infoFormat = InformationFormat.integer
         } else if (str == informationFormatStrings[2]) {
-            infoFormat = SaveInformation.InformationFormat.onePointDecimal
+            infoFormat = InformationFormat.onePointDecimal
         } else if (str == informationFormatStrings[3]) {
-            infoFormat = SaveInformation.InformationFormat.twoPointDecimal
+            infoFormat = InformationFormat.twoPointDecimal
         } else if (str == informationFormatStrings[4]) {
-            infoFormat = SaveInformation.InformationFormat.decimal
+            infoFormat = InformationFormat.decimal
         } else if (str == informationFormatStrings[5]) {
-            infoFormat = SaveInformation.InformationFormat.text
+            infoFormat = InformationFormat.text
         }
 
         return infoFormat
@@ -173,17 +173,17 @@ class SaveInformation {
     public fun informationFormatEnumToString(infoFormat : InformationFormat) : String {
         var str : String = informationFormatStrings[0]
 
-        if (infoFormat == SaveInformation.InformationFormat.checkBox) {
+        if (infoFormat == InformationFormat.checkBox) {
             str = informationFormatStrings[0]
-        } else if (infoFormat == SaveInformation.InformationFormat.integer) {
+        } else if (infoFormat == InformationFormat.integer) {
             str = informationFormatStrings[1]
-        } else if (infoFormat == SaveInformation.InformationFormat.onePointDecimal) {
+        } else if (infoFormat == InformationFormat.onePointDecimal) {
             str = informationFormatStrings[2]
-        } else if (infoFormat == SaveInformation.InformationFormat.twoPointDecimal) {
+        } else if (infoFormat == InformationFormat.twoPointDecimal) {
             str = informationFormatStrings[3]
-        } else if (infoFormat == SaveInformation.InformationFormat.decimal) {
+        } else if (infoFormat == InformationFormat.decimal) {
             str = informationFormatStrings[4]
-        } else if (infoFormat == SaveInformation.InformationFormat.text) {
+        } else if (infoFormat == InformationFormat.text) {
             str = informationFormatStrings[5]
         }
 

@@ -75,7 +75,6 @@
             android:textSize="15dp"
             android:minHeight="0dp"
             android:minWidth="0dp"
-            android:layout_marginRight="10dp"
             />
 
         <!--<Button
@@ -163,5 +162,48 @@
             app:layout_constraintTop_toBottomOf="@id/toggleManageDatesText"
             app:layout_constraintLeft_toLeftOf="parent"
             />
+
+        <TextView
+            android:id="@+id/addDatesTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add Date"
+            android:textSize="20dp"
+            app:layout_constraintTop_toBottomOf="@id/manageDatesList"
+            app:layout_constraintLeft_toLeftOf="parent"
+            />
+
+        <Button
+            android:id="@+id/addDateVisibilityButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/manageDatesList"
+            app:layout_constraintRight_toRightOf="parent"
+            android:text="◀"
+            android:textSize="15dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            />
+
+        <DatePicker
+            android:id="@+id/addDateInput"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/addDateVisibilityButton"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"/>
+
+        <Button
+            android:id="@+id/addDateButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/addDateInput"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:text="Add"
+            android:textSize="16dp"
+            />
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
