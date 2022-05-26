@@ -9,6 +9,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.DisplayMetrics
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,6 +25,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.android.synthetic.main.fragment_home.*
 import peter.mitchell.tododaily.*
 import peter.mitchell.tododaily.HelperClasses.SaveInformation
 import peter.mitchell.tododaily.databinding.FragmentHomeBinding
@@ -63,17 +66,9 @@ class HomeFragment : Fragment() {
             readTodaysDailyInformationFile()
         }
 
-        // --- Dynamic view ---
-        /*val displayHeight =
-            (resources.displayMetrics.heightPixels - (61 + 47 + 47 + 42 + 60 + 50) * resources.displayMetrics.density).toInt()
-
-        var params: ViewGroup.LayoutParams = _binding.mainReminders.layoutParams
-        params.height = displayHeight
-        _binding.mainReminders.layoutParams = params*/
-
+        // --- Dynamic view width (height handled elsewhere) ---
         _binding.newReminderName.maxWidth =
             resources.displayMetrics.widthPixels - (230f * resources.displayMetrics.density).toInt()
-        _binding.newReminderName.maxWidth
 
         binding.mainReminders.onItemClickListener =
             AdapterView.OnItemClickListener { _, _, position, _ ->
@@ -95,10 +90,12 @@ class HomeFragment : Fragment() {
         _binding.newReminderButton.setOnClickListener {
             addingNew = true
             reloadReminderInput()
+            reloadGridSize(true)
         }
         _binding.cancelReminderButton.setOnClickListener {
             addingNew = false
             reloadReminderInput()
+            reloadGridSize(true)
         }
         _binding.confirmReminderButton.setOnClickListener {
             saveInformation.addValue(
@@ -134,20 +131,42 @@ class HomeFragment : Fragment() {
         return root
     }
 
+    private fun reloadGridSize(dontScroll : Boolean = false) {
+        // TODO does this work? hoping it does, shouldnt need to use dynamic because of helper class
+        /*val gridBoxSize = 41*(resources.displayMetrics.density+0.3f) // 0.3 because the thing is claiming the wrong number? +0.3f
+        val rowsTotalHeight = (gridBoxSize*((saveInformation.length+1)/2)).toInt() //resources.displayMetrics.density
+
+        val bottomBarSize = 47;
+        var displayHeight =
+            (resources.displayMetrics.heightPixels - (androidBarsSize + toolBarSize + bottomBarSize + 42 + 50) * resources.displayMetrics.density).toInt() // +60
+
+        if (addingNew) {
+            displayHeight -= (60*resources.displayMetrics.density).toInt()
+        }
+
+        var params: ViewGroup.LayoutParams = _binding.mainReminders.layoutParams
+        Log.i("-----","$rowsTotalHeight - $displayHeight - ${(resources.displayMetrics.densityDpi.toFloat()/ DisplayMetrics.DENSITY_DEFAULT.toFloat())}")
+        params.height = minOf( rowsTotalHeight ,displayHeight)
+        _binding.mainReminders.layoutParams = params*/
+
+        if (!dontScroll)
+            homeScrollView.smoothScrollTo(0,0)
+    }
+
     /** Reloads the main reminders grid */
     private fun reloadMainReminders() {
         var informationViewList = ArrayList<String>()
 
         for (i in 0 until saveInformation.length) {
             informationViewList.add(
-                saveInformation.names[i] + ": " + saveInformation.getDisplayValue(
-                    i
-                )
+                saveInformation.names[i] + ": " + saveInformation.getDisplayValue(i)
             )
         }
 
         val adapter = ArrayAdapter(requireContext(), R.layout.simple_list_item_1, informationViewList)
         _binding.mainReminders.adapter = adapter
+
+        reloadGridSize()
     }
 
     /** Reloads the reminders input section */
