@@ -36,7 +36,7 @@ class DashboardFragment : Fragment() {
         var todoSections : ArrayList<GridView> = ArrayList(5)
 
 
-        for (i in 0..todoLists!!.getSize()) {
+        for (i in 0 until todoLists!!.getSize()) {
             var sectionTitle : TextView = TextView(requireContext())
             sectionTitle.text = todoLists!!.getSectionTitle(i)
             sectionTitle.textSize = 20f

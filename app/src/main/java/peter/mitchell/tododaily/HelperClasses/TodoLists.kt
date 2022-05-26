@@ -45,14 +45,14 @@ class TodoLists {
             return
         } else {
             val todoLines = todosFile.readText().lines()
-            for (line in 0 .. todoLines.size) {
+            for (line in 0 until todoLines.size) {
                 val splitLine = todoLines[line].split(",")
                 if (splitLine.isEmpty()) return
 
                 sectionTitles.add(splitLine[0])
                 sectionTodos.add(ArrayList(10))
 
-                for (todoNum in 0 .. splitLine.size) {
+                for (todoNum in 0 until splitLine.size) {
                     sectionTodos[line].add(splitLine[todoNum])
                 }
             }
@@ -70,7 +70,7 @@ class TodoLists {
             todosFile.createNewFile()
         }
 
-        for (sectionNum in 0 .. sectionTitles.size) {
+        for (sectionNum in 0 until sectionTitles.size) {
             todosFile.writeText(sectionTitles[sectionNum]+",")
             for (todoNum in 0 .. sectionTodos[sectionNum].size) {
                 todosFile.writeText(sectionTodos[sectionNum][todoNum]+",")

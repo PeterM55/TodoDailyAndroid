@@ -128,26 +128,27 @@ class HomeFragment : Fragment() {
         /*reloadReminderInput()
         reloadMainReminders()*/
 
+        Log.i("-----", "button size: ${_binding.bottomSpacingHome.height} ${_binding.bottomSpacingHome.height*resources.displayMetrics.density}")
+
         return root
     }
 
     private fun reloadGridSize(dontScroll : Boolean = false) {
-        // TODO does this work? hoping it does, shouldnt need to use dynamic because of helper class
-        /*val gridBoxSize = 41*(resources.displayMetrics.density+0.3f) // 0.3 because the thing is claiming the wrong number? +0.3f
+        val gridBoxSize = 50*resources.displayMetrics.density
         val rowsTotalHeight = (gridBoxSize*((saveInformation.length+1)/2)).toInt() //resources.displayMetrics.density
 
-        val bottomBarSize = 47;
+        /*val bottomBarSize = 47;
         var displayHeight =
             (resources.displayMetrics.heightPixels - (androidBarsSize + toolBarSize + bottomBarSize + 42 + 50) * resources.displayMetrics.density).toInt() // +60
 
         if (addingNew) {
             displayHeight -= (60*resources.displayMetrics.density).toInt()
-        }
+        }*/
 
         var params: ViewGroup.LayoutParams = _binding.mainReminders.layoutParams
-        Log.i("-----","$rowsTotalHeight - $displayHeight - ${(resources.displayMetrics.densityDpi.toFloat()/ DisplayMetrics.DENSITY_DEFAULT.toFloat())}")
-        params.height = minOf( rowsTotalHeight ,displayHeight)
-        _binding.mainReminders.layoutParams = params*/
+        //Log.i("-----","$rowsTotalHeight - $displayHeight - ${(resources.displayMetrics.densityDpi.toFloat()/ DisplayMetrics.DENSITY_DEFAULT.toFloat())}")
+        params.height = rowsTotalHeight
+        _binding.mainReminders.layoutParams = params
 
         if (!dontScroll)
             homeScrollView.smoothScrollTo(0,0)
