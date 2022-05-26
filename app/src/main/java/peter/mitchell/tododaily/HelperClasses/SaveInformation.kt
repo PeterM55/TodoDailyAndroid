@@ -203,8 +203,8 @@ class SaveInformation {
         values = ArrayList(length+3)
         timeRead = ArrayList(length+3)
         for (i in 0 until length) {
-            values[i] = ""
-            timeRead[i] = 0
+            values.add("")
+            timeRead.add(0)
         }
     }
 

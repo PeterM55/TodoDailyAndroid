@@ -64,6 +64,20 @@
 
                 </LinearLayout>
 
+                <TextView
+                    android:id="@+id/dailyInformationTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+
+                    android:text="Daily"
+                    android:textSize="21dp"
+                    android:textColor="@color/black"
+
+                    app:layout_constraintTop_toBottomOf="@+id/dailyInformationTopBar"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    />
+
                 <!--<GridView
                     android:id="@+id/mainReminders"
                     android:layout_height="200dp"
@@ -78,7 +92,7 @@
                     android:layout_height="wrap_content"
                     android:columnCount="2"
 
-                    app:layout_constraintTop_toBottomOf="@+id/dailyInformationTopBar"
+                    app:layout_constraintTop_toBottomOf="@+id/dailyInformationTitle"
                     app:layout_constraintLeft_toLeftOf="parent"
                     />
 

@@ -75,6 +75,8 @@ class MainActivity : AppCompatActivity() {
  */
 fun saveDailyInformationFile() {
 
+    Log.i("--5--", "Date: ${saveInformation.date.toString()}")
+
     if (!dailyInformationFile.exists()) {
         dailyInformationFile.parentFile!!.mkdirs()
         dailyInformationFile.createNewFile()
@@ -133,6 +135,9 @@ fun saveDailyInformationFile() {
         }
     }
 
+    if (!currentWritten) {
+        tempFile.appendText(saveInformation.toString() + "\n")
+    }
 
     if (!dailyInformationFile.delete()) {
         //Toast.makeText(,"Could not save. Permission denied.", Toast.LENGTH_SHORT).show()

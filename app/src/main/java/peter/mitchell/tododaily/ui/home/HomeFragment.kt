@@ -151,7 +151,7 @@ class HomeFragment : Fragment() {
 
             mainTextGrid.add(TextView(requireContext()))
             mainTextGrid[i].setText(informationViewList[i])
-            mainTextGrid[i].textSize = 20f
+            mainTextGrid[i].textSize = 18f
             mainTextGrid[i].setTextColor(Color.BLACK)
             mainTextGrid[i].textAlignment = TextView.TEXT_ALIGNMENT_TEXT_START
             mainTextGrid[i].minHeight = 30

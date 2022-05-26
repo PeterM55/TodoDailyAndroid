@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
@@ -120,9 +121,28 @@ class ManageDailyNotifications : AppCompatActivity() {
         }
 
         addDateButton.setOnClickListener {
-            saveInformation.clearValues()
-            saveInformation.date = LocalDate.of(addDateInput.year,addDateInput.month,addDateInput.dayOfMonth)
-            saveDailyInformationFile()
+
+            if (!dailyInformationFile.exists()) {
+                dailyInformationFile.parentFile!!.mkdirs()
+                dailyInformationFile.createNewFile()
+            }
+
+            var newDate = LocalDate.of(addDateInput.year,addDateInput.month+1,addDateInput.dayOfMonth)
+
+            var done = false
+            dailyInformationFile.forEachLine {
+                var lineDate: LocalDate = LocalDate.parse(it.split(",")[0])
+                if (newDate == lineDate) {
+                    saveInformation.fromString(it)
+                    done = true
+                }
+            }
+
+            if (!done) {
+                saveInformation.clearValues()
+                saveInformation.date = newDate
+                saveDailyInformationFile()
+            }
         }
         // end of onCreateView
     }
@@ -350,6 +370,11 @@ class ManageDailyNotifications : AppCompatActivity() {
         builder.show()
 
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        reloadVisibilities()
     }
 
     private fun backToHome() {
