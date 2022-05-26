@@ -9,17 +9,15 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.util.DisplayMetrics
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.EditText
-import android.widget.Toast
+import android.widget.*
 import androidx.annotation.RequiresApi
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -46,6 +44,9 @@ class HomeFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding
 
+    private var mainTextGrid : ArrayList<TextView> = ArrayList<TextView>(25)
+    private var initialSetupDone = false
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -70,7 +71,7 @@ class HomeFragment : Fragment() {
         _binding.newReminderName.maxWidth =
             resources.displayMetrics.widthPixels - (230f * resources.displayMetrics.density).toInt()
 
-        binding.mainReminders.onItemClickListener =
+        /*binding.mainReminders.onItemClickListener =
             AdapterView.OnItemClickListener { _, _, position, _ ->
                 if (saveInformation.formats[position] == SaveInformation.InformationFormat.checkBox) {
                     saveInformation.toggleBox(position)
@@ -79,7 +80,7 @@ class HomeFragment : Fragment() {
                 } else {
                     showInputDialog(position, saveInformation.names[position] + ": ")
                 }
-            }
+            }*/
 
         _binding.newReminderInput.adapter = ArrayAdapter(
             requireContext(),
@@ -90,12 +91,10 @@ class HomeFragment : Fragment() {
         _binding.newReminderButton.setOnClickListener {
             addingNew = true
             reloadReminderInput()
-            reloadGridSize(true)
         }
         _binding.cancelReminderButton.setOnClickListener {
             addingNew = false
             reloadReminderInput()
-            reloadGridSize(true)
         }
         _binding.confirmReminderButton.setOnClickListener {
             saveInformation.addValue(
@@ -133,41 +132,45 @@ class HomeFragment : Fragment() {
         return root
     }
 
-    private fun reloadGridSize(dontScroll : Boolean = false) {
-        val gridBoxSize = 50*resources.displayMetrics.density
-        val rowsTotalHeight = (gridBoxSize*((saveInformation.length+1)/2)).toInt() //resources.displayMetrics.density
-
-        /*val bottomBarSize = 47;
-        var displayHeight =
-            (resources.displayMetrics.heightPixels - (androidBarsSize + toolBarSize + bottomBarSize + 42 + 50) * resources.displayMetrics.density).toInt() // +60
-
-        if (addingNew) {
-            displayHeight -= (60*resources.displayMetrics.density).toInt()
-        }*/
-
-        var params: ViewGroup.LayoutParams = _binding.mainReminders.layoutParams
-        //Log.i("-----","$rowsTotalHeight - $displayHeight - ${(resources.displayMetrics.densityDpi.toFloat()/ DisplayMetrics.DENSITY_DEFAULT.toFloat())}")
-        params.height = rowsTotalHeight
-        _binding.mainReminders.layoutParams = params
-
-        if (!dontScroll)
-            homeScrollView.smoothScrollTo(0,0)
-    }
-
     /** Reloads the main reminders grid */
     private fun reloadMainReminders() {
         var informationViewList = ArrayList<String>()
 
+        for (i in 0 until mainTextGrid.size) {
+            mainGridLayout.removeView(mainTextGrid[i])
+        }
+        mainTextGrid.clear()
+
+        var heights : ArrayList<Int> = ArrayList(saveInformation.length)
         for (i in 0 until saveInformation.length) {
             informationViewList.add(
                 saveInformation.names[i] + ": " + saveInformation.getDisplayValue(i)
             )
+
+            mainTextGrid.add(TextView(requireContext()))
+            mainTextGrid[i].setText(informationViewList[i])
+            mainTextGrid[i].textSize = 18f
+            mainTextGrid[i].textAlignment = TextView.TEXT_ALIGNMENT_TEXT_START
+            mainTextGrid[i].id = View.generateViewId()
+
+            var layoutParams : ConstraintLayout.LayoutParams = ConstraintLayout.LayoutParams(
+                resources.displayMetrics.widthPixels/2, // width
+                ConstraintLayout.LayoutParams.WRAP_CONTENT
+            )
+            mainTextGrid[i].layoutParams = layoutParams
+
+            mainTextGrid[i].setOnClickListener {
+                if (saveInformation.formats[i] == SaveInformation.InformationFormat.checkBox) {
+                    saveInformation.toggleBox(i)
+                    saveDailyInformationFile()
+                    reloadMainReminders()
+                } else {
+                    showInputDialog(i, saveInformation.names[i] + ": ")
+                }
+            }
+
+            mainGridLayout.addView(mainTextGrid[i])
         }
-
-        val adapter = ArrayAdapter(requireContext(), R.layout.simple_list_item_1, informationViewList)
-        _binding.mainReminders.adapter = adapter
-
-        reloadGridSize()
     }
 
     /** Reloads the reminders input section */
@@ -409,6 +412,10 @@ class HomeFragment : Fragment() {
         }
 
         reloadMainReminders()
+        if (!initialSetupDone) {
+            homeScrollView.smoothScrollTo(0, 0)
+            initialSetupDone = true
+        }
     }
 
     override fun onDestroyView() {
