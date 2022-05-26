@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -21,6 +22,7 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.core.view.marginRight
 import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -149,14 +151,19 @@ class HomeFragment : Fragment() {
 
             mainTextGrid.add(TextView(requireContext()))
             mainTextGrid[i].setText(informationViewList[i])
-            mainTextGrid[i].textSize = 18f
+            mainTextGrid[i].textSize = 20f
+            mainTextGrid[i].setTextColor(Color.BLACK)
             mainTextGrid[i].textAlignment = TextView.TEXT_ALIGNMENT_TEXT_START
+            mainTextGrid[i].minHeight = 30
             mainTextGrid[i].id = View.generateViewId()
 
             var layoutParams : ConstraintLayout.LayoutParams = ConstraintLayout.LayoutParams(
                 resources.displayMetrics.widthPixels/2, // width
-                ConstraintLayout.LayoutParams.WRAP_CONTENT
+                ConstraintLayout.LayoutParams.WRAP_CONTENT,
             )
+            layoutParams.topMargin = 5
+            layoutParams.leftMargin = 3
+            layoutParams.bottomMargin = 20
             mainTextGrid[i].layoutParams = layoutParams
 
             mainTextGrid[i].setOnClickListener {
