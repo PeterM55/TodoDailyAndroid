@@ -28,6 +28,7 @@ var todoLists : TodoLists? = null // only used in to-do section, but kept in mem
 val dailyInformationFile = File("/data/data/peter.mitchell.tododaily/files/dailyInformation.txt")
 val tempFile = File("/data/data/peter.mitchell.tododaily/files/tempDailyInformation.txt")
 val notificationsFile = File("/data/data/peter.mitchell.tododaily/files/dailyNotifications.txt")
+val nextNotificationIntentFile = File("/data/data/peter.mitchell.tododaily/files/nextNotificationIntent.txt")
 val settingsFile = File("/data/data/peter.mitchell.tododaily/files/settings.txt")
 val todosFile = File("/data/data/peter.mitchell.tododaily/files/todos.txt")
 //val exportFileName = "/storage/emulated/0/Download/dailyInformationExport.txt"

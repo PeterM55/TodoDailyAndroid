@@ -2,6 +2,7 @@ package peter.mitchell.tododaily.ui.notifications
 
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import kotlinx.android.synthetic.main.new_notification.*
@@ -38,9 +39,10 @@ class NewNotification : AppCompatActivity() {
             if (oneTimeNotification) {
 
                 //val notificationDate : LocalDate = LocalDate.of(datePicker.year, datePicker.month, datePicker.dayOfMonth)
-                val notificationDateTime : LocalDateTime = LocalDateTime.of(LocalDate.of(datePicker.year, datePicker.month, datePicker.dayOfMonth),notificationTime)
+                val notificationDateTime : LocalDateTime = LocalDateTime.of(LocalDate.of(datePicker.year, datePicker.month+1, datePicker.dayOfMonth),notificationTime)
 
                 if (notificationDateTime.isBefore(LocalDateTime.now())) {
+                    Log.i("newNotificationSubmitButton", "${notificationDateTime} is before: ${LocalDateTime.now()}")
                     return@setOnClickListener
                 }
 

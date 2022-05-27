@@ -6,10 +6,14 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Parcel
 import android.util.Log
 import android.widget.Toast
 import peter.mitchell.tododaily.HelperClasses.TodoDailyNotification
+import peter.mitchell.tododaily.dailyInformationFile
 import peter.mitchell.tododaily.dailyNotifications
+import peter.mitchell.tododaily.nextNotificationIntentFile
+import peter.mitchell.tododaily.saveInformation
 import java.lang.StringBuilder
 import java.time.*
 
@@ -19,17 +23,10 @@ class DailyNotifications(context : Context) {
 
     lateinit var alarmManager : AlarmManager
 
-    var nextNotificationID = 0
-
-    var notificationIndex = 0
-    var notificationTimes : ArrayList<LocalTime> = ArrayList()
-    var notificationTitles : ArrayList<String> = ArrayList()
-    var notificationDescriptions : ArrayList<String> = ArrayList()
-
     private val channelName = "dailyNotificationChannel"
     private val channelDescription = "The channel for sending daily notifications"
 
-    public val testString = "daily notifications string"
+    private var scheduledNotificationIntent : PendingIntent? = null
 
     init {
         val channel = NotificationChannel(channelID, channelName, NotificationManager.IMPORTANCE_DEFAULT)
@@ -39,39 +36,14 @@ class DailyNotifications(context : Context) {
 
         alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-        if (alarmManager.nextAlarmClock != null)
+        if (alarmManager.nextAlarmClock != null) {
             Toast.makeText(context, "Next alarm in: ${(alarmManager.nextAlarmClock.triggerTime-System.currentTimeMillis())/1000} seconds", Toast.LENGTH_SHORT).show()
+            Log.i("DailyNotifications", "Next alarm at: ${(LocalDateTime.ofEpochSecond(alarmManager.nextAlarmClock.triggerTime/1000,
+                (alarmManager.nextAlarmClock.triggerTime%1000).toInt(), ZoneId.systemDefault().rules.getOffset(Instant.now())).toString())}")
+        } else {
+            Log.i("DailyNotifications", "no alarm scheduled")
+        }
     }
-
-    public fun createNotification(context : Context, time : LocalTime) {
-
-        // this is the intent that is run
-        val intent = Intent(context, TodoDailyNotification::class.java)
-
-            // this sets a pending intent?
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            notificationIndex++,
-            intent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
-
-        // Set an alarm to start the intent
-        //val time = System.currentTimeMillis()+3000;
-        //val timeToTimer : Long = time.toEpochSecond(LocalDate.now(), ZoneId.systemDefault().rules.getOffset(Instant.now()))
-        val testTime : LocalDateTime = time.atDate(LocalDate.now())
-        val timeToTimer : Long = testTime.toEpochSecond(ZoneId.systemDefault().rules.getOffset(Instant.now()))*1000
-
-
-        //val timeToTimer = System.currentTimeMillis()+3000;
-        alarmManager.setAndAllowWhileIdle(//setExactAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP,
-            timeToTimer,
-            pendingIntent
-        )
-    }
-
-
 
     var dailyNotificationsLength = 0
     var dailyNotificationNames : ArrayList<String> = ArrayList()
@@ -99,6 +71,14 @@ class DailyNotifications(context : Context) {
         oneTimeNotificationTitles.add(title)
         oneTimeNotificationDescriptions.add(desc)
         oneTimeNotificationsLength++
+    }
+
+    fun removeOneTimeNotification(i : Int) {
+        oneTimeNotificationNames.removeAt(i)
+        oneTimeNotificationTimes.removeAt(i)
+        oneTimeNotificationTitles.removeAt(i)
+        oneTimeNotificationDescriptions.removeAt(i)
+        oneTimeNotificationsLength--
     }
 
     fun totalLength() : Int {
@@ -160,7 +140,6 @@ class DailyNotifications(context : Context) {
                     } else if (j%4 == 3) {
                         dailyNotificationDescriptions.add(currentString.toString().replace("\"\"", "\""))
                         dailyNotificationsLength++
-                        j++
                     }
 
                 } else {
@@ -174,7 +153,6 @@ class DailyNotifications(context : Context) {
                     } else if (j%4 == 3) {
                         oneTimeNotificationDescriptions.add(currentString.toString().replace("\"\"", "\""))
                         oneTimeNotificationsLength++
-                        j++
                     }
 
                 }
@@ -201,4 +179,137 @@ class DailyNotifications(context : Context) {
         return returnString.toString()
     }
 
+    /**
+     * This should be the ONLY FUNCTION creating and destroying alarms (notifications)
+     * All others should queue ones, then call this one.
+     */
+    public fun refreshNotifications(context : Context) {
+
+        if (dailyNotificationsLength == 0 && oneTimeNotificationsLength == 0)
+            return
+
+        deletePastOneTimeAlarms()
+
+        // --- set a couple constants ---
+
+        // this is the intent that is run
+        val notificationIntent = Intent(context, TodoDailyNotification::class.java)
+
+        // --- Get the currently scheduled notification, and delete it ---
+        if (scheduledNotificationIntent == null && nextNotificationIntentFile.exists()) {
+            val fileText = nextNotificationIntentFile.readText()
+            if (!fileText.isNullOrEmpty()) {
+                val previousIntent = PendingIntent.getBroadcast(
+                    context,
+                    fileText.toInt(),
+                    notificationIntent,
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                )
+
+                alarmManager.cancel(previousIntent)
+            }
+        }
+
+        // --- Get the next notification to schedule ---
+        var nextNotification : LocalDateTime? = null
+        var notificationIndex : Int = 0
+
+        for (i in 0 until oneTimeNotificationsLength) {
+
+            if (nextNotification == null || nextNotification.isAfter(oneTimeNotificationTimes[i])) {
+                nextNotification = oneTimeNotificationTimes[i]
+                notificationIndex = i+dailyNotificationsLength
+            }
+
+        }
+
+        for (i in 0 until dailyNotificationsLength) {
+
+            var tempDateTime : LocalDateTime = LocalDateTime.of(LocalDate.now(), dailyNotificationTimes[i])
+            if (tempDateTime.isBefore(LocalDateTime.now())) {
+                tempDateTime = LocalDateTime.of(LocalDate.now().plusDays(1), dailyNotificationTimes[i])
+            }
+
+            if (nextNotification == null || nextNotification.isAfter(tempDateTime)) {
+                nextNotification = tempDateTime
+                notificationIndex = i
+            }
+
+        }
+
+        // --- Schedule the next notification ---
+        if (nextNotification == null) return
+
+        // this sets a pending intent?
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            notificationIndex,
+            notificationIntent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        var timeToTimer = nextNotification.toEpochSecond(ZoneId.systemDefault().rules.getOffset(Instant.now()))*1000
+
+        alarmManager.setAndAllowWhileIdle(//(setExactAndAllowWhileIdle
+            AlarmManager.RTC_WAKEUP,
+            timeToTimer,
+            pendingIntent
+        )
+
+        Toast.makeText(context, "Next alarm in: ${(timeToTimer-System.currentTimeMillis())/1000} seconds", Toast.LENGTH_SHORT).show()
+
+        // --- Save next intent to file ---
+        if (!nextNotificationIntentFile.exists()) {
+            nextNotificationIntentFile.parentFile!!.mkdirs()
+            nextNotificationIntentFile.createNewFile()
+        }
+
+        nextNotificationIntentFile.writeText(notificationIndex.toString())
+
+    }
+
+    fun deletePastOneTimeAlarms() {
+
+        var i : Int = 0
+
+        while(i < oneTimeNotificationsLength) {
+
+            if (oneTimeNotificationTimes[i].isBefore(LocalDateTime.now())) {
+                removeOneTimeNotification(i)
+            }
+
+        }
+    }
+
 }
+
+
+/*
+public fun createNotification(context : Context, time : LocalTime) {
+
+        // this is the intent that is run
+        val intent = Intent(context, TodoDailyNotification::class.java)
+
+            // this sets a pending intent?
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            notificationIndex++,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        // Set an alarm to start the intent
+        //val time = System.currentTimeMillis()+3000;
+        //val timeToTimer : Long = time.toEpochSecond(LocalDate.now(), ZoneId.systemDefault().rules.getOffset(Instant.now()))
+        val testTime : LocalDateTime = time.atDate(LocalDate.now())
+        val timeToTimer : Long = testTime.toEpochSecond(ZoneId.systemDefault().rules.getOffset(Instant.now()))*1000
+
+
+        //val timeToTimer = System.currentTimeMillis()+3000;
+        alarmManager.setAndAllowWhileIdle(//setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            timeToTimer,
+            pendingIntent
+        )
+    }
+ */
