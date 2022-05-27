@@ -37,11 +37,11 @@
 
 
 
-        <GridView
+        <peter.mitchell.tododaily.HelperClasses.TextGridLayout
             android:id="@+id/oneTimeNotificationsGrid"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:numColumns="2"
+            android:columnCount="2"
 
             app:layout_constraintTop_toBottomOf="@+id/oneTimeNotificationsButton"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -84,11 +84,11 @@
 
             android:layout_marginLeft="10dp"/>
 
-        <GridView
+        <peter.mitchell.tododaily.HelperClasses.TextGridLayout
             android:id="@+id/dailyNotificationsGrid"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:numColumns="3"
+            android:columnCount="3"
 
             app:layout_constraintTop_toBottomOf="@+id/dailyNotificationsButton"
             app:layout_constraintLeft_toLeftOf="parent"

@@ -3,7 +3,9 @@ package peter.mitchell.tododaily.ui.notifications
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.view.isVisible
 import kotlinx.android.synthetic.main.new_notification.*
 import peter.mitchell.tododaily.R
@@ -42,23 +44,30 @@ class NewNotification : AppCompatActivity() {
                 val notificationDateTime : LocalDateTime = LocalDateTime.of(LocalDate.of(datePicker.year, datePicker.month+1, datePicker.dayOfMonth),notificationTime)
 
                 if (notificationDateTime.isBefore(LocalDateTime.now())) {
+                    Toast.makeText(this, "Date/time is in the past", Toast.LENGTH_SHORT).show()
                     Log.i("newNotificationSubmitButton", "${notificationDateTime} is before: ${LocalDateTime.now()}")
                     return@setOnClickListener
                 }
 
-                dailyNotifications.addOneTimeNotification(
+                if (!dailyNotifications.addOneTimeNotification(
                     notificationNameInput.text.toString(),
                     notificationDateTime,
                     notificationTitleInput.text.toString(),
                     notificationDescInput.text.toString()
-                )
+                )) {
+                    Toast.makeText(this, "Date/time already exists", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
             } else {
-                dailyNotifications.addDailyNotification(
+                if (!dailyNotifications.addDailyNotification(
                     notificationNameInput.text.toString(),
                     notificationTime,
                     notificationTitleInput.text.toString(),
                     notificationDescInput.text.toString()
-                )
+                )) {
+                    Toast.makeText(this, "Time already exists", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
             }
             saveNotifications()
 

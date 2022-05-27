@@ -135,7 +135,7 @@ class HomeFragment : Fragment() {
 
     /** Reloads the main reminders grid */
     private fun reloadMainReminders() {
-
+        mainGridLayout.reset()
         for (i in 0 until saveInformation.length) {
 
             mainGridLayout.addString(requireContext(), saveInformation.names[i] + ": " + saveInformation.getDisplayValue(i))

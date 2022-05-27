@@ -3,6 +3,7 @@ package peter.mitchell.tododaily.HelperClasses
 import android.content.Context
 import android.graphics.Color
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import android.widget.GridLayout
 import android.widget.TextView
@@ -10,6 +11,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContentProviderCompat.requireContext
 import kotlinx.android.synthetic.main.fragment_home.*
 import org.w3c.dom.Text
+import peter.mitchell.tododaily.dailyNotifications
 import peter.mitchell.tododaily.saveInformation
 
 class TextGridLayout @JvmOverloads constructor(
@@ -19,7 +21,7 @@ class TextGridLayout @JvmOverloads constructor(
     public var textGrid : ArrayList<TextView> = ArrayList<TextView>(25)
 
     private val layoutParams : ConstraintLayout.LayoutParams = ConstraintLayout.LayoutParams(
-        resources.displayMetrics.widthPixels/2, // width
+        resources.displayMetrics.widthPixels/2-8, // width
         ConstraintLayout.LayoutParams.WRAP_CONTENT,
     )
 
@@ -30,6 +32,13 @@ class TextGridLayout @JvmOverloads constructor(
         layoutParams.leftMargin = 3
         layoutParams.bottomMargin = 20
 
+    }
+
+    public fun reset() {
+        for (i in 0 until textGrid.size) {
+            this.removeView(textGrid[i])
+        }
+        textGrid.clear()
     }
 
     public fun addString(context : Context, str : String) {

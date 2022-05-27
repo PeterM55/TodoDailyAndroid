@@ -189,13 +189,13 @@ fun readNotifications() {
     }
 }
 
-fun saveNotifications() {
+fun saveNotifications(notificationSource : DailyNotifications = dailyNotifications) {
     if (!notificationsFile.exists()) {
         notificationsFile.parentFile!!.mkdirs()
         notificationsFile.createNewFile()
     }
 
-    notificationsFile.writeText(dailyNotifications.toString())
+    notificationsFile.writeText(notificationSource.toString())
 }
 
 /**

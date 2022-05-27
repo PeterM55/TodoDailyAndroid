@@ -21,7 +21,10 @@ import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import kotlinx.android.synthetic.main.fragment_home.*
+import kotlinx.android.synthetic.main.fragment_notifications.*
 import peter.mitchell.tododaily.*
+import peter.mitchell.tododaily.HelperClasses.SaveInformation
 import peter.mitchell.tododaily.databinding.FragmentNotificationsBinding
 import peter.mitchell.tododaily.ui.home.ManageDailyNotifications
 import java.time.*
@@ -83,36 +86,33 @@ class NotificationsFragment : Fragment() {
     }
 
     private fun reloadOneTimeNotifications() {
-        var adapterList = ArrayList<String>()
-
+        _binding.oneTimeNotificationsGrid.reset()
         for (i in 0 until dailyNotifications.oneTimeNotificationsLength) {
-            adapterList.add("${dailyNotifications.oneTimeNotificationTimes[i].toString()}: ${dailyNotifications.oneTimeNotificationNames[i]}")
-        }
+            _binding.oneTimeNotificationsGrid.addString(requireContext(), dailyNotifications.getOneTimeString(i))
 
-        val adapter = ArrayAdapter(requireContext(), R.layout.simple_list_item_1, adapterList)
-        _binding.dailyNotificationsGrid.adapter = adapter
+            _binding.oneTimeNotificationsGrid.textGrid[i].setOnClickListener {
+                Toast.makeText(requireContext(), "hi: $i", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun reloadDailyNotifications() {
-        var adapterList = ArrayList<String>()
-
+        _binding.dailyNotificationsGrid.reset()
         for (i in 0 until dailyNotifications.dailyNotificationsLength) {
             if (notificationsFullNameMode)
-                adapterList.add("${dailyNotifications.dailyNotificationTimes[i].toString()}: ${dailyNotifications.dailyNotificationNames[i]}")
+                _binding.dailyNotificationsGrid.addString(requireContext(), "${dailyNotifications.dailyNotificationTimes[i].toString()}: ${dailyNotifications.dailyNotificationNames[i]}")
             else
-                adapterList.add("${dailyNotifications.dailyNotificationTimes[i].toString()}")
+            _binding.dailyNotificationsGrid.addString(requireContext(), "${dailyNotifications.dailyNotificationTimes[i].toString()}")
         }
-
-        val adapter = ArrayAdapter(requireContext(), R.layout.simple_list_item_1, adapterList)
-        _binding.dailyNotificationsGrid.adapter = adapter
     }
 
     override fun onResume() {
         super.onResume()
-        reloadOneTimeNotifications()
-        reloadDailyNotifications()
 
         dailyNotifications.refreshNotifications(requireContext())
+
+        reloadOneTimeNotifications()
+        reloadDailyNotifications()
     }
 
     override fun onDestroyView() {

@@ -9,11 +9,8 @@ import android.content.Intent
 import android.os.Parcel
 import android.util.Log
 import android.widget.Toast
+import peter.mitchell.tododaily.*
 import peter.mitchell.tododaily.HelperClasses.TodoDailyNotification
-import peter.mitchell.tododaily.dailyInformationFile
-import peter.mitchell.tododaily.dailyNotifications
-import peter.mitchell.tododaily.nextNotificationIntentFile
-import peter.mitchell.tododaily.saveInformation
 import java.lang.StringBuilder
 import java.time.*
 
@@ -57,20 +54,42 @@ class DailyNotifications(context : Context) {
     var oneTimeNotificationTitles : ArrayList<String> = ArrayList()
     var oneTimeNotificationDescriptions : ArrayList<String> = ArrayList()
 
-    fun addDailyNotification(name : String, time : LocalTime, title : String, desc : String) {
+    fun addDailyNotification(name : String, time : LocalTime, title : String, desc : String) : Boolean {
+        for (i in 0 until dailyNotificationsLength) {
+            if (time == dailyNotificationTimes[i]) {
+                return false
+            }
+        }
+        for (i in 0 until oneTimeNotificationsLength) {
+            if (time == oneTimeNotificationTimes[i].toLocalTime()) {
+                return false
+            }
+        }
         dailyNotificationNames.add(name)
         dailyNotificationTimes.add(time)
         dailyNotificationTitles.add(title)
         dailyNotificationDescriptions.add(desc)
         dailyNotificationsLength++
+        return true
     }
 
-    fun addOneTimeNotification(name : String, time : LocalDateTime, title : String, desc : String) {
+    fun addOneTimeNotification(name : String, time : LocalDateTime, title : String, desc : String) : Boolean {
+        for (i in 0 until oneTimeNotificationsLength) {
+            if (time == oneTimeNotificationTimes[i]) {
+                return false
+            }
+        }
+        for (i in 0 until dailyNotificationsLength) {
+            if (time.toLocalTime() == dailyNotificationTimes[i]) {
+                return false
+            }
+        }
         oneTimeNotificationNames.add(name)
         oneTimeNotificationTimes.add(time)
         oneTimeNotificationTitles.add(title)
         oneTimeNotificationDescriptions.add(desc)
         oneTimeNotificationsLength++
+        return true
     }
 
     fun removeOneTimeNotification(i : Int) {
@@ -97,6 +116,10 @@ class DailyNotifications(context : Context) {
         oneTimeNotificationTimes = ArrayList()
         oneTimeNotificationTitles = ArrayList()
         oneTimeNotificationDescriptions = ArrayList()
+    }
+
+    public fun getOneTimeString(i : Int) : String {
+        return "${oneTimeNotificationNames[i]}: ${oneTimeNotificationTimes[i].toLocalDate().toString()} - ${oneTimeNotificationTimes[i].toLocalTime().toString()}"
     }
 
     public fun fromString(str : String) {
@@ -256,7 +279,7 @@ class DailyNotifications(context : Context) {
             pendingIntent
         )
 
-        Toast.makeText(context, "Next alarm in: ${(timeToTimer-System.currentTimeMillis())/1000} seconds", Toast.LENGTH_SHORT).show()
+        //Toast.makeText(context, "Next alarm in: ${(timeToTimer-System.currentTimeMillis())/1000} seconds", Toast.LENGTH_SHORT).show()
 
         // --- Save next intent to file ---
         if (!nextNotificationIntentFile.exists()) {
@@ -266,18 +289,23 @@ class DailyNotifications(context : Context) {
 
         nextNotificationIntentFile.writeText(notificationIndex.toString())
 
+        saveNotifications(this)
     }
 
     fun deletePastOneTimeAlarms() {
+
+        Log.i("-----", "Deleting past one times")
 
         var i : Int = 0
 
         while(i < oneTimeNotificationsLength) {
 
-            if (oneTimeNotificationTimes[i].isBefore(LocalDateTime.now())) {
+            if (!oneTimeNotificationTimes[i].isAfter(LocalDateTime.now())) {
+                Log.i("-----", "Deleting: ${oneTimeNotificationTimes[i]}")
                 removeOneTimeNotification(i)
             }
 
+            i++
         }
     }
 
