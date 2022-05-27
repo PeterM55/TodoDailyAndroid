@@ -86,7 +86,7 @@
                     app:layout_constraintLeft_toLeftOf="parent"
                     android:numColumns="2"
                     />-->
-                <GridLayout
+                <peter.mitchell.tododaily.HelperClasses.TextGridLayout
                     android:id="@+id/mainGridLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

@@ -46,7 +46,6 @@ class HomeFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding
 
-    private var mainTextGrid : ArrayList<TextView> = ArrayList<TextView>(25)
     private var initialSetupDone = false
 
     override fun onCreateView(
@@ -136,37 +135,12 @@ class HomeFragment : Fragment() {
 
     /** Reloads the main reminders grid */
     private fun reloadMainReminders() {
-        var informationViewList = ArrayList<String>()
 
-        for (i in 0 until mainTextGrid.size) {
-            mainGridLayout.removeView(mainTextGrid[i])
-        }
-        mainTextGrid.clear()
-
-        var heights : ArrayList<Int> = ArrayList(saveInformation.length)
         for (i in 0 until saveInformation.length) {
-            informationViewList.add(
-                saveInformation.names[i] + ": " + saveInformation.getDisplayValue(i)
-            )
 
-            mainTextGrid.add(TextView(requireContext()))
-            mainTextGrid[i].setText(informationViewList[i])
-            mainTextGrid[i].textSize = 18f
-            mainTextGrid[i].setTextColor(Color.BLACK)
-            mainTextGrid[i].textAlignment = TextView.TEXT_ALIGNMENT_TEXT_START
-            mainTextGrid[i].minHeight = 30
-            mainTextGrid[i].id = View.generateViewId()
+            mainGridLayout.addString(requireContext(), saveInformation.names[i] + ": " + saveInformation.getDisplayValue(i))
 
-            var layoutParams : ConstraintLayout.LayoutParams = ConstraintLayout.LayoutParams(
-                resources.displayMetrics.widthPixels/2, // width
-                ConstraintLayout.LayoutParams.WRAP_CONTENT,
-            )
-            layoutParams.topMargin = 5
-            layoutParams.leftMargin = 3
-            layoutParams.bottomMargin = 20
-            mainTextGrid[i].layoutParams = layoutParams
-
-            mainTextGrid[i].setOnClickListener {
+            mainGridLayout.textGrid[i].setOnClickListener {
                 if (saveInformation.formats[i] == SaveInformation.InformationFormat.checkBox) {
                     saveInformation.toggleBox(i)
                     saveDailyInformationFile()
@@ -175,8 +149,6 @@ class HomeFragment : Fragment() {
                     showInputDialog(i, saveInformation.names[i] + ": ")
                 }
             }
-
-            mainGridLayout.addView(mainTextGrid[i])
         }
     }
 
