@@ -54,10 +54,7 @@ class TextGridLayout @JvmOverloads constructor(
     }
 
     public fun setAdapter(context : Context, strings : ArrayList<String>) {
-        for (i in 0 until textGrid.size) {
-            this.removeView(textGrid[i])
-        }
-        textGrid.clear()
+        reset()
 
         for (i in 0 until strings.size) {
 

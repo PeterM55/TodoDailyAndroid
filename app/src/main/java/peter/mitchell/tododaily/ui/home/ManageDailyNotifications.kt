@@ -81,19 +81,14 @@ class ManageDailyNotifications : AppCompatActivity() {
 
         deleteAllMainRemindersButton.setOnClickListener {
 
-            manageMainReminders.onItemClickListener =
-                AdapterView.OnItemClickListener { _, _, position, _ ->
+            MaterialAlertDialogBuilder(this).setTitle("delete all titles?")
+                .setMessage("Would you like to delete all of today's items? (this will not remove the titles from any date but today)")
+                .setNegativeButton("Cancel") { dialog, which ->
 
-                    MaterialAlertDialogBuilder(this).setTitle("delete all titles?")
-                        .setMessage("Would you like to delete all of today's items? (this will not remove the titles from any date but today)")
-                        .setNegativeButton("Cancel") { dialog, which ->
-
-                        }.setPositiveButton("Delete") { dialog, which ->
-                            saveInformation.resetData()
-                            reloadCurrentTitles()
-                        }.show()
-                }
-
+                }.setPositiveButton("Delete") { dialog, which ->
+                    saveInformation.resetData()
+                    reloadCurrentTitles()
+                }.show()
         }
 
         toggleManageDatesButton.setOnClickListener {
@@ -106,18 +101,14 @@ class ManageDailyNotifications : AppCompatActivity() {
         }
 
         deleteAllDatesButton.setOnClickListener {
-            manageMainReminders.onItemClickListener =
-                AdapterView.OnItemClickListener { _, _, position, _ ->
+            MaterialAlertDialogBuilder(this).setTitle("delete all data?")
+                .setMessage("This will delete all saved data, except today.")
+                .setNegativeButton("Cancel") { dialog, which ->
 
-                    MaterialAlertDialogBuilder(this).setTitle("delete all data?")
-                        .setMessage("This will delete all saved data, except today.")
-                        .setNegativeButton("Cancel") { dialog, which ->
-
-                        }.setPositiveButton("Delete") { dialog, which ->
-                            deleteAllDates()
-                            setupDates()
-                        }.show()
-                }
+                }.setPositiveButton("Delete") { dialog, which ->
+                    deleteAllDates()
+                    setupDates()
+                }.show()
         }
 
         addDateButton.setOnClickListener {
@@ -148,6 +139,7 @@ class ManageDailyNotifications : AppCompatActivity() {
     }
 
     private fun reloadDynamicView() {
+        return
         // --- Dynamic view ---
         val extraSpace = 10
         var displayHeight = (resources.displayMetrics.heightPixels - (androidBarsSize+toolBarSize + 35 + 35 + 42 + 18 + extraSpace) * resources.displayMetrics.density).toInt()
@@ -190,30 +182,28 @@ class ManageDailyNotifications : AppCompatActivity() {
 
         for (i in 0 until saveInformation.length) {
             informationViewList.add("$i: "+saveInformation.names[i])
+
         }
 
-        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, informationViewList)
-        manageMainReminders.adapter = adapter
-        manageAllTitles.adapter = adapter
+        manageMainReminders.setAdapter(this, informationViewList)
+        manageAllTitles.setAdapter(this, informationViewList)
 
-        manageMainReminders.onItemClickListener =
-            AdapterView.OnItemClickListener { _, _, position, _ ->
-
+        for (i in 0 until informationViewList.size) {
+            manageMainReminders.textGrid[i].setOnClickListener {
                 MaterialAlertDialogBuilder(this).setTitle("delete entry from today?")
                     .setMessage("Would you like to delete this item? (this will not remove the title from any date but today)")
                     .setNegativeButton("Cancel") { dialog, which ->
 
                     }.setPositiveButton("Delete") { dialog, which ->
-                        saveInformation.deleteValue(position)
+                        saveInformation.deleteValue(i)
                         reloadCurrentTitles()
                     }.show()
             }
 
-        manageAllTitles.onItemClickListener =
-            AdapterView.OnItemClickListener { _, _, position, _ ->
-                showSortInputDialog(position)
+            manageAllTitles.textGrid[i].setOnClickListener {
+                showSortInputDialog(i)
             }
-
+        }
     }
 
     private fun reloadVisibilities() {
@@ -255,14 +245,13 @@ class ManageDailyNotifications : AppCompatActivity() {
     private fun setupDates() {
 
         val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, datesList)
-        manageDatesList.adapter = adapter
+        manageDatesList.setAdapter(this,datesList)
 
-        manageDatesList.onItemClickListener =
-            AdapterView.OnItemClickListener { _, _, position, _ ->
-
+        for (i in 0 until datesList.size) {
+            manageDatesList.setOnClickListener {
                 val title : String
                 val desc : String
-                if (position == 0) {
+                if (i == 0) {
                     title = "Are you sure?"
                     desc = "Delete will clear all of today's values and titles."
                 } else {
@@ -276,19 +265,20 @@ class ManageDailyNotifications : AppCompatActivity() {
                     .setNegativeButton("Cancel") { dialog, which ->
 
                     }.setPositiveButton("Delete") { dialog, which ->
-                        if (position == 0) {
+                        if (i == 0) {
                             saveInformation.resetData()
                             reloadCurrentTitles()
                             setupDates()
                             saveDailyInformationFile()
                         } else {
 
-                            deleteDate(position, deleteMultipleMode)
+                            deleteDate(i, deleteMultipleMode)
 
                             setupDates()
                         }
                     }.show()
             }
+        }
     }
 
     private fun deleteDate(dateIndex : Int, andAllAfter : Boolean) {

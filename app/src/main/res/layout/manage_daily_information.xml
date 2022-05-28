@@ -46,11 +46,12 @@
             android:minWidth="0dp"
             />
 
-        <GridView
+        <peter.mitchell.tododaily.HelperClasses.TextGridLayout
             android:id="@+id/manageMainReminders"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:numColumns="2"
+            android:columnCount="2"
             app:layout_constraintTop_toBottomOf="@id/deleteAllMainRemindersButton"
             app:layout_constraintLeft_toLeftOf="parent"
             />
@@ -87,11 +88,12 @@
             android:textSize="15dp"
             />-->
 
-        <GridView
+        <peter.mitchell.tododaily.HelperClasses.TextGridLayout
             android:id="@+id/manageAllTitles"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:numColumns="2"
+            android:columnCount="2"
             app:layout_constraintTop_toBottomOf="@id/toggleRearrangeTitles"
             app:layout_constraintLeft_toLeftOf="parent"
             />
@@ -154,11 +156,12 @@
             app:layout_constraintLeft_toLeftOf="parent"
             />
 
-        <GridView
+        <peter.mitchell.tododaily.HelperClasses.TextGridLayout
             android:id="@+id/manageDatesList"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:numColumns="3"
+            android:columnCount="3"
             app:layout_constraintTop_toBottomOf="@id/toggleManageDatesText"
             app:layout_constraintLeft_toLeftOf="parent"
             />
