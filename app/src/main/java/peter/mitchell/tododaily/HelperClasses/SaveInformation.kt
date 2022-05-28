@@ -4,10 +4,12 @@ import android.os.Build
 import android.text.InputType
 import android.util.Log
 import androidx.annotation.RequiresApi
+import peter.mitchell.tododaily.startOfWeek
 import java.lang.StringBuilder
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.*
+import kotlin.collections.ArrayList
 
 @RequiresApi(Build.VERSION_CODES.O)
 class SaveInformation {
@@ -25,6 +27,17 @@ class SaveInformation {
         "Text",
     )
 
+    enum class RepeatFormat {
+        Daily, Weekly, Monthly, Yearly, Never
+    }
+    public val RepeatFormatStrings : Array<String> = arrayOf(
+        "Daily",
+        "Weekly",
+        "Monthly",
+        "Yearly",
+        "Never"
+    )
+
     var date : LocalDate = LocalDate.now()
     var length : Int = 0
     var names : ArrayList<String> = ArrayList(10)
@@ -32,13 +45,16 @@ class SaveInformation {
     var formats : ArrayList<InformationFormat> = ArrayList(10)
     private var timeRead : ArrayList<Long> = ArrayList(10)
 
-    public fun addValue(name : String, infoFormat : InformationFormat) : Boolean {
+    var repeatTime : ArrayList<RepeatFormat> = ArrayList(10)
+
+    public fun addValue(name : String, infoFormat : InformationFormat, repeat : RepeatFormat = RepeatFormat.Daily) : Boolean {
         if (!verifyFormat("", infoFormat)) return false
 
         names.add(name)
         values.add("")
         formats.add(infoFormat)
         timeRead.add(0)
+        repeatTime.add(repeat)
         length++
         return true
     }
@@ -190,6 +206,34 @@ class SaveInformation {
         return str
     }
 
+    public fun repeatTimeEnumToString(repeatFormat: RepeatFormat) : String {
+        if (repeatFormat == RepeatFormat.Daily) {
+            return RepeatFormatStrings[0]
+        } else if (repeatFormat == RepeatFormat.Weekly) {
+            return RepeatFormatStrings[1]
+        } else if (repeatFormat == RepeatFormat.Monthly) {
+            return RepeatFormatStrings[2]
+        } else if (repeatFormat == RepeatFormat.Yearly) {
+            return RepeatFormatStrings[3]
+        } else { //(repeatFormat == RepeatFormat.Never)
+            return RepeatFormatStrings[4]
+        }
+    }
+
+    public fun repeatTimeStringToEnum(str: String) : RepeatFormat {
+        if (str == RepeatFormatStrings[0] || str == "") {
+            return RepeatFormat.Daily
+        } else if (str == RepeatFormatStrings[1]) {
+            return RepeatFormat.Weekly
+        } else if (str == RepeatFormatStrings[2]) {
+            return RepeatFormat.Monthly
+        } else if (str == RepeatFormatStrings[3]) {
+            return RepeatFormat.Yearly
+        } else { // (str == RepeatFormatStrings[4])
+            return RepeatFormat.Never
+        }
+    }
+
     public fun resetData() {
         date = LocalDate.now()
         length = 0
@@ -197,12 +241,23 @@ class SaveInformation {
         values = ArrayList(10)
         formats = ArrayList(10)
         timeRead = ArrayList(10)
+        repeatTime = ArrayList(10)
     }
 
-    public fun clearValues() {
+    public fun clearValues(purge : Boolean = false) {
         values = ArrayList(length+3)
         timeRead = ArrayList(length+3)
         for (i in 0 until length) {
+
+            if (
+                //repeatTime[i] == RepeatFormat.Daily ||
+                (repeatTime[i] == RepeatFormat.Weekly && date.dayOfWeek == startOfWeek) ||
+                (repeatTime[i] == RepeatFormat.Monthly && date.dayOfMonth == 1) ||
+                (repeatTime[i] == RepeatFormat.Yearly && date.dayOfYear == 1) ||
+                repeatTime[i] == RepeatFormat.Never
+            )
+                continue
+
             values.add("")
             timeRead.add(0)
         }
@@ -213,6 +268,7 @@ class SaveInformation {
         values.removeAt(i)
         formats.removeAt(i)
         timeRead.removeAt(i)
+        repeatTime.removeAt(i)
         length -= 1
     }
 
@@ -222,26 +278,8 @@ class SaveInformation {
         fromString(str)
 
         date = LocalDate.now()
-        for (i in 0 until length) {
-            values[i] = ""
-            timeRead[i] = 0
-        }
+        clearValues()
 
-        /*val splitLine = str.split(",")
-        var i : Int = 0
-
-        //date = LocalDate.parse(splitLine[i++])
-        i++
-
-        while (i+4 <= splitLine.size) {
-            names.add(splitLine[i++])
-            values.add("")
-            i++;
-            formats.add(informationFormatStringToEnum(splitLine[i++]))
-            timeRead.add(0)
-            i++;
-            length++
-        }*/
         return true
     }
 
@@ -253,6 +291,7 @@ class SaveInformation {
         var tempValue = values[i]
         var tempFormat = formats[i]
         var tempTimeRead = timeRead[i]
+        var tempRepeatTime = repeatTime[i]
 
         if (i < to) {
             for (j in i .. to) {
@@ -262,11 +301,13 @@ class SaveInformation {
                     values[j] = values[j+1]
                     formats[j] = formats[j+1]
                     timeRead[j] = timeRead[j+1]
+                    repeatTime[j] = repeatTime[j+1]
                 } else if (j == to) {
                     names[j] = tempName
                     values[j] = tempValue
                     formats[j] = tempFormat
                     timeRead[j] = tempTimeRead
+                    repeatTime[j] = tempRepeatTime
                 }
             }
         } else if (to < i) {
@@ -276,11 +317,13 @@ class SaveInformation {
                     values[j] = values[j-1]
                     formats[j] = formats[j-1]
                     timeRead[j] = timeRead[j-1]
+                    repeatTime[j] = repeatTime[j-1]
                 } else if (j == to) {
                     names[j] = tempName
                     values[j] = tempValue
                     formats[j] = tempFormat
                     timeRead[j] = tempTimeRead
+                    repeatTime[j] = tempRepeatTime
                 }
             }
         }
@@ -296,11 +339,14 @@ class SaveInformation {
         formats.removeAt(i)
         var tempTimeRead = timeRead[i]
         timeRead.removeAt(i)
+        var tempRepeatTime = repeatTime[i]
+        repeatTime.removeAt(i)
 
         names.add(tempName)
         values.add(tempValue)
         formats.add(tempFormat)
         timeRead.add(tempTimeRead)
+        repeatTime.add(tempRepeatTime)
     }
 
     public fun fromString(str : String) : Boolean {
@@ -344,7 +390,17 @@ class SaveInformation {
                     values.add(currentString.toString().replace("\"\"", "\""))
 
                 } else if (j%5 == 3) {
-                    formats.add(informationFormatStringToEnum(currentString.toString()))
+
+                    var splitString = currentString.toString().split("-")
+                    if (splitString.size > 1) {
+                        Log.i("-----", "${splitString[0]}")
+                        formats.add(informationFormatStringToEnum(splitString[0]))
+                        repeatTime.add(repeatTimeStringToEnum(splitString[1]))
+                    } else {
+                        repeatTime.add(repeatTimeStringToEnum(""))
+                        formats.add(informationFormatStringToEnum(currentString.toString()))
+                    }
+
                 } else if (j%5 == 4) {
                     timeRead.add(currentString.toString().toLong())
                     j++
@@ -378,9 +434,9 @@ class SaveInformation {
 
         for (i in 0 until length) {
             if (formats[i] == InformationFormat.text) {
-                returnStr.append("${names[i]},\"${values[i].replace("\"","\"\"").replace("\n"," ")}\",${informationFormatEnumToString(formats[i])},${timeRead[i]},")
+                returnStr.append("${names[i]},\"${values[i].replace("\"","\"\"").replace("\n"," ")}\",${informationFormatEnumToString(formats[i])}-${repeatTimeEnumToString(repeatTime[i])},${timeRead[i]},")
             } else {
-                returnStr.append("${names[i]},${values[i]},${informationFormatEnumToString(formats[i])},${timeRead[i]},")
+                returnStr.append("${names[i]},${values[i]},${informationFormatEnumToString(formats[i])}-${repeatTimeEnumToString(repeatTime[i])},${timeRead[i]},")
             }
         }
 

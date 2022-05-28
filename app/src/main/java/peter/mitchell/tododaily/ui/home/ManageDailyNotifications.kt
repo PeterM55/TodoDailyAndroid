@@ -139,8 +139,8 @@ class ManageDailyNotifications : AppCompatActivity() {
             }
 
             if (!done) {
-                saveInformation.clearValues()
                 saveInformation.date = newDate
+                saveInformation.clearValues()
                 saveDailyInformationFile()
             }
         }

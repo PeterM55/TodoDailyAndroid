@@ -28,6 +28,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.fragment_home.*
 import peter.mitchell.tododaily.*
 import peter.mitchell.tododaily.HelperClasses.SaveInformation
+import peter.mitchell.tododaily.HelperClasses.TextGridLayout
 import peter.mitchell.tododaily.databinding.FragmentHomeBinding
 import java.io.File
 import java.time.LocalDate
@@ -89,6 +90,12 @@ class HomeFragment : Fragment() {
             saveInformation.informationFormatStrings
         )
 
+        _binding.newReminderTime.adapter = ArrayAdapter(
+            requireContext(),
+            R.layout.simple_list_item_1,
+            arrayOf<String>("Daily", "Weekly", "Monthly", "Yearly", "Never")
+        )
+
         _binding.newReminderButton.setOnClickListener {
             addingNew = true
             reloadReminderInput()
@@ -100,7 +107,8 @@ class HomeFragment : Fragment() {
         _binding.confirmReminderButton.setOnClickListener {
             saveInformation.addValue(
                 _binding.newReminderName.text.toString(),
-                saveInformation.informationFormatStringToEnum(_binding.newReminderInput.selectedItem.toString())
+                saveInformation.informationFormatStringToEnum(_binding.newReminderInput.selectedItem.toString()),
+                saveInformation.repeatTimeStringToEnum(_binding.newReminderTime.selectedItem.toString())
             )
             addingNew = false
             saveDailyInformationFile()
@@ -136,11 +144,37 @@ class HomeFragment : Fragment() {
     /** Reloads the main reminders grid */
     private fun reloadMainReminders() {
         mainGridLayout.reset()
+        weeklyGridLayout.reset()
+        monthlyGridLayout.reset()
+        yearlyGridLayout.reset()
+        neverGridLayout.reset()
+
+        var eachCount : Array<Int> = arrayOf(0,0,0,0,0)
         for (i in 0 until saveInformation.length) {
 
-            mainGridLayout.addString(requireContext(), saveInformation.names[i] + ": " + saveInformation.getDisplayValue(i))
+            var textGridLayout : TextGridLayout
+            var currentIndex : Int = 0
 
-            mainGridLayout.textGrid[i].setOnClickListener {
+            if (saveInformation.repeatTime[i] == SaveInformation.RepeatFormat.Daily) {
+                textGridLayout = mainGridLayout
+                currentIndex = eachCount[0]++
+            } else if (saveInformation.repeatTime[i] == SaveInformation.RepeatFormat.Weekly) {
+                textGridLayout = weeklyGridLayout
+                currentIndex = eachCount[1]++
+            } else if (saveInformation.repeatTime[i] == SaveInformation.RepeatFormat.Monthly) {
+                textGridLayout = monthlyGridLayout
+                currentIndex = eachCount[2]++
+            } else if (saveInformation.repeatTime[i] == SaveInformation.RepeatFormat.Yearly) {
+                textGridLayout = yearlyGridLayout
+                currentIndex = eachCount[3]++
+            } else { // (saveInformation.repeatTime[i] == SaveInformation.RepeatFormat.Never)
+                textGridLayout = neverGridLayout
+                currentIndex = eachCount[4]++
+            }
+
+            textGridLayout.addString(requireContext(), saveInformation.names[i] + ": " + saveInformation.getDisplayValue(i))
+
+            textGridLayout.textGrid[currentIndex].setOnClickListener {
                 if (saveInformation.formats[i] == SaveInformation.InformationFormat.checkBox) {
                     saveInformation.toggleBox(i)
                     saveDailyInformationFile()
@@ -150,6 +184,22 @@ class HomeFragment : Fragment() {
                 }
             }
         }
+
+        dailyInformationTitle.isVisible = (eachCount[0] > 0)
+        mainGridLayout.isVisible = (eachCount[0] > 0)
+
+        weeklyInformationTitle.isVisible = (eachCount[1] > 0)
+        weeklyGridLayout.isVisible = (eachCount[1] > 0)
+
+        monthlyInformationTitle.isVisible = (eachCount[2] > 0)
+        monthlyGridLayout.isVisible = (eachCount[2] > 0)
+
+        yearlyInformationTitle.isVisible = (eachCount[3] > 0)
+        yearlyGridLayout.isVisible = (eachCount[3] > 0)
+
+        neverInformationTitle.isVisible = (eachCount[4] > 0)
+        neverGridLayout.isVisible = (eachCount[4] > 0)
+
     }
 
     /** Reloads the reminders input section */
@@ -157,14 +207,16 @@ class HomeFragment : Fragment() {
         if (addingNew) {
             _binding.newReminderName.visibility = View.VISIBLE
             _binding.newReminderInput.visibility = View.VISIBLE
-            _binding.confirmReminderButton.visibility = View.VISIBLE
             _binding.cancelReminderButton.visibility = View.VISIBLE
+            _binding.confirmReminderButton.visibility = View.VISIBLE
+            _binding.newReminderTime.visibility = View.VISIBLE
             _binding.newReminderButton.visibility = View.GONE
         } else {
             _binding.newReminderName.visibility = View.GONE
             _binding.newReminderInput.visibility = View.GONE
-            _binding.confirmReminderButton.visibility = View.GONE
             _binding.cancelReminderButton.visibility = View.GONE
+            _binding.confirmReminderButton.visibility = View.GONE
+            _binding.newReminderTime.visibility = View.GONE
             _binding.newReminderButton.visibility = View.VISIBLE
 
             _binding.newReminderName.setText("")

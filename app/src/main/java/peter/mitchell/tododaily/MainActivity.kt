@@ -16,6 +16,7 @@ import peter.mitchell.tododaily.HelperClasses.SaveInformation
 import peter.mitchell.tododaily.HelperClasses.TodoLists
 import peter.mitchell.tododaily.ui.notifications.DailyNotifications
 import java.io.File
+import java.time.DayOfWeek
 import java.time.LocalDate
 
 var saveInformation : SaveInformation = SaveInformation()
@@ -41,6 +42,7 @@ const val toolBarSize : Int = 47
 // ----- Settings -----
 var settingsRead = false
 var notificationsFullNameMode = false
+var startOfWeek : DayOfWeek = DayOfWeek.MONDAY
 
 
 class MainActivity : AppCompatActivity() {
@@ -75,8 +77,6 @@ class MainActivity : AppCompatActivity() {
  * opening and recording. So the save time is less important than read time.
  */
 fun saveDailyInformationFile() {
-
-    Log.i("--5--", "Date: ${saveInformation.date.toString()}")
 
     if (!dailyInformationFile.exists()) {
         dailyInformationFile.parentFile!!.mkdirs()
