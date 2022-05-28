@@ -43,6 +43,7 @@ const val toolBarSize : Int = 47
 var settingsRead = false
 var notificationsFullNameMode = false
 var startOfWeek : DayOfWeek = DayOfWeek.MONDAY
+var darkMode = true
 
 
 class MainActivity : AppCompatActivity() {

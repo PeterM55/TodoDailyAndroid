@@ -1,6 +1,8 @@
 package peter.mitchell.tododaily.HelperClasses
 
 import android.content.Context
+import android.content.res.ColorStateList
+import android.content.res.XmlResourceParser
 import android.graphics.Color
 import android.util.AttributeSet
 import android.util.Log
@@ -11,7 +13,10 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContentProviderCompat.requireContext
 import kotlinx.android.synthetic.main.fragment_home.*
 import org.w3c.dom.Text
+import org.xmlpull.v1.XmlPullParser
+import peter.mitchell.tododaily.R
 import peter.mitchell.tododaily.dailyNotifications
+import peter.mitchell.tododaily.darkMode
 import peter.mitchell.tododaily.saveInformation
 
 class TextGridLayout @JvmOverloads constructor(
@@ -50,6 +55,13 @@ class TextGridLayout @JvmOverloads constructor(
         textGrid[textGrid.size-1].minHeight = 30
         textGrid[textGrid.size-1].id = View.generateViewId()
         textGrid[textGrid.size-1].layoutParams = layoutParams
+
+        if (darkMode)
+            textGrid[textGrid.size-1].setTextColor(resources.getColor(R.color.textDark))
+        else
+            textGrid[textGrid.size-1].setTextColor(resources.getColor(R.color.textLight))
+
+
         this.addView(textGrid[textGrid.size-1])
     }
 
@@ -66,6 +78,12 @@ class TextGridLayout @JvmOverloads constructor(
             textGrid[i].minHeight = 30
             textGrid[i].id = View.generateViewId()
             textGrid[i].layoutParams = layoutParams
+
+            if (darkMode)
+                textGrid[textGrid.size-1].setTextColor(resources.getColor(R.color.textDark))
+            else
+                textGrid[textGrid.size-1].setTextColor(resources.getColor(R.color.textLight))
+
             this.addView(textGrid[i])
 
         }

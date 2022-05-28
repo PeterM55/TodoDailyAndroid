@@ -245,21 +245,21 @@ class SaveInformation {
     }
 
     public fun clearValues(purge : Boolean = false) {
-        values = ArrayList(length+3)
-        timeRead = ArrayList(length+3)
+        //values = ArrayList(length+3)
+        //timeRead = ArrayList(length+3)
         for (i in 0 until length) {
 
             if (
                 //repeatTime[i] == RepeatFormat.Daily ||
-                (repeatTime[i] == RepeatFormat.Weekly && date.dayOfWeek == startOfWeek) ||
-                (repeatTime[i] == RepeatFormat.Monthly && date.dayOfMonth == 1) ||
-                (repeatTime[i] == RepeatFormat.Yearly && date.dayOfYear == 1) ||
+                (repeatTime[i] == RepeatFormat.Weekly && date.dayOfWeek != startOfWeek) ||
+                (repeatTime[i] == RepeatFormat.Monthly && date.dayOfMonth != 1) ||
+                (repeatTime[i] == RepeatFormat.Yearly && date.dayOfYear != 1) ||
                 repeatTime[i] == RepeatFormat.Never
             )
                 continue
 
-            values.add("")
-            timeRead.add(0)
+            values[i] = ("")
+            timeRead[i] = 0
         }
     }
 
@@ -393,7 +393,6 @@ class SaveInformation {
 
                     var splitString = currentString.toString().split("-")
                     if (splitString.size > 1) {
-                        Log.i("-----", "${splitString[0]}")
                         formats.add(informationFormatStringToEnum(splitString[0]))
                         repeatTime.add(repeatTimeStringToEnum(splitString[1]))
                     } else {

@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.home.HomeFragment">
+    tools:context=".ui.home.HomeFragment"
+    android:background="@color/backgroundDark">
 
     <ScrollView
         android:id="@+id/homeScrollView"
@@ -74,7 +75,7 @@
 
                     android:text="Daily"
                     android:textSize="21dp"
-                    android:textColor="@color/black"
+                    android:textColor="@color/textDark"
 
                     app:layout_constraintTop_toBottomOf="@+id/dailyInformationTopBar"
                     app:layout_constraintLeft_toLeftOf="parent"
@@ -108,7 +109,7 @@
 
                     android:text="Weekly"
                     android:textSize="21dp"
-                    android:textColor="@color/black"
+                    android:textColor="@color/textDark"
 
                     app:layout_constraintTop_toBottomOf="@+id/mainGridLayout"
                     app:layout_constraintLeft_toLeftOf="parent"
@@ -134,7 +135,7 @@
 
                     android:text="Monthly"
                     android:textSize="21dp"
-                    android:textColor="@color/black"
+                    android:textColor="@color/textDark"
 
                     app:layout_constraintTop_toBottomOf="@+id/weeklyGridLayout"
                     app:layout_constraintLeft_toLeftOf="parent"
@@ -161,7 +162,7 @@
 
                     android:text="Yearly"
                     android:textSize="21dp"
-                    android:textColor="@color/black"
+                    android:textColor="@color/textDark"
 
                     app:layout_constraintTop_toBottomOf="@+id/monthlyGridLayout"
                     app:layout_constraintLeft_toLeftOf="parent"
@@ -188,7 +189,7 @@
 
                     android:text="Never"
                     android:textSize="21dp"
-                    android:textColor="@color/black"
+                    android:textColor="@color/textDark"
 
                     app:layout_constraintTop_toBottomOf="@+id/yearlyGridLayout"
                     app:layout_constraintLeft_toLeftOf="parent"
@@ -212,6 +213,7 @@
                     android:layout_width="200dp"
                     android:layout_height="60dp"
                     android:hint="Information Name"
+                    android:textColor="@color/textDark"
                     app:layout_constraintTop_toBottomOf="@+id/neverGridLayout"
                     app:layout_constraintLeft_toLeftOf="parent"
                     android:paddingStart="15dp"
@@ -224,6 +226,7 @@
                     android:layout_height="60dp"
                     app:layout_constraintTop_toBottomOf="@+id/neverGridLayout"
                     app:layout_constraintLeft_toRightOf="@id/newReminderName"
+                    android:textColor="@color/textDark"
                     android:paddingEnd="15dp"
                     android:spinnerMode="dropdown"
                     />
@@ -268,6 +271,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/newReminderInput"
                     app:layout_constraintLeft_toRightOf="@id/confirmReminderButton"
                     app:layout_constraintRight_toRightOf="parent"
+                    android:textColor="@color/textDark"
                     android:paddingEnd="15dp"
                     android:spinnerMode="dropdown"
                     />

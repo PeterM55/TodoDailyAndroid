@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="5dp">
+    android:padding="5dp"
+    android:background="@color/backgroundDark">
 
     <!--<androidx.constraintlayout.widget.ConstraintLayout
         android:layout_height="match_parent"
@@ -22,6 +23,7 @@
                 android:layout_height="wrap_content"
                 android:text="Notification Name: "
                 android:textSize="20dp"
+                android:textColor="@color/textDark"
 
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -33,6 +35,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:hint="Notification name"
+                android:textColor="@color/textDark"
+                android:textColorHint="@color/textDark"
 
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
@@ -49,6 +53,7 @@
                 android:layout_height="wrap_content"
                 android:text="Repeat daily?: "
                 android:textSize="20dp"
+                android:textColor="@color/textDark"
 
                 android:gravity="center_vertical"/>
 
@@ -68,6 +73,7 @@
                 android:layout_height="wrap_content"
                 android:text="Notification Title: "
                 android:textSize="20dp"
+                android:textColor="@color/textDark"
 
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -79,6 +85,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:hint="Notification title"
+                android:textColor="@color/textDark"
+                android:textColorHint="@color/textDark"
 
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
@@ -95,6 +103,7 @@
                 android:layout_height="wrap_content"
                 android:text="Notification Desc.: "
                 android:textSize="20dp"
+                android:textColor="@color/textDark"
 
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -106,6 +115,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:hint="Notification description"
+                android:textColor="@color/textDark"
+                android:textColorHint="@color/textDark"
 
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
@@ -118,13 +129,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
+            android:calendarTextColor="@color/textDark"
+            android:background="@color/white"
             />
 
         <TimePicker
             android:id="@+id/timePicker"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"/>
+            android:layout_gravity="center_horizontal"
+            android:numbersTextColor="@color/textDark"
+            android:background="@color/white"/>
 
         <Button
             android:id="@+id/newNotificationSubmitButton"
