@@ -25,7 +25,7 @@ class TextGridLayout @JvmOverloads constructor(
 
     public var textGrid : ArrayList<TextView> = ArrayList<TextView>(25)
 
-    private val layoutParams : ConstraintLayout.LayoutParams = ConstraintLayout.LayoutParams(
+    private val textLayoutParams : ConstraintLayout.LayoutParams = ConstraintLayout.LayoutParams(
         resources.displayMetrics.widthPixels/2-8, // width
         ConstraintLayout.LayoutParams.WRAP_CONTENT,
     )
@@ -33,9 +33,9 @@ class TextGridLayout @JvmOverloads constructor(
     init {
 
         // setup layoutParams
-        layoutParams.topMargin = 5
-        layoutParams.leftMargin = 3
-        layoutParams.bottomMargin = 20
+        textLayoutParams.topMargin = 5
+        textLayoutParams.leftMargin = 3
+        textLayoutParams.bottomMargin = 20
 
     }
 
@@ -54,7 +54,7 @@ class TextGridLayout @JvmOverloads constructor(
         textGrid[textGrid.size-1].textAlignment = TextView.TEXT_ALIGNMENT_TEXT_START
         textGrid[textGrid.size-1].minHeight = 30
         textGrid[textGrid.size-1].id = View.generateViewId()
-        textGrid[textGrid.size-1].layoutParams = layoutParams
+        textGrid[textGrid.size-1].layoutParams = textLayoutParams
 
         if (darkMode)
             textGrid[textGrid.size-1].setTextColor(resources.getColor(R.color.textDark))
