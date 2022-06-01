@@ -33,13 +33,13 @@ class DailyNotifications(context : Context) {
 
         alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-        if (alarmManager.nextAlarmClock != null) {
+        /*if (alarmManager.nextAlarmClock != null) {
             Toast.makeText(context, "Next alarm in: ${(alarmManager.nextAlarmClock.triggerTime-System.currentTimeMillis())/1000} seconds", Toast.LENGTH_SHORT).show()
             Log.i("DailyNotifications", "Next alarm at: ${(LocalDateTime.ofEpochSecond(alarmManager.nextAlarmClock.triggerTime/1000,
                 (alarmManager.nextAlarmClock.triggerTime%1000).toInt(), ZoneId.systemDefault().rules.getOffset(Instant.now())).toString())}")
         } else {
             Log.i("DailyNotifications", "no alarm scheduled")
-        }
+        }*/
     }
 
     var dailyNotificationsLength = 0

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="5dp"
+    android:background="@color/backgroundDark">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp">
+            <TextView
+                android:id="@+id/todoSection"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Todo Section: "
+                android:textSize="20dp"
+                android:textColor="@color/textDark"
+
+                android:gravity="center_vertical"
+                />
+
+            <Spinner
+                android:id="@+id/todoSectionInput"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/textDark"
+                android:textColorHint="@color/textDark"
+
+                android:gravity="center_vertical"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp">
+            <TextView
+                android:id="@+id/notificationNameTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Todo Title: "
+                android:textSize="20dp"
+                android:textColor="@color/textDark"
+
+                android:gravity="center_vertical"
+                />
+
+            <EditText
+                android:id="@+id/todoNameInput"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="todo title"
+                android:textColor="@color/textDark"
+                android:textColorHint="@color/textDark"
+
+                android:gravity="center_vertical"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/extraInfoLayout"
+            android:layout_width="match_parent"
+            android:layout_height="40dp">
+            <TextView
+                android:id="@+id/notificationTitleTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Todo Extra Info: "
+                android:textSize="20dp"
+                android:textColor="@color/textDark"
+
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                android:gravity="center_vertical"
+                />
+
+            <EditText
+                android:id="@+id/notificationTitleInput"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="Todo Extra Info"
+                android:textColor="@color/textDark"
+                android:textColorHint="@color/textDark"
+
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:gravity="center_vertical"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp">
+
+            <Button
+                android:id="@+id/editTodoSubmitButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Submit"
+                android:layout_marginLeft="25dp"
+                />
+
+            <Button
+                android:id="@+id/deleteTodoButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Delete"
+                android:layout_marginLeft="50dp"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

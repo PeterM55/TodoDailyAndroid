@@ -61,7 +61,6 @@ class TextGridLayout @JvmOverloads constructor(
         else
             textGrid[textGrid.size-1].setTextColor(resources.getColor(R.color.textLight))
 
-
         this.addView(textGrid[textGrid.size-1])
     }
 
@@ -87,6 +86,11 @@ class TextGridLayout @JvmOverloads constructor(
             this.addView(textGrid[i])
 
         }
+    }
+
+    fun setCustomColumnCount(count : Int) {
+        columnCount = count
+        textLayoutParams.width = resources.displayMetrics.widthPixels/columnCount-8
     }
 
 }

@@ -24,8 +24,33 @@ class TodoLists {
         saveTodos()
     }
 
+    fun removeTodo(i : Int, j : Int) {
+        sectionTodos[i].removeAt(j)
+        saveTodos()
+    }
+
+    fun setTodo(i : Int, j : Int, todo : String) {
+        sectionTodos[i][j] = todo
+        saveTodos()
+    }
+
     fun getSectionTitle(i : Int) : String {
         return sectionTitles[i]
+    }
+
+    fun setSectionTitle(i : Int, str : String) {
+        sectionTitles[i]  = str
+        saveTodos()
+    }
+
+    fun removeSection(i : Int) {
+        sectionTitles.removeAt(i)
+        sectionTodos.removeAt(i)
+        saveTodos()
+    }
+
+    fun getSectionTitles() : ArrayList<String> {
+        return sectionTitles
     }
 
     fun getTodo(i : Int, j : Int) : String {
@@ -36,24 +61,29 @@ class TodoLists {
         return sectionTodos[i]
     }
 
+    fun getTodos() : ArrayList<ArrayList<String>> {
+        return sectionTodos
+    }
+
     fun getSize() : Int {
         return sectionTitles.size
     }
 
-    fun readTodos() {
+    private fun readTodos() {
         if (!todosFile.exists()) {
             return
         } else {
             val todoLines = todosFile.readText().lines()
             for (line in 0 until todoLines.size) {
                 val splitLine = todoLines[line].split(",")
-                if (splitLine.isEmpty()) return
+                if (splitLine.size <= 1) return
 
                 sectionTitles.add(splitLine[0])
                 sectionTodos.add(ArrayList(10))
 
-                for (todoNum in 0 until splitLine.size) {
-                    sectionTodos[line].add(splitLine[todoNum])
+                for (todoNum in 1 until splitLine.size) {
+                    if (splitLine[todoNum].isNotEmpty())
+                        sectionTodos[line].add(splitLine[todoNum])
                 }
             }
         }
@@ -70,10 +100,24 @@ class TodoLists {
             todosFile.createNewFile()
         }
 
+        todosFile.writeText("")
         for (sectionNum in 0 until sectionTitles.size) {
-            todosFile.writeText(sectionTitles[sectionNum]+",")
-            for (todoNum in 0 .. sectionTodos[sectionNum].size) {
-                todosFile.writeText(sectionTodos[sectionNum][todoNum]+",")
+            todosFile.appendText(sectionTitles[sectionNum]+",")
+            for (todoNum in 0 until sectionTodos[sectionNum].size) {
+                todosFile.appendText(sectionTodos[sectionNum][todoNum]+",")
+            }
+            todosFile.appendText("\n")
+        }
+
+        //FIXME
+        //todosFile.writeText("")
+    }
+
+    fun debugTodos() {
+        for (sectionNum in 0 until sectionTitles.size) {
+            Log.i("TodoListsSave-$sectionNum", sectionTitles[sectionNum]+",")
+            for (todoNum in 0 until sectionTodos[sectionNum].size) {
+                Log.i("TodoListsSave-$sectionNum-$todoNum", sectionTodos[sectionNum][todoNum]+",")
             }
         }
     }
