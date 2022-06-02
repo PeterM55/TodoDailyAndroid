@@ -20,7 +20,7 @@
 
     <fragment
         android:id="@+id/navigation_notes"
-        android:name="peter.mitchell.tododaily.ui.dashboard.DashboardFragment"
+        android:name="peter.mitchell.tododaily.ui.notes.NotesFragment"
         android:label="@string/titleListsNotepad"
         tools:layout="@layout/fragment_notes" />
 

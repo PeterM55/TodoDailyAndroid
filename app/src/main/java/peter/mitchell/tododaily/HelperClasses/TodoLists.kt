@@ -108,9 +108,6 @@ class TodoLists {
             }
             todosFile.appendText("\n")
         }
-
-        //FIXME
-        //todosFile.writeText("")
     }
 
     fun debugTodos() {
