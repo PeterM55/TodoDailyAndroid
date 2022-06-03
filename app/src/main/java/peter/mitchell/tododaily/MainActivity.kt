@@ -41,7 +41,7 @@ const val toolBarSize : Int = 47
 
 // ----- Settings -----
 var settingsRead = false
-var notificationsFullNameMode = false
+var notificationsFullNameMode = true
 var startOfWeek : DayOfWeek = DayOfWeek.MONDAY
 var darkMode = true
 
@@ -70,7 +70,9 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
         dailyNotifications = DailyNotifications(this)
+
     }
+
 }
 
 /** Save the daily information

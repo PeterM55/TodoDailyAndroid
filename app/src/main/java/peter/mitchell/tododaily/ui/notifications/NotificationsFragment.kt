@@ -19,6 +19,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -91,9 +92,14 @@ class NotificationsFragment : Fragment() {
             _binding.oneTimeNotificationsGrid.addString(requireContext(), dailyNotifications.getOneTimeString(i))
 
             _binding.oneTimeNotificationsGrid.textGrid[i].setOnClickListener {
-                Toast.makeText(requireContext(), "hi: $i", Toast.LENGTH_SHORT).show()
+                val intent = Intent(activity as Context, NewNotification::class.java)
+                intent.putExtra("oneTimeNotification", true)
+                intent.putExtra("index", i)
+                startActivity(intent)
             }
         }
+
+        _binding.oneTimeNotificationsGrid.setCustomColumnCount(2)
     }
 
     private fun reloadDailyNotifications() {
@@ -103,7 +109,16 @@ class NotificationsFragment : Fragment() {
                 _binding.dailyNotificationsGrid.addString(requireContext(), "${dailyNotifications.dailyNotificationTimes[i].toString()}: ${dailyNotifications.dailyNotificationNames[i]}")
             else
             _binding.dailyNotificationsGrid.addString(requireContext(), "${dailyNotifications.dailyNotificationTimes[i].toString()}")
+
+            _binding.dailyNotificationsGrid.textGrid[i].setOnClickListener {
+                val intent = Intent(activity as Context, NewNotification::class.java)
+                intent.putExtra("oneTimeNotification", false)
+                intent.putExtra("index", i)
+                startActivity(intent)
+            }
         }
+
+        _binding.dailyNotificationsGrid.setCustomColumnCount(2)
     }
 
     override fun onResume() {

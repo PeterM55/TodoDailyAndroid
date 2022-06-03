@@ -92,6 +92,44 @@ class DailyNotifications(context : Context) {
         return true
     }
 
+    fun setDailyNotification(iIn : Int, name : String, time : LocalTime, title : String, desc : String) : Boolean {
+        for (i in 0 until dailyNotificationsLength) {
+            if (iIn == i) continue
+            if (time == dailyNotificationTimes[i]) {
+                return false
+            }
+        }
+        for (i in 0 until oneTimeNotificationsLength) {
+            if (time == oneTimeNotificationTimes[i].toLocalTime()) {
+                return false
+            }
+        }
+        dailyNotificationNames[iIn] = (name)
+        dailyNotificationTimes[iIn] = (time)
+        dailyNotificationTitles[iIn] = (title)
+        dailyNotificationDescriptions[iIn] = (desc)
+        return true
+    }
+
+    fun setOneTimeNotification(iIn : Int, name : String, time : LocalDateTime, title : String, desc : String) : Boolean {
+        for (i in 0 until oneTimeNotificationsLength) {
+            if (iIn == i) continue
+            if (time == oneTimeNotificationTimes[i]) {
+                return false
+            }
+        }
+        for (i in 0 until dailyNotificationsLength) {
+            if (time.toLocalTime() == dailyNotificationTimes[i]) {
+                return false
+            }
+        }
+        oneTimeNotificationNames[iIn] = (name)
+        oneTimeNotificationTimes[iIn] = (time)
+        oneTimeNotificationTitles[iIn] = (title)
+        oneTimeNotificationDescriptions[iIn] = (desc)
+        return true
+    }
+
     fun removeOneTimeNotification(i : Int) {
         oneTimeNotificationNames.removeAt(i)
         oneTimeNotificationTimes.removeAt(i)

@@ -34,16 +34,16 @@ class ListOfTextGrids @JvmOverloads constructor(
         RelativeLayout.LayoutParams.WRAP_CONTENT,
     )
     private val titleButtonLayoutParams : RelativeLayout.LayoutParams = RelativeLayout.LayoutParams(
-        RelativeLayout.LayoutParams.WRAP_CONTENT, // width
-        RelativeLayout.LayoutParams.WRAP_CONTENT,
+        (55*resources.displayMetrics.density).toInt(), // width (resources.displayMetrics.density)
+        (40*resources.displayMetrics.density).toInt(),
     )
     private val addButtonLayoutParams : RelativeLayout.LayoutParams = RelativeLayout.LayoutParams(
-        RelativeLayout.LayoutParams.WRAP_CONTENT, // width
-        RelativeLayout.LayoutParams.WRAP_CONTENT,
+        (55*resources.displayMetrics.density).toInt(), // width
+        (40*resources.displayMetrics.density).toInt(),
     )
     private val constraintLayoutParams : RelativeLayout.LayoutParams = RelativeLayout.LayoutParams(
         RelativeLayout.LayoutParams.MATCH_PARENT, // width
-        82, //FrameLayout.LayoutParams.WRAP_CONTENT
+        (40*resources.displayMetrics.density).toInt(), //FrameLayout.LayoutParams.WRAP_CONTENT
     )
 
     init {
@@ -108,6 +108,11 @@ class ListOfTextGrids @JvmOverloads constructor(
             sectionButton.setText("▼")
             sectionButton.layoutParams = titleButtonLayoutParams
             sectionButton.id = View.generateViewId()
+
+            sectionAddButton.minHeight = 0
+            sectionButton.minHeight = 0
+            sectionAddButton.minWidth = 0
+            sectionButton.minWidth = 0
 
             var tempLayout : RelativeLayout.LayoutParams = addButtonLayoutParams
             tempLayout.addRule(RelativeLayout.LEFT_OF, sectionButton.id)

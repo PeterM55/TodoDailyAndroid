@@ -352,8 +352,13 @@ class HomeFragment : Fragment() {
 
             }.setPositiveButton("Export") { dialog, which ->
 
-                if (!hasWriteStoragePermission() || !hasReadStoragePermission()) {
-                    Toast.makeText(requireContext(),"No permission.", Toast.LENGTH_SHORT).show()
+                if (!hasWriteStoragePermission()) {
+                    Toast.makeText(requireContext(),"No write permission :( ", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+
+                if (!hasReadStoragePermission()) {
+                    Toast.makeText(requireContext(),"No read permission :( ", Toast.LENGTH_SHORT).show()
                     return@setPositiveButton
                 }
 
@@ -394,11 +399,12 @@ class HomeFragment : Fragment() {
 
     private fun hasWriteStoragePermission(): Boolean {
 
-        if (!(ContextCompat.checkSelfPermission(
+        if (ContextCompat.checkSelfPermission(
                 requireActivity(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED)
+            ) != PackageManager.PERMISSION_GRANTED
         ) {
+            Log.i("##hasWriteStoragePermission##", "Write permission requested")
             ActivityCompat.requestPermissions(
                 requireActivity(),
                 arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
@@ -418,6 +424,7 @@ class HomeFragment : Fragment() {
                 Manifest.permission.READ_EXTERNAL_STORAGE
             ) == PackageManager.PERMISSION_GRANTED)
         ) {
+            Log.i("##hasReadStoragePermission##", "Read permission requested")
             ActivityCompat.requestPermissions(
                 requireActivity(),
                 arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
