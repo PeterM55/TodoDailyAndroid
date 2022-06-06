@@ -442,4 +442,77 @@ class SaveInformation {
         return returnStr.toString()
     }
 
+    public fun exportToCustomOrder(strFormat : String) : String {
+        var returnStr : StringBuilder = StringBuilder("$date,")
+
+        for (i in 0 until length) {
+
+            for (j in strFormat.indices) {
+                if (strFormat[j] == 'n') {
+                    returnStr.append("${names[i]},")
+                } else if (strFormat[j] == 'v') {
+                    if (formats[i] == InformationFormat.text) {
+                        returnStr.append("\"${values[i].replace("\"","\"\"").replace("\n"," ")}\",")
+                    } else {
+                        returnStr.append("${values[i]},")
+                    }
+                } else if (strFormat[j] == 'i') {
+                    returnStr.append("${informationFormatEnumToString(formats[i])}-${repeatTimeEnumToString(repeatTime[i])},")
+                } else if (strFormat[j] == 't') {
+                    returnStr.append("${timeRead[i]}")
+                } else if (strFormat[j] == ',') {
+                    returnStr.append(',')
+                }
+            }
+        }
+
+        return returnStr.toString()
+    }
+
+    public fun exportToCustomString(strFormat: String) : String {
+        var returnStr : StringBuilder = StringBuilder("$date,")
+
+        var j = 0
+        while (j < strFormat.length) {
+
+            var i : Int = -1
+
+            if (strFormat[j] == 'n' || strFormat[j] == 'v' || strFormat[j] == 'i' || strFormat[j] == 't') {
+                var currentIndex = j+1
+                while (currentIndex < returnStr.length && strFormat[currentIndex].isDigit()) {
+                    try {
+                        i *= 10
+                        i = strFormat[currentIndex].digitToInt()
+                    } catch (e: NumberFormatException) {
+                        i /= 10
+                        break
+                    }
+                    currentIndex++
+                }
+                j = currentIndex-1
+            }
+
+            if (i == -1) {
+                returnStr.append(strFormat[j])
+            } else {
+                if (strFormat[j] == 'n') {
+                    returnStr.append("${names[i]},")
+                } else if (strFormat[j] == 'v') {
+                    if (formats[i] == InformationFormat.text) {
+                        returnStr.append("\"${values[i].replace("\"","\"\"").replace("\n"," ")}\",")
+                    } else {
+                        returnStr.append("${values[i]},")
+                    }
+                } else if (strFormat[j] == 'i') {
+                    returnStr.append("${informationFormatEnumToString(formats[i])}-${repeatTimeEnumToString(repeatTime[i])},")
+                } else if (strFormat[j] == 't') {
+                    returnStr.append("${timeRead[i]}")
+                }
+            }
+
+            j++
+        }
+
+        return returnStr.toString()
+    }
 }

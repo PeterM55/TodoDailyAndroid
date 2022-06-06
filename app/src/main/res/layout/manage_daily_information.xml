@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="5dp"
@@ -201,7 +201,7 @@
             android:layout_height="wrap_content"
             android:textColor="@color/textDark"
             android:calendarTextColor="@color/textDark"
-            android:background="@color/white"
+            android:background="@color/black"
             app:layout_constraintTop_toBottomOf="@id/addDateVisibilityButton"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"/>
@@ -216,6 +216,109 @@
             android:text="Add"
             android:textSize="16dp"
             />
+
+        <TextView
+            android:id="@+id/exportOptionsTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Export Options"
+            android:textSize="20dp"
+            android:textColor="@color/textDark"
+            app:layout_constraintTop_toBottomOf="@id/addDateButton"
+            app:layout_constraintLeft_toLeftOf="parent"
+            />
+
+        <Button
+            android:id="@+id/exportOptionsExpandButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/addDateButton"
+            app:layout_constraintRight_toRightOf="parent"
+            android:text="◀"
+            android:textSize="15dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            />
+
+        <TextView
+            android:id="@+id/exportExplanation1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="n = name, v = value, i = info type, t = time recorded"
+            android:textSize="15dp"
+            android:textColor="@color/textDark"
+            app:layout_constraintTop_toBottomOf="@id/exportOptionsExpandButton"
+            app:layout_constraintLeft_toLeftOf="parent"
+            />
+
+        <TextView
+            android:id="@+id/customOrderTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Order: "
+            android:textSize="18dp"
+            android:textColor="@color/textDark"
+            app:layout_constraintTop_toBottomOf="@id/exportExplanation1"
+            app:layout_constraintLeft_toLeftOf="parent"
+            />
+
+        <EditText
+            android:id="@+id/customOrderInput"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ntiv"
+            android:hint="ntiv"
+            android:textColor="@color/textDark"
+            android:textColorHint="@color/textDark"
+            app:layout_constraintTop_toBottomOf="@id/exportExplanation1"
+            app:layout_constraintLeft_toLeftOf="@+id/customOrderTitle"
+            />
+
+        <TextView
+            android:id="@+id/customExportTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Custom: "
+            android:textSize="18dp"
+            android:textColor="@color/textDark"
+            app:layout_constraintTop_toBottomOf="@id/customOrderInput"
+            app:layout_constraintLeft_toLeftOf="parent"
+            />
+
+        <EditText
+            android:id="@+id/customExportInput"
+            android:layout_width="match_parent"
+            android:layout_height="75dp"
+            android:hint="v1,n1,v3..."
+            android:textColor="@color/textDark"
+            android:textColorHint="@color/textDark"
+            app:layout_constraintTop_toBottomOf="@id/customExportTitle"
+            app:layout_constraintLeft_toLeftOf="parent"
+            />
+
+        <CheckBox
+            android:id="@+id/defaultExportCheck"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Use as default?"
+            app:layout_constraintTop_toBottomOf="@id/customExportInput"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/exportButton"
+            />
+
+        <Button
+            android:id="@+id/exportButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/customExportInput"
+            app:layout_constraintLeft_toRightOf="@+id/defaultExportCheck"
+            app:layout_constraintRight_toRightOf="parent"
+            android:text="Export"
+            android:textSize="16dp"
+            />
+
+
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

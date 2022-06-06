@@ -1,12 +1,19 @@
 package peter.mitchell.tododaily
 
+import android.Manifest
+import android.app.Activity
+import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -44,6 +51,8 @@ var settingsRead = false
 var notificationsFullNameMode = true
 var startOfWeek : DayOfWeek = DayOfWeek.MONDAY
 var darkMode = true
+var exportOrderDefault = "nvit"
+var exportCustomDefault = ""
 
 
 class MainActivity : AppCompatActivity() {
@@ -222,4 +231,88 @@ fun saveSettings() {
     }
 
     settingsFile.writeText("$notificationsFullNameMode ")
+}
+
+fun canExport(activity: Activity, context: Context) : Boolean {
+    if (!hasWriteStoragePermission(activity)) {
+        Toast.makeText(context,"No write permission :( ", Toast.LENGTH_SHORT).show()
+        return false
+    }
+
+    if (!hasReadStoragePermission(activity)) {
+        Toast.makeText(context,"No read permission :( ", Toast.LENGTH_SHORT).show()
+        return false
+    }
+    return true
+}
+
+fun getExportFile() : File? {
+    var exportFile = File(exportFileName)
+
+    if (exportFile.exists()) {
+        var copyNum = 1
+        while (true) {
+            var tempFileName : File
+            if (exportFile.name.contains(".")) {
+                val extension: String = exportFile.name.substring(exportFile.name.lastIndexOf("."))
+                val filepathMinusExtension: String = exportFile.toString().substring(0, exportFile.toString().lastIndexOf("."))
+                tempFileName = File(filepathMinusExtension+"($copyNum)"+extension)
+            } else {
+                tempFileName = File(exportFile.absolutePath+"($copyNum).txt")
+            }
+
+            if (!tempFileName.exists()) {
+                exportFile = tempFileName
+                break
+            }
+            copyNum++
+        }
+    }
+
+    if (!exportFile.exists()) {
+        exportFile.parentFile!!.mkdirs()
+        exportFile.createNewFile()
+    } else
+        return null
+    return exportFile
+}
+
+private fun hasWriteStoragePermission(activity : Activity): Boolean {
+
+    if (ContextCompat.checkSelfPermission(
+            activity,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ) != PackageManager.PERMISSION_GRANTED
+    ) {
+        Log.i("##hasWriteStoragePermission##", "Write permission requested")
+        ActivityCompat.requestPermissions(
+            activity,
+            arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+            101
+        )
+    }
+    return ContextCompat.checkSelfPermission(
+        activity,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE
+    ) == PackageManager.PERMISSION_GRANTED
+}
+
+private fun hasReadStoragePermission(activity: Activity): Boolean {
+
+    if (!(ContextCompat.checkSelfPermission(
+            activity,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_GRANTED)
+    ) {
+        Log.i("##hasReadStoragePermission##", "Read permission requested")
+        ActivityCompat.requestPermissions(
+            activity,
+            arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+            102
+        )
+    }
+    return ContextCompat.checkSelfPermission(
+        activity,
+        Manifest.permission.READ_EXTERNAL_STORAGE
+    ) == PackageManager.PERMISSION_GRANTED
 }

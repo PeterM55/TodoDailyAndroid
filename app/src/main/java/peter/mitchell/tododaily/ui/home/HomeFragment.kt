@@ -27,6 +27,7 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.fragment_home.*
 import peter.mitchell.tododaily.*
+import peter.mitchell.tododaily.MainActivity
 import peter.mitchell.tododaily.HelperClasses.SaveInformation
 import peter.mitchell.tododaily.HelperClasses.TextGridLayout
 import peter.mitchell.tododaily.databinding.FragmentHomeBinding
@@ -34,7 +35,6 @@ import java.io.File
 import java.time.LocalDate
 
 
-@RequiresApi(Build.VERSION_CODES.O)
 class HomeFragment : Fragment() {
 
     private lateinit var _binding: FragmentHomeBinding
@@ -352,42 +352,12 @@ class HomeFragment : Fragment() {
 
             }.setPositiveButton("Export") { dialog, which ->
 
-                if (!hasWriteStoragePermission()) {
-                    Toast.makeText(requireContext(),"No write permission :( ", Toast.LENGTH_SHORT).show()
+                if (!canExport(requireActivity(), requireContext()))
                     return@setPositiveButton
-                }
 
-                if (!hasReadStoragePermission()) {
-                    Toast.makeText(requireContext(),"No read permission :( ", Toast.LENGTH_SHORT).show()
-                    return@setPositiveButton
-                }
+                var exportFile : File? = getExportFile()
 
-                var exportFile = File(exportFileName)
-
-                if (exportFile.exists()) {
-                    var copyNum = 1
-                    while (true) {
-                        var tempFileName : File
-                        if (exportFile.name.contains(".")) {
-                            val extension: String = exportFile.name.substring(exportFile.name.lastIndexOf("."))
-                            val filepathMinusExtension: String = exportFile.toString().substring(0, exportFile.toString().lastIndexOf("."))
-                            tempFileName = File(filepathMinusExtension+"($copyNum)"+extension)
-                        } else {
-                            tempFileName = File(exportFile.absolutePath+"($copyNum).txt")
-                        }
-
-                        if (!tempFileName.exists()) {
-                            exportFile = tempFileName
-                            break
-                        }
-                        copyNum++
-                    }
-                }
-
-                if (!exportFile.exists()) {
-                    exportFile.parentFile!!.mkdirs()
-                    exportFile.createNewFile()
-                } else
+                if (exportFile == null)
                     return@setPositiveButton
 
                 dailyInformationFile.forEachLine {
@@ -395,46 +365,6 @@ class HomeFragment : Fragment() {
                 }
 
             }.show()
-    }
-
-    private fun hasWriteStoragePermission(): Boolean {
-
-        if (ContextCompat.checkSelfPermission(
-                requireActivity(),
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            Log.i("##hasWriteStoragePermission##", "Write permission requested")
-            ActivityCompat.requestPermissions(
-                requireActivity(),
-                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                101
-            )
-        }
-        return ContextCompat.checkSelfPermission(
-            requireActivity(),
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-        ) == PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun hasReadStoragePermission(): Boolean {
-
-        if (!(ContextCompat.checkSelfPermission(
-                requireActivity(),
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED)
-        ) {
-            Log.i("##hasReadStoragePermission##", "Read permission requested")
-            ActivityCompat.requestPermissions(
-                requireActivity(),
-                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                102
-            )
-        }
-        return ContextCompat.checkSelfPermission(
-            requireActivity(),
-            Manifest.permission.READ_EXTERNAL_STORAGE
-        ) == PackageManager.PERMISSION_GRANTED
     }
 
     override fun onResume() {

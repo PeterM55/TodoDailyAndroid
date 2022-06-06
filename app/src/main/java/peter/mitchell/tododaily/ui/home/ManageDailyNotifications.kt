@@ -14,6 +14,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.core.widget.addTextChangedListener
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.manage_daily_information.*
 import peter.mitchell.tododaily.*
@@ -33,6 +34,7 @@ class ManageDailyNotifications : AppCompatActivity() {
     var rearrangeTitlesVisible : Boolean = false
     var manageDatesVisible : Boolean = false
     var addDatesVisible : Boolean = false
+    var exportVisible : Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -135,6 +137,25 @@ class ManageDailyNotifications : AppCompatActivity() {
                 saveDailyInformationFile()
             }
         }
+
+        exportOptionsExpandButton.setOnClickListener {
+            exportVisible = !exportVisible
+            reloadVisibilities()
+        }
+
+        customExportInput.addTextChangedListener {
+            if (customExportInput.text.isNotEmpty()) {
+                exportExplanation1.isVisible = false
+                customOrderTitle.isVisible = false
+                customOrderInput.isVisible = false
+            } else {
+                exportExplanation1.isVisible = true
+                customOrderTitle.isVisible = true
+                customOrderInput.isVisible = true
+            }
+        }
+
+        exportButton.setOnClickListener { customExportSubmit() }
         // end of onCreateView
     }
 
@@ -218,6 +239,18 @@ class ManageDailyNotifications : AppCompatActivity() {
         toggleManageDatesText.isVisible = manageDatesVisible
         addDateInput.isVisible = addDatesVisible
         addDateButton.isVisible = addDatesVisible
+
+        customExportTitle.isVisible = exportVisible
+        customExportInput.isVisible = exportVisible
+        if (exportVisible && customExportInput.text.isEmpty()) {
+            exportExplanation1.isVisible = true
+            customOrderTitle.isVisible = true
+            customOrderInput.isVisible = true
+        } else {
+            exportExplanation1.isVisible = false
+            customOrderTitle.isVisible = false
+            customOrderInput.isVisible = false
+        }
 
         if (currentTitlesVisible)
             toggleMainReminders.setText("▼")
@@ -360,6 +393,18 @@ class ManageDailyNotifications : AppCompatActivity() {
         builder.show()
 
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
+    }
+
+    private fun customExportSubmit() {
+
+        if (customExportInput.text.isNotEmpty()) {
+            saveInformation.exportToCustomString(customExportInput.text.toString())
+        } else {
+            saveInformation.exportToCustomOrder(customOrderInput.text.toString())
+        }
+
+        // set to default if all worked
+
     }
 
     override fun onResume() {
