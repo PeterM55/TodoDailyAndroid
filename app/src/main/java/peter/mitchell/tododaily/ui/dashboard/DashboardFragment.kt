@@ -16,6 +16,7 @@ import android.widget.EditText
 import android.widget.GridView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import peter.mitchell.tododaily.HelperClasses.TodoLists
 import peter.mitchell.tododaily.databinding.FragmentDashboardBinding
@@ -41,6 +42,7 @@ class DashboardFragment : Fragment() {
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
         val root: View = binding.root
         imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        fragmentLabel.text = "Todo"
 
         if (todoLists == null)
             todoLists = TodoLists()

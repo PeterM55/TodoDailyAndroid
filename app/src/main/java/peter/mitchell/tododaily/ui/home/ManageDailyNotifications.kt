@@ -18,6 +18,8 @@ import androidx.core.widget.addTextChangedListener
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.manage_daily_information.*
 import peter.mitchell.tododaily.*
+import peter.mitchell.tododaily.HelperClasses.SaveInformation
+import java.io.File
 import java.lang.NumberFormatException
 import java.time.LocalDate
 
@@ -30,7 +32,7 @@ class ManageDailyNotifications : AppCompatActivity() {
 
     var selectedSortIndex = 0
 
-    var currentTitlesVisible : Boolean = true
+    var currentTitlesVisible : Boolean = false
     var rearrangeTitlesVisible : Boolean = false
     var manageDatesVisible : Boolean = false
     var addDatesVisible : Boolean = false
@@ -143,17 +145,24 @@ class ManageDailyNotifications : AppCompatActivity() {
             reloadVisibilities()
         }
 
+        labelExportCheck.setOnClickListener {
+            exportLabelLine = !exportLabelLine
+        }
+        labelExportCheck.isChecked = exportLabelLine
+
         customExportInput.addTextChangedListener {
             if (customExportInput.text.isNotEmpty()) {
-                exportExplanation1.isVisible = false
+                //exportExplanation1.isVisible = false
                 customOrderTitle.isVisible = false
                 customOrderInput.isVisible = false
             } else {
-                exportExplanation1.isVisible = true
+                //exportExplanation1.isVisible = true
                 customOrderTitle.isVisible = true
                 customOrderInput.isVisible = true
             }
         }
+        customOrderInput.setText(exportOrderDefault)
+        customExportInput.setText(exportCustomDefault)
 
         exportButton.setOnClickListener { customExportSubmit() }
         // end of onCreateView
@@ -162,7 +171,7 @@ class ManageDailyNotifications : AppCompatActivity() {
     private fun reloadDynamicView() {
         return
         // --- Dynamic view ---
-        val extraSpace = 10
+        /*val extraSpace = 10
         var displayHeight = (resources.displayMetrics.heightPixels - (androidBarsSize+toolBarSize + 35 + 35 + 42 + 18 + extraSpace) * resources.displayMetrics.density).toInt()
 
         if (addDatesVisible) displayHeight = 0
@@ -190,7 +199,7 @@ class ManageDailyNotifications : AppCompatActivity() {
             var params: ViewGroup.LayoutParams = manageDatesList.layoutParams
             params.height = displayHeight/displaysVisible
             manageDatesList.layoutParams = params
-        }
+        }*/
 
         /*var params: ViewGroup.LayoutParams = mainReminders.layoutParams
         params.height = displayHeight
@@ -242,14 +251,18 @@ class ManageDailyNotifications : AppCompatActivity() {
 
         customExportTitle.isVisible = exportVisible
         customExportInput.isVisible = exportVisible
+        exportExplanation1.isVisible = exportVisible
+        labelExportCheck.isVisible = exportVisible
         if (exportVisible && customExportInput.text.isEmpty()) {
-            exportExplanation1.isVisible = true
             customOrderTitle.isVisible = true
             customOrderInput.isVisible = true
+            defaultExportCheck.isVisible = true
+            exportButton.isVisible =  true
         } else {
-            exportExplanation1.isVisible = false
             customOrderTitle.isVisible = false
             customOrderInput.isVisible = false
+            defaultExportCheck.isVisible = false
+            exportButton.isVisible =  false
         }
 
         if (currentTitlesVisible)
@@ -271,6 +284,11 @@ class ManageDailyNotifications : AppCompatActivity() {
             addDateVisibilityButton.setText("▼")
         else
             addDateVisibilityButton.setText("◀")
+
+        if (exportVisible)
+            exportOptionsExpandButton.setText("▼")
+        else
+            exportOptionsExpandButton.setText("◀")
 
         reloadDynamicView()
     }
@@ -397,14 +415,41 @@ class ManageDailyNotifications : AppCompatActivity() {
 
     private fun customExportSubmit() {
 
-        if (customExportInput.text.isNotEmpty()) {
-            saveInformation.exportToCustomString(customExportInput.text.toString())
-        } else {
-            saveInformation.exportToCustomOrder(customOrderInput.text.toString())
+        if (!canExport(this, this))
+            return
+
+        var exportFile : File? = getExportFile()
+
+        if (exportFile == null)
+            return
+
+        var putLabel = !exportLabelLine
+
+        var tempSaveInformation : SaveInformation = SaveInformation()
+
+        dailyInformationFile.forEachLine {
+            tempSaveInformation.fromString(it)
+
+            if (customExportInput.text.isNotEmpty()) {
+                exportFile.appendText(tempSaveInformation.exportToCustomString(customExportInput.text.toString(), !putLabel)+"\n")
+            } else {
+                exportFile.appendText(tempSaveInformation.exportToCustomOrder(customOrderInput.text.toString(), !putLabel)+"\n")
+            }
+
+            if (!putLabel) {
+                putLabel = true
+            }
         }
 
         // set to default if all worked
-
+        if (defaultExportCheck.isChecked) {
+            if (customExportInput.text.toString().isNotEmpty()) {
+                exportCustomDefault = customExportInput.text.toString()
+            } else {
+                exportOrderDefault = customOrderInput.text.toString()
+                exportCustomDefault = ""
+            }
+        }
     }
 
     override fun onResume() {

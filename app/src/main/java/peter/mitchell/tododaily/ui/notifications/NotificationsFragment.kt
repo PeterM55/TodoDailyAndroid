@@ -22,6 +22,7 @@ import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.fragment_notifications.*
 import peter.mitchell.tododaily.*
@@ -49,6 +50,7 @@ class NotificationsFragment : Fragment() {
 
         _binding = FragmentNotificationsBinding.inflate(inflater, container, false)
         val root: View = binding.root
+        fragmentLabel.text = "Notifications"
 
         // temporary code
         /*var setTime = LocalTime.now().plusSeconds(10)

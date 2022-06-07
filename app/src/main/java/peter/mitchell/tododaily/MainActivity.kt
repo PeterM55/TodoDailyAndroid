@@ -51,6 +51,7 @@ var settingsRead = false
 var notificationsFullNameMode = true
 var startOfWeek : DayOfWeek = DayOfWeek.MONDAY
 var darkMode = true
+var exportLabelLine = true
 var exportOrderDefault = "nvit"
 var exportCustomDefault = ""
 
@@ -77,6 +78,8 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+        supportActionBar?.hide();
 
         dailyNotifications = DailyNotifications(this)
 

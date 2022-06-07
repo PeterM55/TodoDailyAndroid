@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="5dp"
@@ -133,7 +133,6 @@
             app:layout_constraintRight_toLeftOf="@id/deleteAllDatesButton"
             android:text="◀"
             android:textSize="15dp"
-            android:textColor="@color/textDark"
             android:minHeight="0dp"
             android:minWidth="0dp"
             android:layout_marginRight="10dp"
@@ -240,6 +239,16 @@
             android:minWidth="0dp"
             />
 
+        <CheckBox
+            android:id="@+id/labelExportCheck"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Include label line?"
+            app:layout_constraintTop_toBottomOf="@id/exportOptionsExpandButton"
+            app:layout_constraintLeft_toLeftOf="parent"
+            />
+
         <TextView
             android:id="@+id/exportExplanation1"
             android:layout_width="match_parent"
@@ -247,7 +256,7 @@
             android:text="n = name, v = value, i = info type, t = time recorded"
             android:textSize="15dp"
             android:textColor="@color/textDark"
-            app:layout_constraintTop_toBottomOf="@id/exportOptionsExpandButton"
+            app:layout_constraintTop_toBottomOf="@id/labelExportCheck"
             app:layout_constraintLeft_toLeftOf="parent"
             />
 
@@ -272,6 +281,7 @@
             android:textColorHint="@color/textDark"
             app:layout_constraintTop_toBottomOf="@id/exportExplanation1"
             app:layout_constraintLeft_toLeftOf="@+id/customOrderTitle"
+            android:layout_marginTop="10dp"
             />
 
         <TextView

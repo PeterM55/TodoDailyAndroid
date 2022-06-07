@@ -25,6 +25,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.marginRight
 import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_home.*
 import peter.mitchell.tododaily.*
 import peter.mitchell.tododaily.MainActivity
@@ -59,6 +60,7 @@ class HomeFragment : Fragment() {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
         imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        fragmentLabel.text = "Home"
 
         if (!settingsRead) {
             settingsRead = true

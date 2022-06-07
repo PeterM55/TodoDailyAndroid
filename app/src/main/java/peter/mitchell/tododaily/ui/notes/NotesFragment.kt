@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import kotlinx.android.synthetic.main.activity_main.*
 import peter.mitchell.tododaily.databinding.FragmentNotesBinding
 
 class NotesFragment : Fragment() {
@@ -20,6 +21,7 @@ class NotesFragment : Fragment() {
     ): View {
         _binding = FragmentNotesBinding.inflate(inflater, container, false)
         val root: View = binding.root
+        fragmentLabel.text = "Notes"
 
         var testText : TextView = TextView(requireContext())
         testText.text = "This is a test"

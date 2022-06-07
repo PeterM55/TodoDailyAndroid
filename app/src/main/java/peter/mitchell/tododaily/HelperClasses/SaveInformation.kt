@@ -442,8 +442,34 @@ class SaveInformation {
         return returnStr.toString()
     }
 
-    public fun exportToCustomOrder(strFormat : String) : String {
-        var returnStr : StringBuilder = StringBuilder("$date,")
+    public fun exportToCustomOrder(strFormat : String, addColLabel : Boolean = false) : String {
+        var returnStr : StringBuilder = StringBuilder()
+
+        if (addColLabel) {
+
+            returnStr.append("Date,")
+
+            for (i in 0 until length) {
+                for (j in strFormat.indices) {
+
+                    if (strFormat[j] == 'n') {
+                        returnStr.append("${names[i]} Name,")
+                    } else if (strFormat[j] == 'v') {
+                        returnStr.append("${names[i]},")
+                    } else if (strFormat[j] == 'i') {
+                        returnStr.append("${names[i]} Save Format,")
+                    } else if (strFormat[j] == 't') {
+                        returnStr.append("${names[i]} Time Read,")
+                    } else if (strFormat[j] == ',') {
+                        returnStr.append(',')
+                    }
+
+                }
+            }
+            returnStr.append("\n")
+        }
+
+        returnStr.append("$date,")
 
         for (i in 0 until length) {
 
@@ -459,7 +485,7 @@ class SaveInformation {
                 } else if (strFormat[j] == 'i') {
                     returnStr.append("${informationFormatEnumToString(formats[i])}-${repeatTimeEnumToString(repeatTime[i])},")
                 } else if (strFormat[j] == 't') {
-                    returnStr.append("${timeRead[i]}")
+                    returnStr.append("${timeRead[i]},")
                 } else if (strFormat[j] == ',') {
                     returnStr.append(',')
                 }
@@ -469,15 +495,64 @@ class SaveInformation {
         return returnStr.toString()
     }
 
-    public fun exportToCustomString(strFormat: String) : String {
-        var returnStr : StringBuilder = StringBuilder("$date,")
+    public fun exportToCustomString(strFormat: String, addColLabel : Boolean = false) : String {
+        var returnStr : StringBuilder = StringBuilder()
+
+        if (addColLabel) {
+
+            returnStr.append("Date,")
+
+            var j = 0
+            while (j < strFormat.length) {
+
+                var strRead : Char = ' '
+                var i : Int = -1
+
+                if (strFormat[j] == 'n' || strFormat[j] == 'v' || strFormat[j] == 'i' || strFormat[j] == 't') {
+                    strRead = strFormat[j]
+                    var currentIndex = j+1
+                    while (currentIndex < returnStr.length && strFormat[currentIndex].isDigit()) {
+                        try {
+                            i *= 10
+                            i = strFormat[currentIndex].digitToInt()
+                        } catch (e: NumberFormatException) {
+                            i /= 10
+                            break
+                        }
+                        currentIndex++
+                    }
+                    j = currentIndex-1
+                    i -= 1
+                }
+
+                if (strFormat[j] == ',') {
+                    returnStr.append(',')
+                } else if (i == -1) {
+                    // do nothing
+                } else if (strRead == 'n') {
+                    returnStr.append("${names[i]} Name,")
+                } else if (strRead == 'v') {
+                    returnStr.append("${names[i]},")
+                } else if (strRead == 'i') {
+                    returnStr.append("${names[i]} Save Format,")
+                } else if (strRead == 't') {
+                    returnStr.append("${names[i]} Time Read,")
+                }
+            }
+
+            returnStr.append("\n")
+        }
+
+        returnStr.append("$date,")
 
         var j = 0
         while (j < strFormat.length) {
 
+            var strRead : Char = ' '
             var i : Int = -1
 
             if (strFormat[j] == 'n' || strFormat[j] == 'v' || strFormat[j] == 'i' || strFormat[j] == 't') {
+                strRead = strFormat[j]
                 var currentIndex = j+1
                 while (currentIndex < returnStr.length && strFormat[currentIndex].isDigit()) {
                     try {
@@ -490,22 +565,25 @@ class SaveInformation {
                     currentIndex++
                 }
                 j = currentIndex-1
+                i -= 1
             }
 
             if (i == -1) {
                 returnStr.append(strFormat[j])
             } else {
-                if (strFormat[j] == 'n') {
+                if (i >= length) {
+                    // do nothing
+                } else if (strRead == 'n') {
                     returnStr.append("${names[i]},")
-                } else if (strFormat[j] == 'v') {
+                } else if (strRead == 'v') {
                     if (formats[i] == InformationFormat.text) {
                         returnStr.append("\"${values[i].replace("\"","\"\"").replace("\n"," ")}\",")
                     } else {
                         returnStr.append("${values[i]},")
                     }
-                } else if (strFormat[j] == 'i') {
+                } else if (strRead == 'i') {
                     returnStr.append("${informationFormatEnumToString(formats[i])}-${repeatTimeEnumToString(repeatTime[i])},")
-                } else if (strFormat[j] == 't') {
+                } else if (strRead == 't') {
                     returnStr.append("${timeRead[i]}")
                 }
             }
