@@ -65,9 +65,9 @@ class NotificationsFragment : Fragment() {
         dailyNotifications.createNotification(requireContext(), setTime)*/
 
         // ----- Setup Main View -----
-        if (dailyNotifications.totalLength() == 0) {
+        /*if (dailyNotifications.totalLength() == 0) {
             readNotifications()
-        }
+        }*/
 
         // ----- Setup Buttons -----
         _binding.oneTimeNotificationsButton.setOnClickListener {
@@ -85,6 +85,8 @@ class NotificationsFragment : Fragment() {
             saveSettings()
         }
 
+
+        notifFragment = this
         return root
     }
 
@@ -125,6 +127,8 @@ class NotificationsFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+
+        readNotifications()
 
         dailyNotifications.refreshNotifications(requireContext())
 

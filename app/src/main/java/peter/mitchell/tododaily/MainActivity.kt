@@ -14,6 +14,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -42,6 +43,8 @@ val todosFile = File("/data/data/peter.mitchell.tododaily/files/todos.txt")
 //val exportFileName = "/storage/emulated/0/Download/dailyInformationExport.txt"
 val exportFileName = "${Environment.getExternalStorageDirectory().path}/${Environment.DIRECTORY_DOWNLOADS}/dailyInformationExport.csv"
 
+var notifFragment : Fragment? = null
+
 const val androidBarsSize : Int = 20+41
 const val toolBarSize : Int = 47
 //const val bottomBarSize : Int =
@@ -54,6 +57,7 @@ var darkMode = true
 var exportLabelLine = true
 var exportOrderDefault = "nvit"
 var exportCustomDefault = ""
+var snoozeTime = 360
 
 var mainBinding: ActivityMainBinding? = null
 

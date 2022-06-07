@@ -1,15 +1,15 @@
 package peter.mitchell.tododaily.HelperClasses
 
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
-import peter.mitchell.tododaily.R
-import peter.mitchell.tododaily.nextNotificationIntentFile
-import peter.mitchell.tododaily.notificationsFile
+import peter.mitchell.tododaily.*
 import peter.mitchell.tododaily.ui.notifications.DailyNotifications
 import peter.mitchell.tododaily.ui.notifications.channelID
+import java.time.LocalDateTime
 
 
 //val notificationChannel : NotificationChannel;
@@ -33,6 +33,15 @@ class TodoDailyNotification : BroadcastReceiver() {
             dailyNotificationsTemp.fromString(notificationsFile.bufferedReader().readText())
         }
 
+        // --- handle snooze ---
+        var snooze : Boolean? = intent?.getBooleanExtra("snooze?", false)
+        if (snooze == true && intent != null) {
+            // Snooze by setting up a one time notification
+            dailyNotificationsTemp.addOneTimeNotification(intent.getStringExtra("snoozeName")!!, LocalDateTime.now().plusSeconds(
+                snoozeTime.toLong()
+            ), intent.getStringExtra("snoozeTitle")!!, intent.getStringExtra("snoozeDesc")!!)
+        }
+
         // --- Get the currently scheduled notification, and delete it ---
         var oneTimeNotification : Boolean? = null
         var notificationIndex : Int = -1
@@ -54,8 +63,9 @@ class TodoDailyNotification : BroadcastReceiver() {
             }
         }
 
-        if (notificationIndex < 0 || oneTimeNotification == null) {
+        if (notificationIndex < 0 || oneTimeNotification == null || snooze == true) {
             dailyNotificationsTemp.refreshNotifications(context)
+            notifFragment?.onResume()
             return
         }
 
@@ -70,11 +80,25 @@ class TodoDailyNotification : BroadcastReceiver() {
             notificationDesc = dailyNotificationsTemp.dailyNotificationDescriptions[notificationIndex]
         }
 
+        val snoozeIntent = Intent(context, TodoDailyNotification::class.java)
+        snoozeIntent.putExtra("snooze?", true)
+        snoozeIntent.putExtra("snoozeName", dailyNotificationsTemp.oneTimeNotificationNames[notificationIndex]+"-Snoozed")
+        snoozeIntent.putExtra("snoozeTitle", dailyNotificationsTemp.oneTimeNotificationTitles[notificationIndex])
+        snoozeIntent.putExtra("snoozeDesc", dailyNotificationsTemp.oneTimeNotificationDescriptions[notificationIndex])
+
+        val snoozePendingIntent = PendingIntent.getBroadcast(
+            context,
+            253,
+            snoozeIntent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
         var builder = NotificationCompat.Builder(context, channelID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle(notificationTitle)
             .setContentText(notificationDesc)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .addAction(R.drawable.ic_home_black_24dp, "Snooze", snoozePendingIntent)
             .build()
 
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -82,19 +106,7 @@ class TodoDailyNotification : BroadcastReceiver() {
 
         dailyNotificationsTemp.refreshNotifications(context)
 
-        /*if (LocalTime.now().isAfter(LocalTime.of(12+6,15,0))) {
-            return
-        }
-
-        var setTime = LocalTime.now().plusSeconds(20)
-
-        dailyNotifications.createNotification(context, setTime)*/
-
-        /*with(NotificationManagerCompat.from(context)) {
-            createNotificationChannel(notificationChannel)
-            notify(1, builder.build())
-        }*/
-
+        notifFragment?.onResume()
     }
 
 }
