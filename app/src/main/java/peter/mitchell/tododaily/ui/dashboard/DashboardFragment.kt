@@ -20,6 +20,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import peter.mitchell.tododaily.HelperClasses.TodoLists
 import peter.mitchell.tododaily.databinding.FragmentDashboardBinding
+import peter.mitchell.tododaily.mainBinding
 import peter.mitchell.tododaily.saveDailyInformationFile
 import peter.mitchell.tododaily.saveInformation
 import peter.mitchell.tododaily.todoLists
@@ -42,7 +43,7 @@ class DashboardFragment : Fragment() {
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
         val root: View = binding.root
         imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        fragmentLabel.text = "Todo"
+        mainBinding?.fragmentLabel?.setText("Todo")
 
         if (todoLists == null)
             todoLists = TodoLists()

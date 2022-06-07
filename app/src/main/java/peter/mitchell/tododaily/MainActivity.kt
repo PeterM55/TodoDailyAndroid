@@ -55,18 +55,19 @@ var exportLabelLine = true
 var exportOrderDefault = "nvit"
 var exportCustomDefault = ""
 
+var mainBinding: ActivityMainBinding? = null
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        mainBinding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(mainBinding!!.root)
 
-        val navView: BottomNavigationView = binding.navView
+        val navView: BottomNavigationView = mainBinding!!.navView
 
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
         // Passing each menu ID as a set of Ids because each
@@ -82,7 +83,6 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.hide();
 
         dailyNotifications = DailyNotifications(this)
-
     }
 
 }

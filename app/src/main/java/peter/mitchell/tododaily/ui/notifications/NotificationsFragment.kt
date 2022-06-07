@@ -50,7 +50,7 @@ class NotificationsFragment : Fragment() {
 
         _binding = FragmentNotificationsBinding.inflate(inflater, container, false)
         val root: View = binding.root
-        fragmentLabel.text = "Notifications"
+        mainBinding?.fragmentLabel?.setText("Notifications")
 
         // temporary code
         /*var setTime = LocalTime.now().plusSeconds(10)

@@ -60,7 +60,8 @@ class HomeFragment : Fragment() {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
         imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        fragmentLabel.text = "Home"
+        //fragmentLabel.text = "Home"
+        mainBinding?.fragmentLabel?.setText("Home")
 
         if (!settingsRead) {
             settingsRead = true
