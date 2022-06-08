@@ -3,6 +3,7 @@ package peter.mitchell.tododaily
 import android.Manifest
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -22,6 +23,7 @@ import androidx.navigation.ui.setupWithNavController
 import peter.mitchell.tododaily.databinding.ActivityMainBinding
 import peter.mitchell.tododaily.HelperClasses.SaveInformation
 import peter.mitchell.tododaily.HelperClasses.TodoLists
+import peter.mitchell.tododaily.ui.home.ManageDailyNotifications
 import peter.mitchell.tododaily.ui.notifications.DailyNotifications
 import java.io.File
 import java.time.DayOfWeek
@@ -44,6 +46,10 @@ val todosFile = File("/data/data/peter.mitchell.tododaily/files/todos.txt")
 val exportFileName = "${Environment.getExternalStorageDirectory().path}/${Environment.DIRECTORY_DOWNLOADS}/dailyInformationExport.csv"
 
 var notifFragment : Fragment? = null
+enum class fragments {
+    home, todo, notes, notifs
+}
+var currentFragment : fragments = fragments.home
 
 const val androidBarsSize : Int = 20+41
 const val toolBarSize : Int = 47
@@ -87,6 +93,15 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.hide();
 
         dailyNotifications = DailyNotifications(this)
+
+        mainBinding!!.helpButton.setOnClickListener {
+            val intent = Intent(this as Context, HelpActivity::class.java)
+            startActivity(intent)
+        }
+        mainBinding!!.optionsButton.setOnClickListener {
+            val intent = Intent(this as Context, SettingsActivity::class.java)
+            startActivity(intent)
+        }
     }
 
 }

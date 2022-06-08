@@ -42,6 +42,14 @@
             android:name="peter.mitchell.tododaily.ui.notifications.NewNotification"
             android:screenOrientation="fullSensor" />
 
+        <activity
+            android:name="peter.mitchell.tododaily.HelpActivity"
+            android:screenOrientation="fullSensor" />
+
+        <activity
+            android:name="peter.mitchell.tododaily.SettingsActivity"
+            android:screenOrientation="fullSensor" />
+
     </application>
 
 </manifest>
