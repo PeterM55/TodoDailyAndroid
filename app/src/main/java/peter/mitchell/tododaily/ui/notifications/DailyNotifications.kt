@@ -413,7 +413,7 @@ class DailyNotifications(context : Context) {
 
         var timeToTimer = nextNotification.toEpochSecond(ZoneId.systemDefault().rules.getOffset(Instant.now()))*1000
 
-        alarmManager.setAndAllowWhileIdle(//(setExactAndAllowWhileIdle
+        alarmManager.setExactAndAllowWhileIdle(//(setAndAllowWhileIdle
             AlarmManager.RTC_WAKEUP,
             timeToTimer,
             pendingIntent
