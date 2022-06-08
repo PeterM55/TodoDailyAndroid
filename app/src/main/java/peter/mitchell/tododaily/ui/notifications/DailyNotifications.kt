@@ -54,13 +54,14 @@ class DailyNotifications(context : Context) {
     var oneTimeNotificationTitles : ArrayList<String> = ArrayList()
     var oneTimeNotificationDescriptions : ArrayList<String> = ArrayList()
 
-    fun addDailyNotification(name : String, time : LocalTime, title : String, desc : String) : Boolean {
+    fun addDailyNotification(name : String, time : LocalTime, title : String, desc : String, swappingIndex : Int = -1) : Boolean {
         for (i in 0 until dailyNotificationsLength) {
             if (time == dailyNotificationTimes[i]) {
                 return false
             }
         }
         for (i in 0 until oneTimeNotificationsLength) {
+            if (swappingIndex == i) continue
             if (time == oneTimeNotificationTimes[i].toLocalTime()) {
                 return false
             }
@@ -70,16 +71,22 @@ class DailyNotifications(context : Context) {
         dailyNotificationTitles.add(title)
         dailyNotificationDescriptions.add(desc)
         dailyNotificationsLength++
+
+        if (swappingIndex != -1) {
+            removeOneTimeNotification(swappingIndex)
+        }
+
         return true
     }
 
-    fun addOneTimeNotification(name : String, time : LocalDateTime, title : String, desc : String) : Boolean {
+    fun addOneTimeNotification(name : String, time : LocalDateTime, title : String, desc : String, swappingIndex : Int = -1) : Boolean {
         for (i in 0 until oneTimeNotificationsLength) {
             if (time == oneTimeNotificationTimes[i]) {
                 return false
             }
         }
         for (i in 0 until dailyNotificationsLength) {
+            if (swappingIndex == i) continue
             if (time.toLocalTime() == dailyNotificationTimes[i]) {
                 return false
             }
@@ -89,6 +96,11 @@ class DailyNotifications(context : Context) {
         oneTimeNotificationTitles.add(title)
         oneTimeNotificationDescriptions.add(desc)
         oneTimeNotificationsLength++
+
+        if (swappingIndex != -1) {
+            removeDailyNotification(swappingIndex)
+        }
+
         return true
     }
 
@@ -130,12 +142,102 @@ class DailyNotifications(context : Context) {
         return true
     }
 
+    fun removeDailyNotification(i : Int) {
+        dailyNotificationNames.removeAt(i)
+        dailyNotificationTimes.removeAt(i)
+        dailyNotificationTitles.removeAt(i)
+        dailyNotificationDescriptions.removeAt(i)
+        dailyNotificationsLength--
+    }
+
     fun removeOneTimeNotification(i : Int) {
         oneTimeNotificationNames.removeAt(i)
         oneTimeNotificationTimes.removeAt(i)
         oneTimeNotificationTitles.removeAt(i)
         oneTimeNotificationDescriptions.removeAt(i)
         oneTimeNotificationsLength--
+    }
+
+    fun dailyMoveFrom(i : Int, to : Int) {
+
+        if (i == to || i >= dailyNotificationsLength || to >= dailyNotificationsLength) return
+
+        var tempName = dailyNotificationNames[i]
+        var tempTime = dailyNotificationTimes[i]
+        var tempTitle = dailyNotificationTitles[i]
+        var tempDesc = dailyNotificationDescriptions[i]
+
+        if (i < to) {
+            for (j in i .. to) {
+                if (j < to) {
+                    dailyNotificationNames[j] = dailyNotificationNames[j+1]
+                    dailyNotificationTimes[j] = dailyNotificationTimes[j+1]
+                    dailyNotificationTitles[j] = dailyNotificationTitles[j+1]
+                    dailyNotificationDescriptions[j] = dailyNotificationDescriptions[j+1]
+                } else if (j == to) {
+                    dailyNotificationNames[j] = tempName
+                    dailyNotificationTimes[j] = tempTime
+                    dailyNotificationTitles[j] = tempTitle
+                    dailyNotificationDescriptions[j] = tempDesc
+                }
+            }
+        } else if (to < i) {
+            for (j in i downTo to) {
+                if (j > to) {
+                    dailyNotificationNames[j] = dailyNotificationNames[j-1]
+                    dailyNotificationTimes[j] = dailyNotificationTimes[j-1]
+                    dailyNotificationTitles[j] = dailyNotificationTitles[j-1]
+                    dailyNotificationDescriptions[j] = dailyNotificationDescriptions[j-1]
+                } else if (j == to) {
+                    dailyNotificationNames[j] = tempName
+                    dailyNotificationTimes[j] = tempTime
+                    dailyNotificationTitles[j] = tempTitle
+                    dailyNotificationDescriptions[j] = tempDesc
+                }
+            }
+        }
+
+    }
+
+    fun oneTimeMoveFrom(i : Int, to : Int) {
+
+        if (i == to || i >= oneTimeNotificationsLength || to >= oneTimeNotificationsLength) return
+
+        var tempName = oneTimeNotificationNames[i]
+        var tempTime = oneTimeNotificationTimes[i]
+        var tempTitle = oneTimeNotificationTitles[i]
+        var tempDesc = oneTimeNotificationDescriptions[i]
+
+        if (i < to) {
+            for (j in i .. to) {
+                if (j < to) {
+                    oneTimeNotificationNames[j] = oneTimeNotificationNames[j+1]
+                    oneTimeNotificationTimes[j] = oneTimeNotificationTimes[j+1]
+                    oneTimeNotificationTitles[j] = oneTimeNotificationTitles[j+1]
+                    oneTimeNotificationDescriptions[j] = oneTimeNotificationDescriptions[j+1]
+                } else if (j == to) {
+                    oneTimeNotificationNames[j] = tempName
+                    oneTimeNotificationTimes[j] = tempTime
+                    oneTimeNotificationTitles[j] = tempTitle
+                    oneTimeNotificationDescriptions[j] = tempDesc
+                }
+            }
+        } else if (to < i) {
+            for (j in i downTo to) {
+                if (j > to) {
+                    oneTimeNotificationNames[j] = oneTimeNotificationNames[j-1]
+                    oneTimeNotificationTimes[j] = oneTimeNotificationTimes[j-1]
+                    oneTimeNotificationTitles[j] = oneTimeNotificationTitles[j-1]
+                    oneTimeNotificationDescriptions[j] = oneTimeNotificationDescriptions[j-1]
+                } else if (j == to) {
+                    oneTimeNotificationNames[j] = tempName
+                    oneTimeNotificationTimes[j] = tempTime
+                    oneTimeNotificationTitles[j] = tempTitle
+                    oneTimeNotificationDescriptions[j] = tempDesc
+                }
+            }
+        }
+
     }
 
     fun totalLength() : Int {

@@ -3,6 +3,7 @@ package peter.mitchell.tododaily.ui.notifications
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.util.Log
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContentProviderCompat.requireContext
@@ -10,7 +11,9 @@ import androidx.core.view.isVisible
 import kotlinx.android.synthetic.main.new_notification.*
 import peter.mitchell.tododaily.R
 import peter.mitchell.tododaily.dailyNotifications
+import peter.mitchell.tododaily.saveInformation
 import peter.mitchell.tododaily.saveNotifications
+import java.lang.StringBuilder
 import java.time.*
 import java.time.temporal.TemporalField
 
@@ -34,8 +37,10 @@ class NewNotification : AppCompatActivity() {
 
         notificationRepeatInput.isChecked = !oneTimeNotification
         notificationRepeatInput.setOnClickListener {
-            notificationRepeatInput.isChecked = !oneTimeNotification
-            datePicker.isVisible = oneTimeNotification
+            //notificationRepeatInput.isChecked = !oneTimeNotification
+            datePicker.isVisible = notificationRepeatInput.isChecked
+
+            // update: notificationIndexInput
         }
 
         if (editNotificationIndex != -1) {
@@ -63,13 +68,38 @@ class NewNotification : AppCompatActivity() {
             submitButton()
         }
 
+        newNotificationDeleteButton.setOnClickListener { deleteButton() }
+
+        var indexArray : ArrayList<String> = ArrayList()
+        if (oneTimeNotification) {
+            for (i in 0 until dailyNotifications.oneTimeNotificationsLength) {
+                indexArray.add("$i: ${dailyNotifications.oneTimeNotificationNames[i]}")
+            }
+            if (editNotificationIndex == -1)
+                indexArray.add("End: new")
+        } else {
+            for (i in 0 until dailyNotifications.dailyNotificationsLength) {
+                indexArray.add("$i: ${dailyNotifications.dailyNotificationNames[i]}")
+            }
+            if (editNotificationIndex == -1)
+                indexArray.add("End: new")
+        }
+
+        notificationIndexInput.adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_list_item_1,
+            indexArray.toArray()
+        )
+        if (editNotificationIndex != -1)
+            notificationIndexInput.setSelection(editNotificationIndex)
+        else
+            notificationIndexInput.setSelection(indexArray.size-1)
     }
 
     private fun submitButton() {
-
         var notificationTime : LocalTime = LocalTime.of(timePicker.hour, timePicker.minute)
 
-        if (oneTimeNotification) {
+        if (!notificationRepeatInput.isChecked) {
 
             //val notificationDate : LocalDate = LocalDate.of(datePicker.year, datePicker.month, datePicker.dayOfMonth)
             val notificationDateTime : LocalDateTime = LocalDateTime.of(LocalDate.of(datePicker.year, datePicker.month+1, datePicker.dayOfMonth),notificationTime)
@@ -80,12 +110,13 @@ class NewNotification : AppCompatActivity() {
                 return
             }
 
-            if (editNotificationIndex == -1) {
+            if (editNotificationIndex == -1 || oneTimeNotification == notificationRepeatInput.isChecked) {
                 if (!dailyNotifications.addOneTimeNotification(
                         notificationNameInput.text.toString(),
                         notificationDateTime,
                         notificationTitleInput.text.toString(),
-                        notificationDescInput.text.toString()
+                        notificationDescInput.text.toString(),
+                        editNotificationIndex // is either -1, or needs to be used.
                     )) {
                     Toast.makeText(this, "Date/time already exists", Toast.LENGTH_SHORT).show()
                     return
@@ -104,12 +135,13 @@ class NewNotification : AppCompatActivity() {
             }
 
         } else {
-            if (editNotificationIndex == -1) {
+            if (editNotificationIndex == -1 || oneTimeNotification == notificationRepeatInput.isChecked) {
                 if (!dailyNotifications.addDailyNotification(
                         notificationNameInput.text.toString(),
                         notificationTime,
                         notificationTitleInput.text.toString(),
-                        notificationDescInput.text.toString()
+                        notificationDescInput.text.toString(),
+                        editNotificationIndex
                     )) {
                     Toast.makeText(this, "Time already exists", Toast.LENGTH_SHORT).show()
                     return
@@ -127,10 +159,43 @@ class NewNotification : AppCompatActivity() {
                 }
             }
         }
+
+        // --- delete notification if swapped locations --- MOVED INTO DAILYNOTIFICATIONS
+        /*if (editNotificationIndex != -1 || oneTimeNotification == notificationRepeatInput.isChecked) {
+            if (oneTimeNotification) {
+                dailyNotifications.removeOneTimeNotification(editNotificationIndex)
+            } else {
+                dailyNotifications.removeDailyNotification(editNotificationIndex)
+            }
+        }*/
+
+        // --- If notification index is set, then set the position ---
+
+
+        if (!notificationRepeatInput.isChecked) {
+            if (editNotificationIndex == -1)
+                editNotificationIndex = dailyNotifications.oneTimeNotificationsLength-1
+            dailyNotifications.oneTimeMoveFrom(editNotificationIndex, notificationIndexInput.selectedItemPosition)
+        } else {
+            if (editNotificationIndex == -1)
+                editNotificationIndex = dailyNotifications.dailyNotificationsLength-1
+            dailyNotifications.dailyMoveFrom(editNotificationIndex, notificationIndexInput.selectedItemPosition)
+        }
+
+
         saveNotifications()
 
         finish()
 
     }
 
+    private fun deleteButton() {
+        if (oneTimeNotification) {
+            dailyNotifications.removeOneTimeNotification(editNotificationIndex)
+        } else {
+            dailyNotifications.removeDailyNotification(editNotificationIndex)
+        }
+        saveNotifications()
+        finish()
+    }
 }
