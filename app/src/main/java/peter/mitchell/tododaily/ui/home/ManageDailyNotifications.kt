@@ -208,6 +208,9 @@ class ManageDailyNotifications : AppCompatActivity() {
 
     private fun reloadCurrentTitles() {
 
+        manageAllTitles.setCustomColumnCount(2)
+        manageMainReminders.setCustomColumnCount(2)
+
         var informationViewList = ArrayList<String>()
 
         for (i in 0 until saveInformation.length) {

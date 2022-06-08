@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.View
 import android.widget.GridLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContentProviderCompat.requireContext
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -76,7 +77,7 @@ class TextGridLayout @JvmOverloads constructor(
             textGrid[i].textAlignment = TextView.TEXT_ALIGNMENT_TEXT_START
             textGrid[i].minHeight = 30
             textGrid[i].id = View.generateViewId()
-            textGrid[i].layoutParams = layoutParams
+            textGrid[i].layoutParams = textLayoutParams
 
             if (darkMode)
                 textGrid[textGrid.size-1].setTextColor(resources.getColor(R.color.textDark))
