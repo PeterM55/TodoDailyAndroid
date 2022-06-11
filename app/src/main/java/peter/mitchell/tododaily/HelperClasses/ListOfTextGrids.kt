@@ -24,7 +24,7 @@ class ListOfTextGrids @JvmOverloads constructor(
     var titleText : ArrayList<TextView> = ArrayList(10)
     var sectionAddButtons : ArrayList<Button> = ArrayList()
     private var sectionButtons : ArrayList<Button> = ArrayList()
-    private var sectionGrids : ArrayList<TextGridLayout> = ArrayList()
+    var sectionGrids : ArrayList<TextGridLayout> = ArrayList()
     var listContent : ArrayList<ArrayList<TextView>> = ArrayList(10)
 
     var sectionOpened : ArrayList<Boolean> = ArrayList()

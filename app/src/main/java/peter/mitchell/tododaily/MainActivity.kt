@@ -20,6 +20,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import peter.mitchell.tododaily.HelperClasses.NotesList
 import peter.mitchell.tododaily.databinding.ActivityMainBinding
 import peter.mitchell.tododaily.HelperClasses.SaveInformation
 import peter.mitchell.tododaily.HelperClasses.TodoLists
@@ -32,6 +33,7 @@ import java.time.LocalDate
 var saveInformation : SaveInformation = SaveInformation()
 lateinit var dailyNotifications : DailyNotifications
 var todoLists : TodoLists? = null // only used in to-do section, but kept in memory to not have to read every time
+var notesList : NotesList? = null
 
 //FIXME
 //val dailyInformationFile = File("${requireContext().filesDir.path}/dailyInformation.txt")
@@ -56,13 +58,18 @@ const val toolBarSize : Int = 47
 //const val bottomBarSize : Int =
 
 // ----- Settings -----
+    // --- overall settings ---
 var settingsRead = false
-var notificationsFullNameMode = true
-var startOfWeek : DayOfWeek = DayOfWeek.MONDAY
 var darkMode = true
+    // --- home ---
+var startOfWeek : DayOfWeek = DayOfWeek.MONDAY
 var exportLabelLine = true
 var exportOrderDefault = "nvit"
 var exportCustomDefault = ""
+    // --- to-do ---
+    // --- notes ---
+    // --- notifs ---
+var notificationsFullNameMode = true
 var snoozeTime = 360
 
 var mainBinding: ActivityMainBinding? = null
@@ -240,9 +247,20 @@ fun readSettings() {
     if (!settingsFile.exists()) {
         return
     } else {
-        var splitSettings = settingsFile.readText().split(" ")
+        var splitSettings = settingsFile.readText().split("\n")
 
-        notificationsFullNameMode = splitSettings[0].toBoolean()
+        try {
+            notificationsFullNameMode = splitSettings[0].toBoolean()
+            darkMode = splitSettings[1].toBoolean()
+            startOfWeek = DayOfWeek.valueOf(splitSettings[2])
+            exportLabelLine = splitSettings[3].toBoolean()
+            exportOrderDefault = splitSettings[4]
+            exportCustomDefault = splitSettings[5]
+            notificationsFullNameMode = splitSettings[6].toBoolean()
+            snoozeTime = splitSettings[7].toInt()
+        } catch (e : Exception) {
+            e.printStackTrace()
+        }
     }
 }
 
@@ -252,7 +270,14 @@ fun saveSettings() {
         settingsFile.createNewFile()
     }
 
-    settingsFile.writeText("$notificationsFullNameMode ")
+    settingsFile.writeText("$notificationsFullNameMode\n")
+    settingsFile.appendText("$darkMode\n")
+    settingsFile.appendText("${startOfWeek.toString()}\n")
+    settingsFile.appendText("$exportLabelLine\n")
+    settingsFile.appendText("$exportOrderDefault\n")
+    settingsFile.appendText("$exportCustomDefault\n")
+    settingsFile.appendText("$notificationsFullNameMode\n")
+    settingsFile.appendText("$snoozeTime\n")
 }
 
 fun canExport(activity: Activity, context: Context) : Boolean {

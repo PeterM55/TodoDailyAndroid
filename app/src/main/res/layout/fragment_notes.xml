@@ -53,6 +53,13 @@
 
             </LinearLayout>
 
+            <peter.mitchell.tododaily.HelperClasses.ListOfTextGrids
+                android:id="@+id/notesListGrid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+
+
         </LinearLayout>
 
     </ScrollView>

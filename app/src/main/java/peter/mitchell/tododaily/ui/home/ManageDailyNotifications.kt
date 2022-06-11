@@ -430,6 +430,8 @@ class ManageDailyNotifications : AppCompatActivity() {
 
         var tempSaveInformation : SaveInformation = SaveInformation()
 
+        exportFile.writeText("")
+
         dailyInformationFile.forEachLine {
             tempSaveInformation.fromString(it)
 
@@ -447,9 +449,9 @@ class ManageDailyNotifications : AppCompatActivity() {
         // set to default if all worked
         if (defaultExportCheck.isChecked) {
             if (customExportInput.text.toString().isNotEmpty()) {
-                exportCustomDefault = customExportInput.text.toString()
+                exportCustomDefault = customExportInput.text.toString().replace('\n',' ')
             } else {
-                exportOrderDefault = customOrderInput.text.toString()
+                exportOrderDefault = customOrderInput.text.toString().replace('\n',' ')
                 exportCustomDefault = ""
             }
         }

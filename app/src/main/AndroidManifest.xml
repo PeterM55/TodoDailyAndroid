@@ -39,6 +39,10 @@
             android:screenOrientation="fullSensor" />
 
         <activity
+            android:name="peter.mitchell.tododaily.ui.notes.EditNotes"
+            android:screenOrientation="fullSensor" />
+
+        <activity
             android:name="peter.mitchell.tododaily.ui.notifications.NewNotification"
             android:screenOrientation="fullSensor" />
 

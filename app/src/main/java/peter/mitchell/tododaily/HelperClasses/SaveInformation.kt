@@ -295,7 +295,6 @@ class SaveInformation {
 
         if (i < to) {
             for (j in i .. to) {
-                Log.i("-----", "i: $i to: $to j: $j")
                 if (j < to) {
                     names[j] = names[j+1]
                     values[j] = values[j+1]
@@ -511,7 +510,7 @@ class SaveInformation {
                 if (strFormat[j] == 'n' || strFormat[j] == 'v' || strFormat[j] == 'i' || strFormat[j] == 't') {
                     strRead = strFormat[j]
                     var currentIndex = j+1
-                    while (currentIndex < returnStr.length && strFormat[currentIndex].isDigit()) {
+                    while (currentIndex < strFormat.length && strFormat[currentIndex].isDigit()) {
                         try {
                             i *= 10
                             i = strFormat[currentIndex].digitToInt()
@@ -538,6 +537,8 @@ class SaveInformation {
                 } else if (strRead == 't') {
                     returnStr.append("${names[i]} Time Read,")
                 }
+
+                j++
             }
 
             returnStr.append("\n")
@@ -554,7 +555,7 @@ class SaveInformation {
             if (strFormat[j] == 'n' || strFormat[j] == 'v' || strFormat[j] == 'i' || strFormat[j] == 't') {
                 strRead = strFormat[j]
                 var currentIndex = j+1
-                while (currentIndex < returnStr.length && strFormat[currentIndex].isDigit()) {
+                while (currentIndex < strFormat.length && strFormat[currentIndex].isDigit()) {
                     try {
                         i *= 10
                         i = strFormat[currentIndex].digitToInt()
