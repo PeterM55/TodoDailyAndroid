@@ -32,27 +32,27 @@
 
         <activity
             android:name="peter.mitchell.tododaily.ui.home.ManageDailyNotifications"
-            android:screenOrientation="fullSensor" />
+            android:screenOrientation="user" />
 
         <activity
             android:name="peter.mitchell.tododaily.ui.dashboard.EditTodo"
-            android:screenOrientation="fullSensor" />
+            android:screenOrientation="user" />
 
         <activity
             android:name="peter.mitchell.tododaily.ui.notes.EditNotes"
-            android:screenOrientation="fullSensor" />
+            android:screenOrientation="user" />
 
         <activity
             android:name="peter.mitchell.tododaily.ui.notifications.NewNotification"
-            android:screenOrientation="fullSensor" />
+            android:screenOrientation="user" />
 
         <activity
             android:name="peter.mitchell.tododaily.HelpActivity"
-            android:screenOrientation="fullSensor" />
+            android:screenOrientation="user" />
 
         <activity
             android:name="peter.mitchell.tododaily.SettingsActivity"
-            android:screenOrientation="fullSensor" />
+            android:screenOrientation="user" />
 
     </application>
 

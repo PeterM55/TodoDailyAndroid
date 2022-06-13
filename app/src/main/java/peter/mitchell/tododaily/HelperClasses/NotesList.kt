@@ -1,5 +1,6 @@
 package peter.mitchell.tododaily.HelperClasses
 
+import android.util.Log
 import peter.mitchell.tododaily.notificationsFullNameMode
 import peter.mitchell.tododaily.settingsFile
 import java.io.File
@@ -36,6 +37,36 @@ class NotesList {
         return true
     }
 
+    fun deleteOldFile(i : Int) {
+        if (i == -1) return
+
+        var delFile : File = File("$notesPath${notesFiles[i]}.txt")
+
+        if (!delFile.exists()) {
+            notesFiles.removeAt(i)
+            saveNotesList()
+            return
+        }
+
+        delFile.delete()
+        notesFiles.removeAt(i)
+        saveNotesList()
+    }
+
+    fun deleteOldList(i : Int) {
+        if (i == -1) return
+
+        var delFile : File = File("$notesPath${listsFiles[i]}.txt")
+
+        if (!delFile.exists()) {
+            return
+        }
+
+        delFile.delete()
+        listsFiles.removeAt(i)
+        saveNotesList()
+    }
+
     fun readNotesList() {
         notesFiles.clear()
         listsFiles.clear()
@@ -43,9 +74,9 @@ class NotesList {
         if (!notesListFile.exists()) {
             return
         } else {
-            var splitLines = settingsFile.readText().split("\n")
-            var notesSplit = splitLines[0].split(" ")
-            var listsSplit = splitLines[1].split(" ")
+            var splitLines = notesListFile.readText().split("\n")
+            var notesSplit = splitLines[0].split("|")
+            var listsSplit = splitLines[1].split("|")
 
             for (i in 0 until notesSplit.size) {
                 if (notesSplit[i].isNotEmpty())
@@ -70,13 +101,14 @@ class NotesList {
         }
 
         for (i in 0 until notesFiles.size) {
+            Log.i("saveNotesList", "Saving: ${notesFiles[i]}")
             if (notesFiles[i].isNotEmpty())
-                stringBuilder.append(notesFiles[i])
+                stringBuilder.append(notesFiles[i]+"|")
         }
         stringBuilder.append("\n")
         for (i in 0 until listsFiles.size) {
             if (listsFiles[i].isNotEmpty())
-                stringBuilder.append(listsFiles[i])
+                stringBuilder.append(listsFiles[i]+"|")
         }
 
         notesListFile.writeText(stringBuilder.toString())
@@ -85,11 +117,7 @@ class NotesList {
 
     private fun createFile(fileTitle : String) : Boolean {
 
-        for (i in 0 until fileTitle.length) {
-            if (!fileTitle[i].isLetterOrDigit() && fileTitle[i] != ' ') {
-                return false
-            }
-        }
+        if (!fileNameValid(fileTitle)) return false
 
         var finalPath : File = File("$notesPath$fileTitle.txt")
 
@@ -111,6 +139,123 @@ class NotesList {
 
         if (!finalPath.exists())
             return false
+
+        return true
+    }
+
+    fun readNote(i : Int) : String {
+        if (i == -1) return ""
+        val saveFile : File = File("$notesPath${notesFiles[i]}.txt")
+        if (!saveFile.exists()) {
+            return ""
+        } else {
+            return saveFile.readText()
+        }
+    }
+
+    fun readList(i : Int) : String {
+        if (i == -1) return ""
+        val saveFile : File = File("$notesPath${listsFiles[i]}.txt")
+        if (!saveFile.exists()) {
+            return ""
+        } else {
+            return saveFile.readText()
+        }
+    }
+
+    fun saveNote(i : Int, title : String, text : String) : Int {
+
+        var newIndex : Int = i
+
+        // --- delete the old one ---
+        if (i == -1) {
+            if (!createFile(title))
+                return -1
+            notesFiles.add(title)
+            newIndex = notesFiles.size-1
+            saveNotesList()
+        } else if (title != notesFiles[i]) {
+            if (!createFile(title))
+                return -1
+            deleteOldFile(i)
+            notesFiles[i] = title
+            saveNotesList()
+    }
+
+        // --- write the new string ---
+        val saveFile : File = File("$notesPath$title.txt")
+
+        if (!saveFile.exists())
+            return -1
+
+        saveFile.writeText(text)
+
+        return newIndex
+    }
+
+    fun saveList(i : Int, title : String, text : String) : Int {
+
+        var newIndex : Int = i
+
+        // --- delete the old one ---
+        if (i == -1) {
+            if (!createFile(title))
+                return -1
+            listsFiles.add(title)
+            newIndex = listsFiles.size-1
+            saveNotesList()
+        } else if (title != listsFiles[i]) {
+            if (!createFile(title))
+                return -1
+            deleteOldFile(i)
+            listsFiles[i] = title
+            saveNotesList()
+    }
+
+        // --- write the new string ---
+        val saveFile : File = File("$notesPath$title.txt")
+
+        if (!saveFile.exists())
+            return -1
+
+        saveFile.writeText(text)
+
+        return newIndex
+    }
+
+    fun fileNameValid(fileTitle : String) : Boolean {
+
+        var invalidList = arrayOf("CON", "PRN", "AUX", "NUL")
+
+        for (i in 0 until invalidList.size) {
+            if (fileTitle == invalidList[i]) {
+                return false
+            }
+        }
+
+        if (fileTitle.length < 5) {
+            var illegalStarts = arrayOf("COM, LPT")
+            for (i in 0 until illegalStarts.size) {
+                if (fileTitle.contains(illegalStarts[i], true)) {
+                    return false
+                }
+            }
+        }
+
+        var illegalCharacters = arrayOf("<", ">", ":", "\"", "/", "\\", "|", "?", "*", "\n")
+        for (i in 0 until illegalCharacters.size) {
+            if (fileTitle.contains(illegalCharacters[i])) {
+                return false
+            }
+        }
+
+        if (fileTitle.endsWith(" ") || fileTitle.endsWith(".") || fileTitle.startsWith("."))
+            return false
+
+        for (element in fileTitle) {
+            if (element < 32.toChar())
+                return false
+        }
 
         return true
     }

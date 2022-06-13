@@ -8,16 +8,7 @@ class HelpActivity : AppCompatActivity() {
 
     val helpString : String =
 """
-General Description:
-Sections:
-Adding Information to Track:
-How the Data is Saved:
-Accessing past dates:
 
-Exporting:
-
-Managing the Information:
-    test
 """.trimIndent()
 
 

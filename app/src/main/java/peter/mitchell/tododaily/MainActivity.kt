@@ -48,9 +48,7 @@ val todosFile = File("/data/data/peter.mitchell.tododaily/files/todos.txt")
 val exportFileName = "${Environment.getExternalStorageDirectory().path}/${Environment.DIRECTORY_DOWNLOADS}/dailyInformationExport.csv"
 
 var notifFragment : Fragment? = null
-enum class fragments {
-    home, todo, notes, notifs
-}
+enum class fragments { home, todo, notes, notifs }
 var currentFragment : fragments = fragments.home
 
 const val androidBarsSize : Int = 20+41

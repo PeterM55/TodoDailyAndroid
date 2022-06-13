@@ -16,7 +16,7 @@
             android:id="@+id/manageMainRemindersTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Current Titles (delete)"
+            android:text="Delete Titles"
             android:textSize="20dp"
             android:textColor="@color/textDark"
             app:layout_constraintTop_toTopOf="parent"
@@ -243,7 +243,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="true"
-            android:text="Include label line?"
+            android:text="Include Label Line?"
             app:layout_constraintTop_toBottomOf="@id/exportOptionsExpandButton"
             app:layout_constraintLeft_toLeftOf="parent"
             />

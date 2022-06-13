@@ -2,7 +2,6 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="5dp"
     android:background="@color/backgroundDark">
 
     <LinearLayout
@@ -22,6 +21,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="◀"
+                android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:minHeight="0dp"
                 android:minWidth="0dp"/>
@@ -29,19 +29,38 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
                 android:layout_gravity="center_vertical"
 
                 android:text="Edit Note"
                 android:textSize="20sp"
                 android:textColor="@color/textDark"
+                android:layout_weight="1"
                 />
+
+            <Button
+                android:id="@+id/deleteNoteButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="delete"
+                android:minHeight="0dp"
+                android:minWidth="0dp"/>
+
+            <Button
+                android:id="@+id/saveNoteButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Save"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"/>
 
         </LinearLayout>
 
         <!-- Main text box -->
 
         <EditText
+            android:id="@+id/noteTitleTextBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
 
@@ -49,10 +68,11 @@
             android:textSize="20dp"
             android:hint="Title (Can't be blank)"
             android:textColor="@color/textDark"
-
+            android:layout_margin="5dp"
             />
 
         <EditText
+            android:id="@+id/noteTextBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
 
@@ -60,6 +80,9 @@
             android:textSize="20dp"
             android:textColor="@color/textDark"
 
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="5dp"
             />
     </LinearLayout>
 </ScrollView>
