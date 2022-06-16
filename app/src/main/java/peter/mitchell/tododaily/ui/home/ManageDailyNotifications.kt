@@ -43,7 +43,12 @@ class ManageDailyNotifications : AppCompatActivity() {
         setContentView(R.layout.manage_daily_information)
         imm = this.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
-        reloadDynamicView()
+        manageMainReminders.setCustomColumnCount(homeColumns)
+        manageMainReminders.setTextSize(homeTextSize)
+        manageAllTitles.setCustomColumnCount(homeColumns)
+        manageAllTitles.setTextSize(homeTextSize)
+
+        manageDatesList.setCustomColumnCount(3)
 
         manageMainReminders.isVisible = currentTitlesVisible
         manageAllTitles.isVisible = rearrangeTitlesVisible
@@ -147,6 +152,7 @@ class ManageDailyNotifications : AppCompatActivity() {
 
         labelExportCheck.setOnClickListener {
             exportLabelLine = !exportLabelLine
+            saveSettings()
         }
         labelExportCheck.isChecked = exportLabelLine
 
@@ -168,48 +174,7 @@ class ManageDailyNotifications : AppCompatActivity() {
         // end of onCreateView
     }
 
-    private fun reloadDynamicView() {
-        return
-        // --- Dynamic view ---
-        /*val extraSpace = 10
-        var displayHeight = (resources.displayMetrics.heightPixels - (androidBarsSize+toolBarSize + 35 + 35 + 42 + 18 + extraSpace) * resources.displayMetrics.density).toInt()
-
-        if (addDatesVisible) displayHeight = 0
-
-        var displaysVisible = 0
-        if (currentTitlesVisible) displaysVisible++
-        if (rearrangeTitlesVisible) displaysVisible++
-        if (manageDatesVisible) displaysVisible++
-
-        if (displaysVisible == 0) return
-
-        if (currentTitlesVisible) {
-            var params: ViewGroup.LayoutParams = manageMainReminders.layoutParams
-            params.height = displayHeight/displaysVisible
-            manageMainReminders.layoutParams = params
-        }
-
-        if (rearrangeTitlesVisible) {
-            var params: ViewGroup.LayoutParams = manageAllTitles.layoutParams
-            params.height = displayHeight/displaysVisible
-            manageAllTitles.layoutParams = params
-        }
-
-        if (manageDatesVisible) {
-            var params: ViewGroup.LayoutParams = manageDatesList.layoutParams
-            params.height = displayHeight/displaysVisible
-            manageDatesList.layoutParams = params
-        }*/
-
-        /*var params: ViewGroup.LayoutParams = mainReminders.layoutParams
-        params.height = displayHeight
-        _binding.mainReminders.layoutParams = params*/
-    }
-
     private fun reloadCurrentTitles() {
-
-        manageAllTitles.setCustomColumnCount(2)
-        manageMainReminders.setCustomColumnCount(2)
 
         var informationViewList = ArrayList<String>()
 
@@ -292,8 +257,6 @@ class ManageDailyNotifications : AppCompatActivity() {
             exportOptionsExpandButton.setText("▼")
         else
             exportOptionsExpandButton.setText("◀")
-
-        reloadDynamicView()
     }
 
     private fun setupDates() {
@@ -454,6 +417,7 @@ class ManageDailyNotifications : AppCompatActivity() {
                 exportOrderDefault = customOrderInput.text.toString().replace('\n',' ')
                 exportCustomDefault = ""
             }
+            saveSettings()
         }
     }
 

@@ -25,6 +25,7 @@ class TextGridLayout @JvmOverloads constructor(
 ) : GridLayout(context, attrs) {
 
     public var textGrid : ArrayList<TextView> = ArrayList<TextView>(25)
+    var customTextSize : Float = 18f
 
     private val textLayoutParams : ConstraintLayout.LayoutParams = ConstraintLayout.LayoutParams(
         resources.displayMetrics.widthPixels/2-8, // width
@@ -50,7 +51,7 @@ class TextGridLayout @JvmOverloads constructor(
     public fun addString(context : Context, str : String) {
         textGrid.add(TextView(context))
         textGrid[textGrid.size-1].setText(str)
-        textGrid[textGrid.size-1].textSize = 18f
+        textGrid[textGrid.size-1].textSize = customTextSize
         textGrid[textGrid.size-1].setTextColor(Color.BLACK)
         textGrid[textGrid.size-1].textAlignment = TextView.TEXT_ALIGNMENT_TEXT_START
         textGrid[textGrid.size-1].minHeight = 30
@@ -72,7 +73,7 @@ class TextGridLayout @JvmOverloads constructor(
 
             textGrid.add(TextView(context))
             textGrid[i].setText(strings[i])
-            textGrid[i].textSize = 18f
+            textGrid[i].textSize = customTextSize
             textGrid[i].setTextColor(Color.BLACK)
             textGrid[i].textAlignment = TextView.TEXT_ALIGNMENT_TEXT_START
             textGrid[i].minHeight = 30
@@ -92,6 +93,13 @@ class TextGridLayout @JvmOverloads constructor(
     fun setCustomColumnCount(count : Int) {
         columnCount = count
         textLayoutParams.width = resources.displayMetrics.widthPixels/columnCount-8
+    }
+
+    fun setTextSize(size : Float) {
+        for (i in 0 until textGrid.size) {
+            textGrid[i].textSize = size
+        }
+        customTextSize = size
     }
 
 }

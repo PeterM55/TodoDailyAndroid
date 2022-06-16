@@ -10,11 +10,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.fragment_notes.*
+import peter.mitchell.tododaily.*
 import peter.mitchell.tododaily.HelperClasses.NotesList
-import peter.mitchell.tododaily.SettingsActivity
 import peter.mitchell.tododaily.databinding.FragmentNotesBinding
-import peter.mitchell.tododaily.mainBinding
-import peter.mitchell.tododaily.notesList
 
 class NotesFragment : Fragment() {
 
@@ -39,8 +38,10 @@ class NotesFragment : Fragment() {
         titles.add("Lists")
         _binding.notesListGrid.setupTitles(titles)
 
-        _binding.notesListGrid.sectionGrids[0].setCustomColumnCount(1)
-        _binding.notesListGrid.sectionGrids[1].setCustomColumnCount(2)
+        _binding.notesListGrid.sectionGrids[0].setCustomColumnCount(notesColumns)
+        _binding.notesListGrid.sectionGrids[0].setTextSize(notesTextSize)
+        _binding.notesListGrid.sectionGrids[1].setCustomColumnCount(listsColumns)
+        _binding.notesListGrid.sectionGrids[1].setTextSize(listsTextSize)
 
         var content : ArrayList<ArrayList<String>> = ArrayList(2)
         content.add(notesList!!.notesFiles)

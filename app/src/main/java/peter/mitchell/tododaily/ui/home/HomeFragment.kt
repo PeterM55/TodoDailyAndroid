@@ -63,10 +63,21 @@ class HomeFragment : Fragment() {
         //fragmentLabel.text = "Home"
         mainBinding?.fragmentLabel?.setText("Home")
 
-        if (!settingsRead) {
-            settingsRead = true
-            readSettings()
-        }
+        readSettings()
+
+        _binding.mainGridLayout.setCustomColumnCount(homeColumns)
+        _binding.weeklyGridLayout.setCustomColumnCount(homeColumns)
+        _binding.monthlyGridLayout.setCustomColumnCount(homeColumns)
+        _binding.yearlyGridLayout.setCustomColumnCount(homeColumns)
+        _binding.neverGridLayout.setCustomColumnCount(homeColumns)
+
+        _binding.mainGridLayout.setTextSize(homeTextSize)
+        _binding.weeklyGridLayout.setTextSize(homeTextSize)
+        _binding.monthlyGridLayout.setTextSize(homeTextSize)
+        _binding.yearlyGridLayout.setTextSize(homeTextSize)
+        _binding.neverGridLayout.setTextSize(homeTextSize)
+
+
 
         if (saveInformation.length == 0) {
             readTodaysDailyInformationFile()
@@ -138,8 +149,6 @@ class HomeFragment : Fragment() {
         // this is done in onResume, which runs after onCreate
         /*reloadReminderInput()
         reloadMainReminders()*/
-
-        Log.i("-----", "button size: ${_binding.bottomSpacingHome.height} ${_binding.bottomSpacingHome.height*resources.displayMetrics.density}")
 
         return root
     }
@@ -339,6 +348,7 @@ class HomeFragment : Fragment() {
 
         builder.show()
 
+        input.requestFocus()
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
     }
 

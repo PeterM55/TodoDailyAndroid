@@ -419,6 +419,7 @@ class DailyNotifications(context : Context) {
             pendingIntent
         )
 
+        Log.i("tdd-refreshNotifs", "Next alarm (${nextNotification.toLocalTime().toString()}) in: ${(timeToTimer-System.currentTimeMillis())/1000} seconds")
         //Toast.makeText(context, "Next alarm in: ${(timeToTimer-System.currentTimeMillis())/1000} seconds", Toast.LENGTH_SHORT).show()
 
         // --- Save next intent to file ---

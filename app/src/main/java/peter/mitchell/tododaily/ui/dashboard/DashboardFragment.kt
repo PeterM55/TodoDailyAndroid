@@ -18,12 +18,9 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_dashboard.*
+import peter.mitchell.tododaily.*
 import peter.mitchell.tododaily.HelperClasses.TodoLists
 import peter.mitchell.tododaily.databinding.FragmentDashboardBinding
-import peter.mitchell.tododaily.mainBinding
-import peter.mitchell.tododaily.saveDailyInformationFile
-import peter.mitchell.tododaily.saveInformation
-import peter.mitchell.tododaily.todoLists
 import peter.mitchell.tododaily.ui.home.ManageDailyNotifications
 
 class DashboardFragment : Fragment() {
@@ -44,6 +41,9 @@ class DashboardFragment : Fragment() {
         val root: View = binding.root
         imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         mainBinding?.fragmentLabel?.setText("Todo")
+
+        _binding.todoListsVisual.setCustomColumnCount(todoColumns)
+        _binding.todoListsVisual.setTextSize(todoTextSize)
 
         if (todoLists == null)
             todoLists = TodoLists()

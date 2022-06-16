@@ -56,17 +56,29 @@ const val toolBarSize : Int = 47
 //const val bottomBarSize : Int =
 
 // ----- Settings -----
-    // --- overall settings ---
+// --- overall settings ---
 var settingsRead = false
 var darkMode = true
-    // --- home ---
+// --- home ---
+var homeColumns = 2
+var homeTextSize = 18f
 var startOfWeek : DayOfWeek = DayOfWeek.MONDAY
 var exportLabelLine = true
 var exportOrderDefault = "nvit"
 var exportCustomDefault = ""
-    // --- to-do ---
-    // --- notes ---
-    // --- notifs ---
+// --- to-do ---
+var todoColumns = 3
+var todoTextSize = 18f
+// --- notes ---
+var notesColumns = 2
+var notesTextSize = 18f
+var listsColumns = 2
+var listsTextSize = 18f
+// --- notifs ---
+var oneTimeNotifsColumns = 2
+var oneTimeNotifsTextSize = 18f
+var dailyNotifsColumns = 2
+var dailyNotifsTextSize = 18f
 var notificationsFullNameMode = true
 var snoozeTime = 360
 
@@ -242,24 +254,43 @@ fun saveNotifications(notificationSource : DailyNotifications = dailyNotificatio
  * notificationsFullNameMode
  */
 fun readSettings() {
-    if (!settingsFile.exists()) {
+    if (settingsRead || !settingsFile.exists()) {
         return
     } else {
         var splitSettings = settingsFile.readText().split("\n")
 
         try {
-            notificationsFullNameMode = splitSettings[0].toBoolean()
-            darkMode = splitSettings[1].toBoolean()
-            startOfWeek = DayOfWeek.valueOf(splitSettings[2])
-            exportLabelLine = splitSettings[3].toBoolean()
-            exportOrderDefault = splitSettings[4]
-            exportCustomDefault = splitSettings[5]
-            notificationsFullNameMode = splitSettings[6].toBoolean()
-            snoozeTime = splitSettings[7].toInt()
+            var inputNum = 0
+
+            // -- All --
+            darkMode = splitSettings[inputNum++].toBoolean()
+            // -- home --
+            homeColumns = splitSettings[inputNum++].toInt()
+            homeTextSize = splitSettings[inputNum++].toFloat()
+            startOfWeek = DayOfWeek.valueOf(splitSettings[inputNum++])
+            exportLabelLine = splitSettings[inputNum++].toBoolean()
+            exportOrderDefault = splitSettings[inputNum++]
+            exportCustomDefault = splitSettings[inputNum++]
+            // -- To-do --
+            todoColumns = splitSettings[inputNum++].toInt()
+            todoTextSize = splitSettings[inputNum++].toFloat()
+            // -- Notes --
+            notesColumns = splitSettings[inputNum++].toInt()
+            notesTextSize = splitSettings[inputNum++].toFloat()
+            listsColumns = splitSettings[inputNum++].toInt()
+            listsTextSize = splitSettings[inputNum++].toFloat()
+            // -- Notifs --
+            oneTimeNotifsColumns = splitSettings[inputNum++].toInt()
+            oneTimeNotifsTextSize = splitSettings[inputNum++].toFloat()
+            dailyNotifsColumns = splitSettings[inputNum++].toInt()
+            dailyNotifsTextSize = splitSettings[inputNum++].toFloat()
+            notificationsFullNameMode = splitSettings[inputNum++].toBoolean()
+            snoozeTime = splitSettings[inputNum++].toInt()
         } catch (e : Exception) {
             e.printStackTrace()
         }
     }
+    settingsRead = true
 }
 
 fun saveSettings() {
@@ -268,12 +299,28 @@ fun saveSettings() {
         settingsFile.createNewFile()
     }
 
-    settingsFile.writeText("$notificationsFullNameMode\n")
-    settingsFile.appendText("$darkMode\n")
+    // -- All --
+    settingsFile.writeText("$darkMode\n")
+    // -- home --
+    settingsFile.appendText("$homeColumns\n")
+    settingsFile.appendText("$homeTextSize\n")
     settingsFile.appendText("${startOfWeek.toString()}\n")
     settingsFile.appendText("$exportLabelLine\n")
     settingsFile.appendText("$exportOrderDefault\n")
     settingsFile.appendText("$exportCustomDefault\n")
+    // -- To-do --
+    settingsFile.appendText("$todoColumns\n")
+    settingsFile.appendText("$todoTextSize\n")
+    // -- Notes --
+    settingsFile.appendText("$notesColumns\n")
+    settingsFile.appendText("$notesTextSize\n")
+    settingsFile.appendText("$listsColumns\n")
+    settingsFile.appendText("$listsTextSize\n")
+    // -- Notifs --
+    settingsFile.appendText("$oneTimeNotifsColumns\n")
+    settingsFile.appendText("$oneTimeNotifsTextSize\n")
+    settingsFile.appendText("$dailyNotifsColumns\n")
+    settingsFile.appendText("$dailyNotifsTextSize\n")
     settingsFile.appendText("$notificationsFullNameMode\n")
     settingsFile.appendText("$snoozeTime\n")
 }

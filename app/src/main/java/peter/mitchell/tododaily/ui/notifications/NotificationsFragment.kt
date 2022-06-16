@@ -52,22 +52,10 @@ class NotificationsFragment : Fragment() {
         val root: View = binding.root
         mainBinding?.fragmentLabel?.setText("Notifications")
 
-        // temporary code
-        /*var setTime = LocalTime.now().plusSeconds(10)
-
-        val testTime : LocalDateTime = setTime.atDate(LocalDate.now())
-        val timeToTimer : Long = testTime.toEpochSecond(ZoneId.systemDefault().rules.getOffset(Instant.now()))*1000
-        Toast.makeText(context, "Next alarm in: ${(timeToTimer-System.currentTimeMillis())/1000} seconds", Toast.LENGTH_SHORT).show()
-
-        //Log.i("Notif Fragment 55: ","Time set to now + 15s, but set to: ${timeToTimer/1000} and current is: ${(System.currentTimeMillis())/1000}")
-        //Log.i("Notif Fragment 55: ","Difference is: ${(timeToTimer-System.currentTimeMillis())/1000}")
-
-        dailyNotifications.createNotification(requireContext(), setTime)*/
-
-        // ----- Setup Main View -----
-        /*if (dailyNotifications.totalLength() == 0) {
-            readNotifications()
-        }*/
+        _binding.oneTimeNotificationsGrid.setCustomColumnCount(oneTimeNotifsColumns)
+        _binding.oneTimeNotificationsGrid.setTextSize(oneTimeNotifsTextSize)
+        _binding.dailyNotificationsGrid.setCustomColumnCount(dailyNotifsColumns)
+        _binding.dailyNotificationsGrid.setTextSize(dailyNotifsTextSize)
 
         // ----- Setup Buttons -----
         _binding.oneTimeNotificationsButton.setOnClickListener {
@@ -83,6 +71,8 @@ class NotificationsFragment : Fragment() {
         _binding.dailyNotificationsToggle.setOnClickListener {
             notificationsFullNameMode = !notificationsFullNameMode
             saveSettings()
+
+            reloadDailyNotifications()
         }
 
 

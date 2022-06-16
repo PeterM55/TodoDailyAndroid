@@ -29,6 +29,9 @@ class ListOfTextGrids @JvmOverloads constructor(
 
     var sectionOpened : ArrayList<Boolean> = ArrayList()
 
+    var columnCount = 2
+    var customTextSize = 18f
+
     private val titleTextLayoutParams : RelativeLayout.LayoutParams = RelativeLayout.LayoutParams(
         resources.displayMetrics.widthPixels-62*2-34, // width //RelativeLayout.LayoutParams.WRAP_CONTENT
         RelativeLayout.LayoutParams.WRAP_CONTENT,
@@ -57,9 +60,6 @@ class ListOfTextGrids @JvmOverloads constructor(
         for (i in 0 until listContent.size) {
             this.removeView(relativeLayouts[i])
             this.removeView(sectionGrids[i])
-            for (j in 0 until listContent[i].size) {
-
-            }
         }
 
         relativeLayouts.clear()
@@ -218,6 +218,20 @@ class ListOfTextGrids @JvmOverloads constructor(
             //titleText[i].layoutParams.width = RelativeLayout.LayoutParams.WRAP_CONTENT
             //titleText[i].
         }
+    }
+
+    fun setCustomColumnCount(count : Int) {
+        for (i in 0 until sectionGrids.size) {
+            sectionGrids[i].setCustomColumnCount(count)
+        }
+        columnCount = count
+    }
+
+    fun setTextSize(size : Float) {
+        for (i in 0 until sectionGrids.size) {
+            sectionGrids[i].setTextSize(size)
+        }
+        customTextSize = size
     }
 
 }

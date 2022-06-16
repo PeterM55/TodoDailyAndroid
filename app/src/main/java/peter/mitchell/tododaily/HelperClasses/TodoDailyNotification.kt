@@ -82,9 +82,15 @@ class TodoDailyNotification : BroadcastReceiver() {
 
         val snoozeIntent = Intent(context, TodoDailyNotification::class.java)
         snoozeIntent.putExtra("snooze?", true)
-        snoozeIntent.putExtra("snoozeName", dailyNotificationsTemp.oneTimeNotificationNames[notificationIndex]+"-Snoozed")
-        snoozeIntent.putExtra("snoozeTitle", dailyNotificationsTemp.oneTimeNotificationTitles[notificationIndex])
-        snoozeIntent.putExtra("snoozeDesc", dailyNotificationsTemp.oneTimeNotificationDescriptions[notificationIndex])
+        if (oneTimeNotification) {
+            snoozeIntent.putExtra("snoozeName", dailyNotificationsTemp.oneTimeNotificationNames[notificationIndex]+"-Snoozed")
+            snoozeIntent.putExtra("snoozeTitle", dailyNotificationsTemp.oneTimeNotificationTitles[notificationIndex])
+            snoozeIntent.putExtra("snoozeDesc", dailyNotificationsTemp.oneTimeNotificationDescriptions[notificationIndex])
+        } else {
+            snoozeIntent.putExtra("snoozeName", dailyNotificationsTemp.dailyNotificationNames[notificationIndex]+"-Snoozed")
+            snoozeIntent.putExtra("snoozeTitle", dailyNotificationsTemp.dailyNotificationTitles[notificationIndex])
+            snoozeIntent.putExtra("snoozeDesc", dailyNotificationsTemp.dailyNotificationDescriptions[notificationIndex])
+        }
 
         val snoozePendingIntent = PendingIntent.getBroadcast(
             context,
