@@ -11,10 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.ArrayAdapter
-import android.widget.EditText
-import android.widget.GridView
-import android.widget.TextView
+import android.widget.*
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_dashboard.*
@@ -42,9 +39,6 @@ class DashboardFragment : Fragment() {
         imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         mainBinding?.fragmentLabel?.setText("Todo")
 
-        _binding.todoListsVisual.setCustomColumnCount(todoColumns)
-        _binding.todoListsVisual.setTextSize(todoTextSize)
-
         if (todoLists == null)
             todoLists = TodoLists()
 
@@ -57,28 +51,8 @@ class DashboardFragment : Fragment() {
 
     private fun reloadTodoList() {
 
-        /*var tempTodoList : ArrayList<String> = ArrayList<String>()
-        tempTodoList.add("test1")
-        tempTodoList.add("test2")
-        tempTodoList.add("test3")
-        tempTodoList.add("test4")*/
         _binding.todoListsVisual.setupTitles(todoLists!!.getSectionTitles())
 
-        /*var tempTodoContent : ArrayList<ArrayList<String>> = ArrayList<ArrayList<String>>()
-        tempTodoContent.add(ArrayList())
-        tempTodoContent.add(ArrayList())
-        tempTodoContent.add(ArrayList())
-        tempTodoContent.add(ArrayList())
-        tempTodoContent[0].add("test11")
-        tempTodoContent[0].add("test12")
-        tempTodoContent[0].add("test13")
-        tempTodoContent[0].add("test14")
-        tempTodoContent[0].add("test15")
-        tempTodoContent[1].add("test21")
-        tempTodoContent[1].add("test22")
-        tempTodoContent[1].add("test23")
-        tempTodoContent[1].add("test24")
-        tempTodoContent[2].add("test31")*/
         _binding.todoListsVisual.setupContent(todoLists!!.getTodos())
 
         for (i in 0 until _binding.todoListsVisual.listContent.size) {
@@ -95,6 +69,8 @@ class DashboardFragment : Fragment() {
             }
         }
 
+        _binding.todoListsVisual.setCustomColumnCount(todoColumns)
+        _binding.todoListsVisual.setTextSize(todoTextSize)
     }
 
     private fun openEditTodo(i : Int, j : Int) {

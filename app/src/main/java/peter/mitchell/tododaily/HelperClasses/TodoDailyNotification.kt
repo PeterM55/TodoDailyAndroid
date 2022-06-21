@@ -37,7 +37,7 @@ class TodoDailyNotification : BroadcastReceiver() {
         var snooze : Boolean? = intent?.getBooleanExtra("snooze?", false)
         if (snooze == true && intent != null) {
             // Snooze by setting up a one time notification
-            dailyNotificationsTemp.addOneTimeNotification(intent.getStringExtra("snoozeName")!!, LocalDateTime.now().plusSeconds(
+            dailyNotificationsTemp.addOneTimeNotification(intent.getStringExtra("snoozeName")!!, LocalDateTime.now().plusMinutes(
                 snoozeTime.toLong()
             ), intent.getStringExtra("snoozeTitle")!!, intent.getStringExtra("snoozeDesc")!!)
         }

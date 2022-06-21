@@ -13,6 +13,7 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.view.isVisible
 import peter.mitchell.tododaily.R
 import peter.mitchell.tododaily.darkMode
+import peter.mitchell.tododaily.todoColumns
 import java.lang.reflect.Array
 
 class ListOfTextGrids @JvmOverloads constructor(
@@ -79,7 +80,6 @@ class ListOfTextGrids @JvmOverloads constructor(
             constraintLayout.id = View.generateViewId()
 
             constraintLayout.layoutParams = constraintLayoutParams
-            var constraintSet : ConstraintSet = ConstraintSet()
 
             var sectionTitle : TextView = TextView(context)
             sectionTitle.setText(titles[i])

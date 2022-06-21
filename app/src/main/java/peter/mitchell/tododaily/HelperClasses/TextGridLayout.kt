@@ -12,6 +12,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.core.view.children
 import kotlinx.android.synthetic.main.fragment_home.*
 import org.w3c.dom.Text
 import org.xmlpull.v1.XmlPullParser
@@ -91,8 +92,18 @@ class TextGridLayout @JvmOverloads constructor(
     }
 
     fun setCustomColumnCount(count : Int) {
+        textLayoutParams.width = resources.displayMetrics.widthPixels/count-8
+
+        var tempTextArrayList : ArrayList<String> = ArrayList(textGrid.size)
+        for (i in 0 until textGrid.size) {
+            tempTextArrayList.add(textGrid[i].text.toString())
+        }
+
+        reset()
+        // before column count can be set to anything smaller, the contents must be reset for some reason.
         columnCount = count
-        textLayoutParams.width = resources.displayMetrics.widthPixels/columnCount-8
+
+        setAdapter(context, tempTextArrayList)
     }
 
     fun setTextSize(size : Float) {
@@ -101,5 +112,6 @@ class TextGridLayout @JvmOverloads constructor(
         }
         customTextSize = size
     }
+
 
 }

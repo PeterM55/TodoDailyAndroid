@@ -65,20 +65,6 @@ class HomeFragment : Fragment() {
 
         readSettings()
 
-        _binding.mainGridLayout.setCustomColumnCount(homeColumns)
-        _binding.weeklyGridLayout.setCustomColumnCount(homeColumns)
-        _binding.monthlyGridLayout.setCustomColumnCount(homeColumns)
-        _binding.yearlyGridLayout.setCustomColumnCount(homeColumns)
-        _binding.neverGridLayout.setCustomColumnCount(homeColumns)
-
-        _binding.mainGridLayout.setTextSize(homeTextSize)
-        _binding.weeklyGridLayout.setTextSize(homeTextSize)
-        _binding.monthlyGridLayout.setTextSize(homeTextSize)
-        _binding.yearlyGridLayout.setTextSize(homeTextSize)
-        _binding.neverGridLayout.setTextSize(homeTextSize)
-
-
-
         if (saveInformation.length == 0) {
             readTodaysDailyInformationFile()
         }
@@ -155,6 +141,23 @@ class HomeFragment : Fragment() {
 
     /** Reloads the main reminders grid */
     private fun reloadMainReminders() {
+
+        if (homeColumns != _binding.mainGridLayout.columnCount) {
+            _binding.mainGridLayout.setCustomColumnCount(homeColumns)
+            _binding.weeklyGridLayout.setCustomColumnCount(homeColumns)
+            _binding.monthlyGridLayout.setCustomColumnCount(homeColumns)
+            _binding.yearlyGridLayout.setCustomColumnCount(homeColumns)
+            _binding.neverGridLayout.setCustomColumnCount(homeColumns)
+        }
+
+        if (homeTextSize != _binding.mainGridLayout.customTextSize) {
+            _binding.mainGridLayout.setTextSize(homeTextSize)
+            _binding.weeklyGridLayout.setTextSize(homeTextSize)
+            _binding.monthlyGridLayout.setTextSize(homeTextSize)
+            _binding.yearlyGridLayout.setTextSize(homeTextSize)
+            _binding.neverGridLayout.setTextSize(homeTextSize)
+        }
+
         mainGridLayout.reset()
         weeklyGridLayout.reset()
         monthlyGridLayout.reset()

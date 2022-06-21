@@ -52,11 +52,6 @@ class NotificationsFragment : Fragment() {
         val root: View = binding.root
         mainBinding?.fragmentLabel?.setText("Notifications")
 
-        _binding.oneTimeNotificationsGrid.setCustomColumnCount(oneTimeNotifsColumns)
-        _binding.oneTimeNotificationsGrid.setTextSize(oneTimeNotifsTextSize)
-        _binding.dailyNotificationsGrid.setCustomColumnCount(dailyNotifsColumns)
-        _binding.dailyNotificationsGrid.setTextSize(dailyNotifsTextSize)
-
         // ----- Setup Buttons -----
         _binding.oneTimeNotificationsButton.setOnClickListener {
             val intent = Intent(activity as Context, NewNotification::class.java)
@@ -93,7 +88,9 @@ class NotificationsFragment : Fragment() {
             }
         }
 
-        _binding.oneTimeNotificationsGrid.setCustomColumnCount(2)
+
+        _binding.oneTimeNotificationsGrid.setCustomColumnCount(oneTimeNotifsColumns)
+        _binding.oneTimeNotificationsGrid.setTextSize(oneTimeNotifsTextSize)
     }
 
     private fun reloadDailyNotifications() {
@@ -112,7 +109,8 @@ class NotificationsFragment : Fragment() {
             }
         }
 
-        _binding.dailyNotificationsGrid.setCustomColumnCount(2)
+        _binding.dailyNotificationsGrid.setCustomColumnCount(dailyNotifsColumns)
+        _binding.dailyNotificationsGrid.setTextSize(dailyNotifsTextSize)
     }
 
     override fun onResume() {

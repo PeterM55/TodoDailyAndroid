@@ -80,7 +80,7 @@ var oneTimeNotifsTextSize = 18f
 var dailyNotifsColumns = 2
 var dailyNotifsTextSize = 18f
 var notificationsFullNameMode = true
-var snoozeTime = 360
+var snoozeTime = 5
 
 var mainBinding: ActivityMainBinding? = null
 
