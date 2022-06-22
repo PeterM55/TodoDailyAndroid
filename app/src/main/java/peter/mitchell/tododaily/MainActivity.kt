@@ -340,6 +340,8 @@ fun readBackupSettings() {
 
             for (i in 0 until splitSettings.size) {
 
+                if (splitSettings[i].split(" ").size < 2) return
+
                 val splitTitle = splitSettings[i].split(" ")[0]
                 val splitValue = splitSettings[i].split(" ")[1]
 
