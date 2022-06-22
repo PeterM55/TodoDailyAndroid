@@ -43,6 +43,7 @@ val tempFile = File("/data/data/peter.mitchell.tododaily/files/tempDailyInformat
 val notificationsFile = File("/data/data/peter.mitchell.tododaily/files/dailyNotifications.txt")
 val nextNotificationIntentFile = File("/data/data/peter.mitchell.tododaily/files/nextNotificationIntent.txt")
 val settingsFile = File("/data/data/peter.mitchell.tododaily/files/settings.txt")
+val settingsBackupFile = File("/data/data/peter.mitchell.tododaily/files/settingsBackup.txt")
 val todosFile = File("/data/data/peter.mitchell.tododaily/files/todos.txt")
 //val exportFileName = "/storage/emulated/0/Download/dailyInformationExport.txt"
 val exportFileName = "${Environment.getExternalStorageDirectory().path}/${Environment.DIRECTORY_DOWNLOADS}/dailyInformationExport.csv"
@@ -288,6 +289,7 @@ fun readSettings() {
             snoozeTime = splitSettings[inputNum++].toInt()
         } catch (e : Exception) {
             e.printStackTrace()
+            readBackupSettings()
         }
     }
     settingsRead = true
@@ -323,6 +325,88 @@ fun saveSettings() {
     settingsFile.appendText("$dailyNotifsTextSize\n")
     settingsFile.appendText("$notificationsFullNameMode\n")
     settingsFile.appendText("$snoozeTime\n")
+
+    saveBackupSettings()
+}
+
+fun readBackupSettings() {
+
+    if (!settingsBackupFile.exists()) {
+        return
+    } else {
+        var splitSettings = settingsBackupFile.readText().split("\n")
+
+        try {
+
+            for (i in 0 until splitSettings.size) {
+
+                val splitTitle = splitSettings[i].split(" ")[0]
+                val splitValue = splitSettings[i].split(" ")[1]
+
+                // -- All --
+                if (splitTitle == "darkMode") darkMode = splitValue.toBoolean()
+                // -- home --
+                else if (splitTitle == "homeColumns") homeColumns = splitValue.toInt()
+                else if (splitTitle == "homeTextSize") homeTextSize = splitValue.toFloat()
+                else if (splitTitle == "startOfWeek") startOfWeek = DayOfWeek.valueOf(splitValue)
+                else if (splitTitle == "exportLabelLine") exportLabelLine = splitValue.toBoolean()
+                else if (splitTitle == "exportOrderDefault") exportOrderDefault = splitValue
+                else if (splitTitle == "exportCustomDefault") exportCustomDefault = splitValue
+                // -- To-do --
+                else if (splitTitle == "todoColumns") todoColumns = splitValue.toInt()
+                else if (splitTitle == "todoTextSize") todoTextSize = splitValue.toFloat()
+                // -- Notes --
+                else if (splitTitle == "notesColumns") notesColumns = splitValue.toInt()
+                else if (splitTitle == "notesTextSize") notesTextSize = splitValue.toFloat()
+                else if (splitTitle == "listsColumns") listsColumns = splitValue.toInt()
+                else if (splitTitle == "listsTextSize") listsTextSize = splitValue.toFloat()
+                // -- Notifs --
+                else if (splitTitle == "oneTimeNotifsColumns") oneTimeNotifsColumns = splitValue.toInt()
+                else if (splitTitle == "oneTimeNotifsTextSize") oneTimeNotifsTextSize = splitValue.toFloat()
+                else if (splitTitle == "dailyNotifsColumns") dailyNotifsColumns = splitValue.toInt()
+                else if (splitTitle == "dailyNotifsTextSize") dailyNotifsTextSize = splitValue.toFloat()
+                else if (splitTitle == "notificationsFullNameMode") notificationsFullNameMode = splitValue.toBoolean()
+                else if (splitTitle == "snoozeTime") snoozeTime = splitValue.toInt()
+            }
+
+        } catch (e : Exception) {
+            e.printStackTrace()
+        }
+    }
+    settingsRead = true
+
+}
+
+fun saveBackupSettings() {
+    if (!settingsBackupFile.exists()) {
+        settingsBackupFile.parentFile!!.mkdirs()
+        settingsBackupFile.createNewFile()
+    }
+
+    // -- All --
+    settingsBackupFile.writeText("darkMode $darkMode\n")
+    // -- home --
+    settingsBackupFile.appendText("homeColumns $homeColumns\n")
+    settingsBackupFile.appendText("homeTextSize $homeTextSize\n")
+    settingsBackupFile.appendText("startOfWeek ${startOfWeek.toString()}\n")
+    settingsBackupFile.appendText("exportLabelLine $exportLabelLine\n")
+    settingsBackupFile.appendText("exportOrderDefault $exportOrderDefault\n")
+    settingsBackupFile.appendText("exportCustomDefault $exportCustomDefault\n")
+    // -- To-do --
+    settingsBackupFile.appendText("todoColumns $todoColumns\n")
+    settingsBackupFile.appendText("todoTextSize $todoTextSize\n")
+    // -- Notes --
+    settingsBackupFile.appendText("notesColumns $notesColumns\n")
+    settingsBackupFile.appendText("notesTextSize $notesTextSize\n")
+    settingsBackupFile.appendText("listsColumns $listsColumns\n")
+    settingsBackupFile.appendText("listsTextSize $listsTextSize\n")
+    // -- Notifs --
+    settingsBackupFile.appendText("oneTimeNotifsColumns $oneTimeNotifsColumns\n")
+    settingsBackupFile.appendText("oneTimeNotifsTextSize $oneTimeNotifsTextSize\n")
+    settingsBackupFile.appendText("dailyNotifsColumns $dailyNotifsColumns\n")
+    settingsBackupFile.appendText("dailyNotifsTextSize $dailyNotifsTextSize\n")
+    settingsBackupFile.appendText("notificationsFullNameMode $notificationsFullNameMode\n")
+    settingsBackupFile.appendText("snoozeTime $snoozeTime\n")
 }
 
 fun canExport(activity: Activity, context: Context) : Boolean {
