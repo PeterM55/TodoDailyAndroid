@@ -76,6 +76,9 @@ class NotificationsFragment : Fragment() {
     }
 
     private fun reloadOneTimeNotifications() {
+        _binding.oneTimeNotificationsGrid.setCustomColumnCount(oneTimeNotifsColumns)
+        _binding.oneTimeNotificationsGrid.setTextSize(oneTimeNotifsTextSize)
+
         _binding.oneTimeNotificationsGrid.reset()
         for (i in 0 until dailyNotifications.oneTimeNotificationsLength) {
             _binding.oneTimeNotificationsGrid.addString(requireContext(), dailyNotifications.getOneTimeString(i))
@@ -87,13 +90,12 @@ class NotificationsFragment : Fragment() {
                 startActivity(intent)
             }
         }
-
-
-        _binding.oneTimeNotificationsGrid.setCustomColumnCount(oneTimeNotifsColumns)
-        _binding.oneTimeNotificationsGrid.setTextSize(oneTimeNotifsTextSize)
     }
 
     private fun reloadDailyNotifications() {
+        _binding.dailyNotificationsGrid.setCustomColumnCount(dailyNotifsColumns)
+        _binding.dailyNotificationsGrid.setTextSize(dailyNotifsTextSize)
+
         _binding.dailyNotificationsGrid.reset()
         for (i in 0 until dailyNotifications.dailyNotificationsLength) {
             if (notificationsFullNameMode)
@@ -108,9 +110,6 @@ class NotificationsFragment : Fragment() {
                 startActivity(intent)
             }
         }
-
-        _binding.dailyNotificationsGrid.setCustomColumnCount(dailyNotifsColumns)
-        _binding.dailyNotificationsGrid.setTextSize(dailyNotifsTextSize)
     }
 
     override fun onResume() {

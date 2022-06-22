@@ -50,6 +50,8 @@ class DashboardFragment : Fragment() {
     }
 
     private fun reloadTodoList() {
+        _binding.todoListsVisual.setCustomColumnCount(todoColumns)
+        _binding.todoListsVisual.setTextSize(todoTextSize)
 
         _binding.todoListsVisual.setupTitles(todoLists!!.getSectionTitles())
 
@@ -69,8 +71,6 @@ class DashboardFragment : Fragment() {
             }
         }
 
-        _binding.todoListsVisual.setCustomColumnCount(todoColumns)
-        _binding.todoListsVisual.setTextSize(todoTextSize)
     }
 
     private fun openEditTodo(i : Int, j : Int) {
