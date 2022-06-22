@@ -6,13 +6,17 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Parcel
 import android.util.Log
 import android.widget.Toast
+import androidx.work.Data
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
 import peter.mitchell.tododaily.*
+import peter.mitchell.tododaily.HelperClasses.NotifWorker
 import peter.mitchell.tododaily.HelperClasses.TodoDailyNotification
-import java.lang.StringBuilder
 import java.time.*
+import java.time.temporal.ChronoUnit
+import java.util.concurrent.TimeUnit
 
 const val channelID = "todoDailyNotificationChannel"
 
@@ -359,19 +363,7 @@ class DailyNotifications(context : Context) {
         val notificationIntent = Intent(context, TodoDailyNotification::class.java)
 
         // --- Get the currently scheduled notification, and delete it ---
-        if (scheduledNotificationIntent == null && nextNotificationIntentFile.exists()) {
-            val fileText = nextNotificationIntentFile.readText()
-            if (!fileText.isNullOrEmpty()) {
-                val previousIntent = PendingIntent.getBroadcast(
-                    context,
-                    fileText.toInt(),
-                    notificationIntent,
-                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-                )
-
-                alarmManager.cancel(previousIntent)
-            }
-        }
+        WorkManager.getInstance(context).cancelAllWork()
 
         // --- Get the next notification to schedule ---
         var nextNotification : LocalDateTime? = null
@@ -403,32 +395,23 @@ class DailyNotifications(context : Context) {
         // --- Schedule the next notification ---
         if (nextNotification == null) return
 
-        // this sets a pending intent?
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            notificationIndex,
-            notificationIntent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
+        //var timeOfTimer : Long = nextNotification.toEpochSecond(ZoneId.systemDefault().rules.getOffset(Instant.now()))*1000
+        var secondsToTimer : Long = ChronoUnit.SECONDS.between(LocalDateTime.now(),nextNotification)
 
-        var timeToTimer = nextNotification.toEpochSecond(ZoneId.systemDefault().rules.getOffset(Instant.now()))*1000
+        val testWorkTag = "notificationDailyTag"
 
-        alarmManager.setExactAndAllowWhileIdle(//(setAndAllowWhileIdle
-            AlarmManager.RTC_WAKEUP,
-            timeToTimer,
-            pendingIntent
-        )
+        Log.i("tdd-----", "${nextNotification.toString()} is in $secondsToTimer seconds")
+        //Toast.makeText(context, "${nextNotification.toString()} is in $secondsToTimer seconds", Toast.LENGTH_SHORT).show()
 
-        Log.i("tdd-refreshNotifs", "Next alarm (${nextNotification.toLocalTime().toString()}) in: ${(timeToTimer-System.currentTimeMillis())/1000} seconds")
+        val notificationWork : OneTimeWorkRequest = OneTimeWorkRequest.Builder(NotifWorker::class.java)
+            .setInitialDelay(secondsToTimer, TimeUnit.SECONDS)
+            .addTag(testWorkTag)
+            .build()
+
+        WorkManager.getInstance(context).enqueue(notificationWork)
+
+        Log.i("tdd-refreshNotifs", "Next alarm (${nextNotification.toLocalTime().toString()}) in: ${secondsToTimer} seconds")
         //Toast.makeText(context, "Next alarm in: ${(timeToTimer-System.currentTimeMillis())/1000} seconds", Toast.LENGTH_SHORT).show()
-
-        // --- Save next intent to file ---
-        if (!nextNotificationIntentFile.exists()) {
-            nextNotificationIntentFile.parentFile!!.mkdirs()
-            nextNotificationIntentFile.createNewFile()
-        }
-
-        nextNotificationIntentFile.writeText(notificationIndex.toString())
 
         saveNotifications(this)
     }
