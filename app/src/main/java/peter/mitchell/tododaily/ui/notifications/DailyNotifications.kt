@@ -146,6 +146,34 @@ class DailyNotifications(context : Context) {
         return true
     }
 
+    fun getNextNotificationTime() : LocalDateTime? {
+
+        var nextNotification : LocalDateTime? = null
+
+        for (i in 0 until oneTimeNotificationsLength) {
+
+            if (nextNotification == null || nextNotification.isAfter(oneTimeNotificationTimes[i])) {
+                nextNotification = oneTimeNotificationTimes[i]
+            }
+
+        }
+
+        for (i in 0 until dailyNotificationsLength) {
+
+            var tempDateTime : LocalDateTime = LocalDateTime.of(LocalDate.now(), dailyNotificationTimes[i])
+            if (tempDateTime.isBefore(LocalDateTime.now())) {
+                tempDateTime = LocalDateTime.of(LocalDate.now().plusDays(1), dailyNotificationTimes[i])
+            }
+
+            if (nextNotification == null || nextNotification.isAfter(tempDateTime)) {
+                nextNotification = tempDateTime
+            }
+
+        }
+
+        return nextNotification
+    }
+
     fun removeDailyNotification(i : Int) {
         dailyNotificationNames.removeAt(i)
         dailyNotificationTimes.removeAt(i)

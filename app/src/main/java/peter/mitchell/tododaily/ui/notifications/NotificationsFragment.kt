@@ -75,6 +75,18 @@ class NotificationsFragment : Fragment() {
         return root
     }
 
+    private fun reloadNextNotification() {
+
+        var nextNotification = dailyNotifications.getNextNotificationTime()
+
+        if (nextNotification == null) {
+            nextNotificationText.text = "No notifications found"
+        } else {
+            nextNotificationText.text = "Next Notification: ${nextNotification.toLocalDate().toString()} at ${nextNotification.toLocalTime().toString()}"
+        }
+
+    }
+
     private fun reloadOneTimeNotifications() {
         _binding.oneTimeNotificationsGrid.setCustomColumnCount(oneTimeNotifsColumns)
         _binding.oneTimeNotificationsGrid.setTextSize(oneTimeNotifsTextSize)
@@ -119,6 +131,7 @@ class NotificationsFragment : Fragment() {
 
         dailyNotifications.refreshNotifications(requireContext())
 
+        reloadNextNotification()
         reloadOneTimeNotifications()
         reloadDailyNotifications()
     }
