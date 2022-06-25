@@ -3,6 +3,7 @@ package peter.mitchell.tododaily.HelperClasses
 import android.util.Log
 import peter.mitchell.tododaily.settingsFile
 import peter.mitchell.tododaily.todosFile
+import java.lang.StringBuilder
 
 class TodoLists {
 
@@ -69,22 +70,103 @@ class TodoLists {
         return sectionTitles.size
     }
 
+    fun getSize(i : Int) : Int {
+        return sectionTodos[i].size
+    }
+
+    public fun moveFrom(sectionNum : Int, i : Int, to : Int) {
+
+        if (i == to || i >= sectionTodos[sectionNum].size || to >= sectionTodos[sectionNum].size) return
+
+        var tempName = sectionTodos[sectionNum][i]
+
+        if (i < to) {
+            for (j in i .. to) {
+                if (j < to) {
+                    sectionTodos[sectionNum][j] = sectionTodos[sectionNum][j+1]
+                } else if (j == to) {
+                    sectionTodos[sectionNum][j] = tempName
+                }
+            }
+        } else if (to < i) {
+            for (j in i downTo to) {
+                if (j > to) {
+                    sectionTodos[sectionNum][j] = sectionTodos[sectionNum][j-1]
+                } else if (j == to) {
+                    sectionTodos[sectionNum][j] = tempName
+                }
+            }
+        }
+
+        saveTodos()
+    }
+
     private fun readTodos() {
         if (!todosFile.exists()) {
             return
         } else {
+            sectionTitles.clear()
+            sectionTodos.clear()
+
             val todoLines = todosFile.readText().lines()
             for (line in 0 until todoLines.size) {
-                val splitLine = todoLines[line].split(",")
-                if (splitLine.size <= 1) return
-
-                sectionTitles.add(splitLine[0])
+                if (todoLines[line].length <= 2) return
                 sectionTodos.add(ArrayList(10))
 
-                for (todoNum in 1 until splitLine.size) {
-                    if (splitLine[todoNum].isNotEmpty())
-                        sectionTodos[line].add(splitLine[todoNum])
+                var i : Int = 1 // skip first "
+                var previousWasQuote : Boolean = false
+                var savedTitle : Boolean = false
+                var currentString = StringBuilder()
+
+                while (i < todoLines[line].length) {
+
+                    if (!previousWasQuote && todoLines[line][i] == '\"' && todoLines[line][i+1] == ',') {
+
+                        if (savedTitle)
+                            sectionTodos[sectionTodos.size-1].add(currentString.toString())
+                        else {
+                            sectionTitles.add(currentString.toString())
+                            savedTitle = true
+                        }
+                        currentString.clear()
+                        i+= 2 // adds 3 (because of i++), starting on the char after " or exiting while
+                        previousWasQuote = false
+                    } else {
+
+                        if (todoLines[line][i] == '\"') {
+
+                            if (!previousWasQuote)
+                                currentString.append(todoLines[line][i])
+
+                            previousWasQuote = !previousWasQuote
+                        } else {
+                            currentString.append(todoLines[line][i])
+                        }
+
+                    }
+
+                    i++
                 }
+
+
+
+
+                /*val splitLine = todoLines[line].split(",")
+                if (splitLine.size <= 1) return
+
+                var splitIndex = 0
+
+                sectionTitles.add(splitLine[splitIndex++])
+                sectionTodos.add(ArrayList(10))
+
+                for (todoNum in splitIndex until splitLine.size) {
+                    if (splitLine[todoNum].isNullOrEmpty()) continue
+
+                    if (todoNum != 1 && splitLine[todoNum-1].get(splitLine[todoNum-1].length-1) == '\\') {
+                        sectionTodos[sectionTodos.size-1][sectionTitles.size-1] += ","+splitLine[splitIndex++]
+                    } else
+                        sectionTodos[sectionTodos.size-1].add(splitLine[todoNum])
+                }*/
             }
         }
     }
@@ -102,9 +184,9 @@ class TodoLists {
 
         todosFile.writeText("")
         for (sectionNum in 0 until sectionTitles.size) {
-            todosFile.appendText(sectionTitles[sectionNum]+",")
+            todosFile.appendText("\""+sectionTitles[sectionNum].replace("\"","\"\"").replace("\n"," ")+"\",")
             for (todoNum in 0 until sectionTodos[sectionNum].size) {
-                todosFile.appendText(sectionTodos[sectionNum][todoNum]+",")
+                todosFile.appendText("\""+sectionTodos[sectionNum][todoNum].replace("\"","\"\"").replace("\n"," ")+"\",")
             }
             todosFile.appendText("\n")
         }

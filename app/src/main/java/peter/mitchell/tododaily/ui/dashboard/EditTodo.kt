@@ -38,6 +38,25 @@ class EditTodo : AppCompatActivity() {
         } else if (myIndexJ != -1)
             todoNameInput.setText(todoLists!!.getTodo(myIndexI,myIndexJ))
 
+        if (myIndexJ != -2) {
+            var positionArrayList = ArrayList<String>()
+            for (i in 0 until todoLists!!.getSize(myIndexI)) {
+                positionArrayList.add("${i + 1}")
+            }
+            if (myIndexJ == -1) {
+                positionArrayList.add("${positionArrayList.size}")
+            }
+            todoPositionInput.adapter =
+                    ArrayAdapter(this, android.R.layout.simple_list_item_1, positionArrayList)
+
+            if (myIndexJ == -1)
+                todoPositionInput.setSelection(positionArrayList.size-1)
+            else
+                todoPositionInput.setSelection(myIndexJ)
+
+        } else
+            todoPositionLayout.isVisible = false
+
         editTodoSubmitButton.setOnClickListener {
             if (myIndexJ == -2) {
                 if (todoNameInput.text.toString() != "")
@@ -47,11 +66,15 @@ class EditTodo : AppCompatActivity() {
             } else if (myIndexJ == -1) {
                 if (todoNameInput.text.toString() != "")
                     todoLists!!.addTodo(myIndexI, todoNameInput.text.toString())
+
+                todoLists!!.moveFrom(myIndexI, todoLists!!.getSize(myIndexI)-1, todoPositionInput.selectedItemPosition)
             } else {
                 if (todoNameInput.text.toString() != "")
                     todoLists!!.setTodo(myIndexI, myIndexJ, todoNameInput.text.toString())
                 else
                     todoLists!!.removeTodo(myIndexI, myIndexJ)
+
+                todoLists!!.moveFrom(myIndexI, myIndexJ, todoPositionInput.selectedItemPosition)
             }
             finish()
         }
