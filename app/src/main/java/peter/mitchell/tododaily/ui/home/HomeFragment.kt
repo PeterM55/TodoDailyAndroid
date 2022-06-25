@@ -363,7 +363,7 @@ class HomeFragment : Fragment() {
         }
 
         MaterialAlertDialogBuilder(requireContext()).setTitle("Export?")
-            .setMessage("This will export to your external downloads folder.")
+            .setMessage("This will export to your external downloads folder.\nThis uses the default export option (manage)")
             .setNegativeButton("Cancel") { dialog, which ->
 
             }.setPositiveButton("Export") { dialog, which ->

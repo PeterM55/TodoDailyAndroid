@@ -6,6 +6,7 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
+import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
@@ -17,6 +18,7 @@ import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.manage_daily_information.*
+import kotlinx.coroutines.selects.select
 import peter.mitchell.tododaily.*
 import peter.mitchell.tododaily.HelperClasses.SaveInformation
 import java.io.File
@@ -38,6 +40,22 @@ class ManageDailyNotifications : AppCompatActivity() {
     var addDatesVisible : Boolean = false
     var exportVisible : Boolean = false
 
+    val exportPresetsFile = File("/data/data/peter.mitchell.tododaily/files/exportPresets.txt")
+    class ExportPresetFormat(nameIn : String, lineLabelsIn : Boolean, customIn : Boolean, exportStringIn : String) {
+        var name : String = nameIn;
+        var lineLabels : Boolean = lineLabelsIn;
+        var custom : Boolean = customIn
+        var exportString : String = exportStringIn;
+    };
+    var exportPresets = ArrayList<ExportPresetFormat>()
+    var defaultExportPresets : ArrayList<ExportPresetFormat> = arrayListOf(
+        ExportPresetFormat("New", true, false, ""),
+        ExportPresetFormat("Standard", true, false, "v"),
+        ExportPresetFormat("Raw Data", false, false, "nvit"),
+    )
+    var defaultPreset : Int = 1
+    var selectedPreset : Int = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.manage_daily_information)
@@ -55,6 +73,7 @@ class ManageDailyNotifications : AppCompatActivity() {
         manageDatesList.isVisible = manageDatesVisible
         toggleManageDatesText.isVisible = manageDatesVisible
 
+        readExportPresets()
         if (dailyInformationFile.exists()) {
             dailyInformationFile.forEachLine {
                 datesList.add(it.split(",")[0]) //LocalDate.parse
@@ -148,6 +167,27 @@ class ManageDailyNotifications : AppCompatActivity() {
         exportOptionsExpandButton.setOnClickListener {
             exportVisible = !exportVisible
             reloadVisibilities()
+            setExportPresetsInputPosition(selectedPreset)
+        }
+
+        reloadExportPresetsInput()
+
+        exportPresetsInput.onItemSelectedListener = object :
+            AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                Log.i("======", "'you' selected: $position")
+                setExportPresetsInputPosition(position)
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                /*readDailyInformationFile()
+                        reloadMainReminders()*/
+            }
         }
 
         labelExportCheck.setOnClickListener {
@@ -169,6 +209,23 @@ class ManageDailyNotifications : AppCompatActivity() {
         }
         customOrderInput.setText(exportOrderDefault)
         customExportInput.setText(exportCustomDefault)
+
+        deleteExportPreset.setOnClickListener {
+            if (selectedPreset > 2) {
+                exportPresets.removeAt(selectedPreset)
+                if (selectedPreset == defaultPreset)
+                    defaultPreset = 1
+
+                saveExportPresets()
+                reloadVisibilities()
+                setExportPresetsInputPosition(selectedPreset-1)
+                reloadExportPresetsInput()
+            }
+        }
+
+        saveExportPreset.setOnClickListener {
+            saveExportPresetPressed()
+        }
 
         exportButton.setOnClickListener { customExportSubmit() }
         // end of onCreateView
@@ -217,21 +274,25 @@ class ManageDailyNotifications : AppCompatActivity() {
         addDateInput.isVisible = addDatesVisible
         addDateButton.isVisible = addDatesVisible
 
-        customExportTitle.isVisible = exportVisible
-        customExportInput.isVisible = exportVisible
-        exportExplanation1.isVisible = exportVisible
+        exportPresetsTitle.isVisible = exportVisible
+        exportPresetsInput.isVisible = exportVisible
+        val exportPresetNew = exportPresetsInput.selectedItemPosition == 0 || exportPresetsInput.selectedItemPosition > 2
+
         labelExportCheck.isVisible = exportVisible
-        if (exportVisible && customExportInput.text.isEmpty()) {
+        exportExplanation1.isVisible = exportVisible && exportPresetNew
+        if (exportPresetNew && exportVisible && customExportInput.text.isEmpty()) {
             customOrderTitle.isVisible = true
             customOrderInput.isVisible = true
-            defaultExportCheck.isVisible = true
-            exportButton.isVisible =  true
         } else {
             customOrderTitle.isVisible = false
             customOrderInput.isVisible = false
-            defaultExportCheck.isVisible = false
-            exportButton.isVisible =  false
         }
+        customExportTitle.isVisible = exportVisible && exportPresetNew
+        customExportInput.isVisible = exportVisible && exportPresetNew
+        deleteExportPreset.isVisible = exportVisible && selectedPreset != 1 && selectedPreset != 2
+        saveExportPreset.isVisible = exportVisible && selectedPreset != 1 && selectedPreset != 2
+        defaultExportCheck.isVisible = exportVisible
+        exportButton.isVisible =  exportVisible
 
         if (currentTitlesVisible)
             toggleMainReminders.setText("▼")
@@ -379,6 +440,39 @@ class ManageDailyNotifications : AppCompatActivity() {
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
     }
 
+    private fun reloadExportPresetsInput() {
+        var exportPresetNames = ArrayList<String>()
+        for (i in 0 until exportPresets.size) {
+            if (i == defaultPreset)
+                exportPresetNames.add("*"+exportPresets[i].name)
+            else
+                exportPresetNames.add(exportPresets[i].name)
+        }
+
+        exportPresetsInput.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, exportPresetNames)
+    }
+
+    private fun setExportPresetsInputPosition(position : Int) {
+        if (position < 0) return
+        if (position >= exportPresets.size) return
+        Log.i("======", "position set to: $position")
+
+        labelExportCheck.isChecked = exportPresets[position].lineLabels
+        if (exportPresets[position].custom) {
+            customOrderInput.setText("")
+            customExportInput.setText(exportPresets[position].exportString)
+        } else {
+            customOrderInput.setText(exportPresets[position].exportString)
+            customExportInput.setText("")
+        }
+        defaultExportCheck.isChecked = position == defaultPreset
+
+        selectedPreset = position
+        exportPresetsInput.setSelection(position)
+        reloadVisibilities()
+
+    }
+
     private fun customExportSubmit() {
 
         if (!canExport(this, this))
@@ -417,8 +511,129 @@ class ManageDailyNotifications : AppCompatActivity() {
                 exportOrderDefault = customOrderInput.text.toString().replace('\n',' ')
                 exportCustomDefault = ""
             }
+            saveExportPresetPressed()
+            defaultPreset = exportPresetsInput.selectedItemPosition
             saveSettings()
         }
+    }
+
+    private fun saveExportPresetPressed() {
+        if (selectedPreset == 0) {
+
+            if (customExportInput.text.toString().isNotEmpty()) {
+                exportPresets.add(
+                    ExportPresetFormat(
+                        "User Preset ${exportPresets.size - 2}",
+                        labelExportCheck.isChecked,
+                        true,
+                        customExportInput.text.toString(),
+                    )
+                )
+            } else {
+                exportPresets.add(
+                    ExportPresetFormat(
+                        "User Preset ${exportPresets.size - 2}",
+                        labelExportCheck.isChecked,
+                        false,
+                        customOrderInput.text.toString(),
+                    )
+                )
+            }
+
+
+            if (defaultExportCheck.isChecked) {
+                if (customExportInput.text.toString().isNotEmpty()) {
+                    exportCustomDefault = customExportInput.text.toString().replace('\n',' ')
+                } else {
+                    exportOrderDefault = customOrderInput.text.toString().replace('\n',' ')
+                    exportCustomDefault = ""
+                }
+                saveSettings()
+
+                defaultPreset = exportPresets.size-1
+            }
+
+            reloadExportPresetsInput()
+            setExportPresetsInputPosition(exportPresets.size - 1)
+            saveExportPresets()
+
+        } else if (selectedPreset > 2) {
+
+            exportPresets[selectedPreset].lineLabels = labelExportCheck.isChecked
+            if (customExportInput.text.toString().isNotEmpty()) {
+                exportPresets[selectedPreset].custom = true
+                exportPresets[selectedPreset].exportString = customExportInput.text.toString()
+            } else {
+                exportPresets[selectedPreset].custom = false
+                exportPresets[selectedPreset].exportString = customOrderInput.text.toString()
+            }
+
+            if (defaultExportCheck.isChecked) {
+                if (customExportInput.text.toString().isNotEmpty()) {
+                    exportCustomDefault = customExportInput.text.toString().replace('\n',' ')
+                } else {
+                    exportOrderDefault = customOrderInput.text.toString().replace('\n',' ')
+                    exportCustomDefault = ""
+                }
+                defaultPreset = exportPresetsInput.selectedItemPosition
+                saveSettings()
+            }
+
+            saveExportPresets()
+        }
+    }
+
+    private fun readExportPresets() {
+        exportPresets = defaultExportPresets.clone() as ArrayList<ExportPresetFormat>
+
+        if (!exportPresetsFile.exists()) {
+            defaultPreset = 1
+            selectedPreset = defaultPreset
+            reloadExportPresetsInput()
+            Log.i("======", "position set try: $selectedPreset")
+            setExportPresetsInputPosition(selectedPreset)
+            return
+        } else {
+
+            var latestLine = exportPresetsFile.inputStream().bufferedReader().readLines()
+            defaultPreset = latestLine[0].toInt()
+
+            for (i in 1 until latestLine.size) {
+                val splitLine = latestLine[i].split(",")
+                if (splitLine.size < 4) continue
+
+                exportPresets.add(
+                    ExportPresetFormat(
+                        splitLine[0],
+                        splitLine[1].toBoolean(),
+                        splitLine[2].toBoolean(),
+                        splitLine[3],
+                    )
+                )
+
+                for (j in 4 until splitLine.size) {
+                    exportPresets[i+2].exportString += ","+splitLine[j]
+                }
+
+            }
+
+        }
+
+        reloadExportPresetsInput()
+        setExportPresetsInputPosition(defaultPreset)
+
+    }
+
+    private fun saveExportPresets() {
+        if (!exportPresetsFile.exists()) {
+            exportPresetsFile.parentFile!!.mkdirs()
+            exportPresetsFile.createNewFile()
+        }
+        exportPresetsFile.writeText("$defaultPreset\n")
+        for (i in 3 until exportPresets.size) {
+            exportPresetsFile.appendText("${exportPresets[i].name},${exportPresets[i].lineLabels},${exportPresets[i].custom},${exportPresets[i].exportString}\n")
+        }
+
     }
 
     override fun onResume() {

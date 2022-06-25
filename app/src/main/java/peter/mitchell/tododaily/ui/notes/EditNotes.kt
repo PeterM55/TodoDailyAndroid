@@ -100,7 +100,7 @@ class EditNotes : AppCompatActivity() {
             if (isList)
                 notesList!!.deleteOldList(fileIndex)
             else
-                notesList!!.deleteOldFile(fileIndex)
+                notesList!!.deleteOldNote(fileIndex)
             finish()
         }
     }

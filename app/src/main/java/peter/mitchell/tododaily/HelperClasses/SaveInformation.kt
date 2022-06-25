@@ -494,7 +494,7 @@ class SaveInformation {
         return returnStr.toString()
     }
 
-    public fun exportToCustomString(strFormat: String, addColLabel : Boolean = false) : String {
+    public fun exportToCustomString(strFormat: String, addColLabel : Boolean = false) : String? {
         var returnStr : StringBuilder = StringBuilder()
 
         if (addColLabel) {
@@ -553,12 +553,13 @@ class SaveInformation {
             var i : Int = -1
 
             if (strFormat[j] == 'n' || strFormat[j] == 'v' || strFormat[j] == 'i' || strFormat[j] == 't') {
+                i = 0
                 strRead = strFormat[j]
                 var currentIndex = j+1
                 while (currentIndex < strFormat.length && strFormat[currentIndex].isDigit()) {
                     try {
                         i *= 10
-                        i = strFormat[currentIndex].digitToInt()
+                        i += strFormat[currentIndex].digitToInt()
                     } catch (e: NumberFormatException) {
                         i /= 10
                         break
@@ -569,7 +570,7 @@ class SaveInformation {
                 i -= 1
             }
 
-            if (i == -1) {
+            if (i < 0) {
                 returnStr.append(strFormat[j])
             } else {
                 if (i >= length) {

@@ -1,8 +1,6 @@
 package peter.mitchell.tododaily.HelperClasses
 
 import android.util.Log
-import peter.mitchell.tododaily.notificationsFullNameMode
-import peter.mitchell.tododaily.settingsFile
 import java.io.File
 import java.lang.Exception
 import java.lang.StringBuilder
@@ -37,19 +35,25 @@ class NotesList {
         return true
     }
 
-    fun deleteOldFile(i : Int) {
+    fun deleteOldNote(i : Int, leaveIndex : Boolean = false) {
         if (i == -1) return
 
         var delFile : File = File("$notesPath${notesFiles[i]}.txt")
 
         if (!delFile.exists()) {
-            notesFiles.removeAt(i)
+            if (leaveIndex)
+                notesFiles[i] = ""
+            else
+                notesFiles.removeAt(i)
             saveNotesList()
             return
         }
 
         delFile.delete()
-        notesFiles.removeAt(i)
+        if (leaveIndex)
+            notesFiles[i] = ""
+        else
+            notesFiles.removeAt(i)
         saveNotesList()
     }
 
@@ -177,7 +181,7 @@ class NotesList {
         } else if (title != notesFiles[i]) {
             if (!createFile(title))
                 return -1
-            deleteOldFile(i)
+            deleteOldNote(i, true)
             notesFiles[i] = title
             saveNotesList()
     }
@@ -207,7 +211,7 @@ class NotesList {
         } else if (title != listsFiles[i]) {
             if (!createFile(title))
                 return -1
-            deleteOldFile(i)
+            deleteOldNote(i, true)
             listsFiles[i] = title
             saveNotesList()
     }

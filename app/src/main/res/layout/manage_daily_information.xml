@@ -238,13 +238,42 @@
             android:minWidth="0dp"
             />
 
+        <LinearLayout
+            android:id="@+id/exportPresetLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+
+            app:layout_constraintTop_toBottomOf="@id/exportOptionsExpandButton"
+            app:layout_constraintLeft_toLeftOf="parent">
+
+            <TextView
+                android:id="@+id/exportPresetsTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:text="Export Presets: "
+                android:textSize="18dp"
+                android:textColor="@color/textDark"
+                />
+
+            <Spinner
+                android:id="@+id/exportPresetsInput"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="18dp"
+
+                />
+        </LinearLayout>
+
         <CheckBox
             android:id="@+id/labelExportCheck"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="true"
             android:text="Include Label Line?"
-            app:layout_constraintTop_toBottomOf="@id/exportOptionsExpandButton"
+            app:layout_constraintTop_toBottomOf="@id/exportPresetLayout"
             app:layout_constraintLeft_toLeftOf="parent"
             />
 
@@ -305,14 +334,40 @@
             app:layout_constraintLeft_toLeftOf="parent"
             />
 
+        <Button
+            android:id="@+id/deleteExportPreset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/customExportInput"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@+id/saveExportPreset"
+            android:text="Delete\nPreset"
+            android:textSize="10dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            />
+
+        <Button
+            android:id="@+id/saveExportPreset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/customExportInput"
+            app:layout_constraintLeft_toRightOf="@+id/deleteExportPreset"
+            app:layout_constraintRight_toLeftOf="@+id/defaultExportCheck"
+            android:text="Save\nPreset"
+            android:textSize="10dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            />
+
         <CheckBox
             android:id="@+id/defaultExportCheck"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="true"
-            android:text="Use as default?"
+            android:text="default"
             app:layout_constraintTop_toBottomOf="@id/customExportInput"
-            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintLeft_toRightOf="@+id/saveExportPreset"
             app:layout_constraintRight_toLeftOf="@id/exportButton"
             />
 
