@@ -127,6 +127,10 @@ class SaveInformation {
         return values[i]
     }
 
+    public fun getRawValue(i : Int) : String {
+        return values[i]
+    }
+
     public fun setValue(i : Int, value : String) : Boolean {
         if (!verifyFormat(value, formats[i])) return false
 

@@ -22,6 +22,7 @@ var darkMode = true
 var homeColumns = 2
 var homeTextSize = 18
 var startOfWeek : DayOfWeek = DayOfWeek.MONDAY
+var selectHoldText = true
 var exportLabelLine = true
 var exportOrderDefault = "nvit"
 var exportCustomDefault = ""
@@ -62,6 +63,7 @@ var snoozeTime = 360
         "Home Columns",
         "Home Text Size",
         "Start of Week",
+        "Select Hold Text",
         "Export Line Label",
         // export location?
 
@@ -97,6 +99,7 @@ var snoozeTime = 360
         SettingType.ColumnCount,
         SettingType.TextSize,
         SettingType.DayOfWeek,
+        SettingType.Toggle,
         SettingType.Toggle,
         // export location?
 
@@ -311,6 +314,8 @@ var snoozeTime = 360
         (settingsList[countingIndex++] as EditText).setText(homeTextSize.toString())
         // "Start of Week",
         (settingsList[countingIndex++] as Spinner).setSelection(getDayIndex(dayObjectToString(startOfWeek)))
+        // "Select Hold Text",
+        (settingsList[countingIndex++] as TextView).text = getBooleanString(selectHoldText)
         // "Export Line Label",
         (settingsList[countingIndex++] as TextView).text = getBooleanString(exportLabelLine)
         // export location?
@@ -366,6 +371,8 @@ var snoozeTime = 360
         homeTextSize = (settingsList[countingIndex++] as EditText).text.toString().toFloat()
         // "Start of Week",
         startOfWeek = dayIndexToObject((settingsList[countingIndex++] as Spinner).selectedItemPosition)
+        // "Select Hold Text",
+        selectHoldText = getStringBoolean((settingsList[countingIndex++] as TextView).text.toString())
         // "Export Line Label",
         exportLabelLine = getStringBoolean((settingsList[countingIndex++] as TextView).text.toString())
         // export location?

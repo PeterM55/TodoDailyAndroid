@@ -336,6 +336,8 @@ class HomeFragment : Fragment() {
         val input = EditText(requireContext())
         input.hint = "Enter the value"
         input.inputType = saveInformation.getInputType(i)
+        if (selectHoldText)
+            input.setText(saveInformation.getRawValue(i))
         builder.setView(input)
 
         builder.setPositiveButton("OK", DialogInterface.OnClickListener { dialog, which ->

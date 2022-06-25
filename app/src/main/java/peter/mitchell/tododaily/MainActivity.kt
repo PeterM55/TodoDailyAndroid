@@ -64,6 +64,7 @@ var darkMode = true
 var homeColumns = 2
 var homeTextSize = 18f
 var startOfWeek : DayOfWeek = DayOfWeek.MONDAY
+var selectHoldText = true
 var exportLabelLine = true
 var exportOrderDefault = "nvit"
 var exportCustomDefault = ""
@@ -269,6 +270,7 @@ fun readSettings() {
             homeColumns = splitSettings[inputNum++].toInt()
             homeTextSize = splitSettings[inputNum++].toFloat()
             startOfWeek = DayOfWeek.valueOf(splitSettings[inputNum++])
+            selectHoldText = splitSettings[inputNum++].toBoolean()
             exportLabelLine = splitSettings[inputNum++].toBoolean()
             exportOrderDefault = splitSettings[inputNum++]
             exportCustomDefault = splitSettings[inputNum++]
@@ -307,6 +309,7 @@ fun saveSettings() {
     settingsFile.appendText("$homeColumns\n")
     settingsFile.appendText("$homeTextSize\n")
     settingsFile.appendText("${startOfWeek.toString()}\n")
+    settingsFile.appendText("${selectHoldText}\n")
     settingsFile.appendText("$exportLabelLine\n")
     settingsFile.appendText("$exportOrderDefault\n")
     settingsFile.appendText("$exportCustomDefault\n")
@@ -351,6 +354,7 @@ fun readBackupSettings() {
                 else if (splitTitle == "homeColumns") homeColumns = splitValue.toInt()
                 else if (splitTitle == "homeTextSize") homeTextSize = splitValue.toFloat()
                 else if (splitTitle == "startOfWeek") startOfWeek = DayOfWeek.valueOf(splitValue)
+                else if (splitTitle == "selectHoldText") selectHoldText = splitValue.toBoolean()
                 else if (splitTitle == "exportLabelLine") exportLabelLine = splitValue.toBoolean()
                 else if (splitTitle == "exportOrderDefault") exportOrderDefault = splitValue
                 else if (splitTitle == "exportCustomDefault") exportCustomDefault = splitValue
@@ -391,6 +395,7 @@ fun saveBackupSettings() {
     settingsBackupFile.appendText("homeColumns $homeColumns\n")
     settingsBackupFile.appendText("homeTextSize $homeTextSize\n")
     settingsBackupFile.appendText("startOfWeek ${startOfWeek.toString()}\n")
+    settingsBackupFile.appendText("selectHoldText $selectHoldText\n")
     settingsBackupFile.appendText("exportLabelLine $exportLabelLine\n")
     settingsBackupFile.appendText("exportOrderDefault $exportOrderDefault\n")
     settingsBackupFile.appendText("exportCustomDefault $exportCustomDefault\n")

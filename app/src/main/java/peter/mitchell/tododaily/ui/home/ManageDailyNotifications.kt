@@ -115,6 +115,7 @@ class ManageDailyNotifications : AppCompatActivity() {
 
                 }.setPositiveButton("Delete") { dialog, which ->
                     saveInformation.resetData()
+                    saveDailyInformationFile()
                     reloadCurrentTitles()
                 }.show()
         }
@@ -136,6 +137,7 @@ class ManageDailyNotifications : AppCompatActivity() {
                 }.setPositiveButton("Delete") { dialog, which ->
                     deleteAllDates()
                     setupDates()
+                    saveDailyInformationFile()
                 }.show()
         }
 
@@ -251,6 +253,7 @@ class ManageDailyNotifications : AppCompatActivity() {
 
                     }.setPositiveButton("Delete") { dialog, which ->
                         saveInformation.deleteValue(i)
+                        saveDailyInformationFile()
                         reloadCurrentTitles()
                     }.show()
             }
