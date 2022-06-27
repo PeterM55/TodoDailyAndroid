@@ -83,6 +83,23 @@ class ManageNotes : AppCompatActivity() {
                 exportListDialog(i)
             }
         }
+
+        exportAllNotesButton.setOnClickListener {
+
+            for (i in 0 until notesList!!.notesFiles.size) {
+                if (i == 0 && !attemptExport(exportPath+notesList!!.notesFiles[i]+".txt", notesList!!.readNote(i))) {
+                    Toast.makeText(this, "Export failed.", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                } else
+                    attemptExport(exportPath+notesList!!.notesFiles[i]+".txt", notesList!!.readNote(i))
+            }
+
+            for (i in 0 until notesList!!.listsFiles.size) {
+                attemptExport(exportPath+notesList!!.listsFiles[i]+".txt", notesList!!.readList(i))
+            }
+
+        }
+
         // end of onCreateView
     }
 
@@ -154,15 +171,8 @@ class ManageNotes : AppCompatActivity() {
 
             }.setPositiveButton("Export") { dialog, which ->
 
-                if (!canExport(this, this))
-                    return@setPositiveButton
-
-                var exportFile : File? = getExportFile(exportPath+notesList!!.notesFiles[i]+".txt")
-
-                if (exportFile == null)
-                    return@setPositiveButton
-
-                exportFile.writeText(notesList!!.readNote(i))
+                if (!attemptExport(exportPath+notesList!!.notesFiles[i]+".txt", notesList!!.readNote(i)))
+                    Toast.makeText(this, "Export failed.", Toast.LENGTH_SHORT).show()
 
             }.show()
 
@@ -175,17 +185,23 @@ class ManageNotes : AppCompatActivity() {
 
             }.setPositiveButton("Export") { dialog, which ->
 
-                if (!canExport(this, this))
-                    return@setPositiveButton
-
-                var exportFile : File? = getExportFile(exportPath+notesList!!.listsFiles[i]+".txt")
-
-                if (exportFile == null)
-                    return@setPositiveButton
-
-                exportFile.writeText(notesList!!.readList(i))
+                if (!attemptExport(exportPath+notesList!!.listsFiles[i]+".txt", notesList!!.readList(i)))
+                    Toast.makeText(this, "Export failed.", Toast.LENGTH_SHORT).show()
 
             }.show()
+    }
+
+    private fun attemptExport(fullPath : String, text : String) : Boolean {
+        if (!canExport(this, this))
+            return false
+
+        var exportFile : File? = getExportFile(fullPath)
+
+        if (exportFile == null)
+            return false
+
+        exportFile.writeText(text)
+        return true
     }
 
 }

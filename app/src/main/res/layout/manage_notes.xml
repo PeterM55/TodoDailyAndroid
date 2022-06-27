@@ -11,13 +11,28 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <peter.mitchell.tododaily.HelperClasses.ListOfTextGrids
-            android:id="@+id/manageNotesTextGrids"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            />
+            <peter.mitchell.tododaily.HelperClasses.ListOfTextGrids
+                android:id="@+id/manageNotesTextGrids"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
 
+                />
+
+            <Button
+                android:id="@+id/exportAllNotesButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Export All"
+                android:textSize="16sp"
+                />
+
+        </LinearLayout>
     </ScrollView>
 
 </LinearLayout>
