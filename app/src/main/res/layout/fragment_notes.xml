@@ -29,27 +29,13 @@
                 >
 
                 <Button
-                    android:id="@+id/manageMainRemindersButton"
+                    android:id="@+id/manageNotesButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/manageDailyInformationButton"
                     android:layout_marginRight="10dp"
                     android:minHeight="0dp"
                     android:minWidth="0dp"/>
-
-                <Button
-                    android:id="@+id/exportMainRemindersButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Export"
-                    android:layout_marginRight="10dp"
-                    android:minHeight="0dp"
-                    android:minWidth="0dp"/>
-
-                <Spinner
-                    android:id="@+id/selectPastDateSpinner"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"/>
 
             </LinearLayout>
 

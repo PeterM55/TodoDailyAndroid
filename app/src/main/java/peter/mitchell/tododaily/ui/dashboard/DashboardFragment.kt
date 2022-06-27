@@ -13,12 +13,14 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.fragment.app.Fragment
+import androidx.navigation.findNavController
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_dashboard.*
 import peter.mitchell.tododaily.*
 import peter.mitchell.tododaily.HelperClasses.TodoLists
 import peter.mitchell.tododaily.databinding.FragmentDashboardBinding
 import peter.mitchell.tododaily.ui.home.ManageDailyNotifications
+import peter.mitchell.tododaily.ui.notes.NotesFragmentDirections
 
 class DashboardFragment : Fragment() {
 
@@ -109,7 +111,17 @@ class DashboardFragment : Fragment() {
     }
 
     override fun onResume() {
+
+        if (!notesShown) {
+            super.onResume()
+
+            val action = DashboardFragmentDirections.actionNavigationDashboardToNavigationHome()
+            view?.findNavController()?.navigate(action)
+        }
+
         reloadTodoList()
+
+        updateBottomNavVisibilities()
         super.onResume()
     }
 

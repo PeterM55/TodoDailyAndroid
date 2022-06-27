@@ -22,6 +22,8 @@ import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.findNavController
+import androidx.work.WorkManager
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.fragment_notifications.*
@@ -127,6 +129,15 @@ class NotificationsFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
+        if (!notificationsShown) {
+            updateBottomNavVisibilities()
+
+            WorkManager.getInstance(requireContext()).cancelAllWork()
+
+            val action = NotificationsFragmentDirections.actionNavigationNotificationsToNavigationHome()
+            view?.findNavController()?.navigate(action)
+        }
+
         readNotifications()
 
         dailyNotifications.refreshNotifications(requireContext())
@@ -134,6 +145,9 @@ class NotificationsFragment : Fragment() {
         reloadNextNotification()
         reloadOneTimeNotifications()
         reloadDailyNotifications()
+
+        updateBottomNavVisibilities()
+
     }
 
     override fun onDestroyView() {

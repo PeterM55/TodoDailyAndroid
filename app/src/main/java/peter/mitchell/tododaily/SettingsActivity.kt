@@ -6,6 +6,7 @@ import android.text.InputType
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.work.WorkManager
 import kotlinx.android.synthetic.main.edit_notes.*
 import kotlinx.android.synthetic.main.new_notification.*
 import kotlinx.android.synthetic.main.settings_screen.*
@@ -15,32 +16,35 @@ class SettingsActivity : AppCompatActivity() {
 
     /*
 // ----- Settings -----
-    // --- overall settings ---
+// --- overall settings ---
 var settingsRead = false
 var darkMode = true
-    // --- home ---
+// --- home ---
 var homeColumns = 2
-var homeTextSize = 18
+var homeTextSize = 18f
 var startOfWeek : DayOfWeek = DayOfWeek.MONDAY
 var selectHoldText = true
 var exportLabelLine = true
 var exportOrderDefault = "nvit"
 var exportCustomDefault = ""
-    // --- to-do ---
+// --- to-do ---
+var todoShown = true
 var todoColumns = 3
-var todoTextSize = 18
-    // --- notes ---
+var todoTextSize = 18f
+// --- notes ---
+var notesShown = true
 var notesColumns = 2
-var notesTextSize = 18
+var notesTextSize = 18f
 var listsColumns = 2
-var listsTextSize = 18
-    // --- notifs ---
+var listsTextSize = 18f
+// --- notifs ---
+var notificationsShown = true
 var oneTimeNotifsColumns = 2
-var oneTimeNotifsTextSize = 18
+var oneTimeNotifsTextSize = 18f
 var dailyNotifsColumns = 2
-var dailyNotifsTextSize = 18
+var dailyNotifsTextSize = 18f
 var notificationsFullNameMode = true
-var snoozeTime = 360
+var snoozeTime = 5
     * */
 
     enum class SettingType {
@@ -69,11 +73,13 @@ var snoozeTime = 360
 
         // -- To-do --
         "Todo",
+        "Todo Shown",
         "Todo Columns",
         "Todo Text Size",
 
         // -- Notes --
         "Notes",
+        "Notes Shown",
         "Notes Columns",
         "Notes Text Size",
         "Lists Columns",
@@ -81,6 +87,7 @@ var snoozeTime = 360
 
         // -- Notifs --
         "Notifs",
+        "Notifs Shown",
         "One Time Columns",
         "One Text Size",
         "Daily Columns",
@@ -105,11 +112,13 @@ var snoozeTime = 360
 
         // -- To-do --
         SettingType.Title,
+        SettingType.Toggle,
         SettingType.ColumnCount,
         SettingType.TextSize,
 
         // -- Notes --
         SettingType.Title,
+        SettingType.Toggle,
         SettingType.ColumnCount,
         SettingType.TextSize,
         SettingType.ColumnCount,
@@ -117,6 +126,7 @@ var snoozeTime = 360
 
         // -- Notifs --
         SettingType.Title,
+        SettingType.Toggle,
         SettingType.ColumnCount,
         SettingType.TextSize,
         SettingType.ColumnCount,
@@ -322,6 +332,8 @@ var snoozeTime = 360
 
         // -- To-do --
         // "To-do",
+        //"To-do Shown",
+        (settingsList[countingIndex++] as TextView).text = getBooleanString(todoShown)
         // "To-do Columns",
         (settingsList[countingIndex++] as Spinner).setSelection(todoColumns-1)
         // "To-do Text Size",
@@ -329,6 +341,8 @@ var snoozeTime = 360
 
         // -- Notes --
         //"Notes",
+        //"Notes Shown",
+        (settingsList[countingIndex++] as TextView).text = getBooleanString(notesShown)
         //"Notes Columns",
         (settingsList[countingIndex++] as Spinner).setSelection(notesColumns-1)
         //"Notes Text Size",
@@ -340,6 +354,8 @@ var snoozeTime = 360
 
         // -- Notifs --
         //"Notifs",
+        //"Notifs Shown",
+        (settingsList[countingIndex++] as TextView).text = getBooleanString(notificationsShown)
         //"One Time Columns",
         (settingsList[countingIndex++] as Spinner).setSelection(oneTimeNotifsColumns-1)
         //"One Text Size",
@@ -379,6 +395,8 @@ var snoozeTime = 360
 
         // -- To-do --
         // "To-do",
+        //"To-do Shown",
+        todoShown = getStringBoolean((settingsList[countingIndex++] as TextView).text.toString())
         // "To-do Columns",
         todoColumns = (settingsList[countingIndex++] as Spinner).selectedItem.toString().toInt()
         // "To-do Text Size",
@@ -386,6 +404,8 @@ var snoozeTime = 360
 
         // -- Notes --
         //"Notes",
+        //"Notes Shown",
+        notesShown = getStringBoolean((settingsList[countingIndex++] as TextView).text.toString())
         //"Notes Columns",
         notesColumns = (settingsList[countingIndex++] as Spinner).selectedItem.toString().toInt()
         //"Notes Text Size",
@@ -397,6 +417,14 @@ var snoozeTime = 360
 
         // -- Notifs --
         //"Notifs",
+        //"Notifs Shown",
+
+        // Special case for notifications shown, cancel pending notifications to stop it from activating while disabled
+        if (notificationsShown && !getStringBoolean((settingsList[countingIndex] as TextView).text.toString())) {
+            WorkManager.getInstance(this).cancelAllWork()
+        }
+
+        notificationsShown = getStringBoolean((settingsList[countingIndex++] as TextView).text.toString())
         //"One Time Columns",
         oneTimeNotifsColumns = (settingsList[countingIndex++] as Spinner).selectedItem.toString().toInt()
         //"One Text Size",

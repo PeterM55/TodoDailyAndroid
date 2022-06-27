@@ -6,7 +6,9 @@
     android:layout_height="match_parent"
     tools:context=".ui.notifications.NotificationsFragment"
     android:background="@color/backgroundDark"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    app:navGraph="@navigation/mobile_navigation"
+    >
 
     <ScrollView
         android:layout_width="match_parent"

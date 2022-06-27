@@ -481,7 +481,7 @@ class ManageDailyNotifications : AppCompatActivity() {
         if (!canExport(this, this))
             return
 
-        var exportFile : File? = getExportFile()
+        var exportFile : File? = getExportFile(exportFileName)
 
         if (exportFile == null)
             return

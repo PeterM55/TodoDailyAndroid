@@ -9,11 +9,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.navigation.findNavController
+import androidx.work.WorkManager
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_notes.*
 import peter.mitchell.tododaily.*
 import peter.mitchell.tododaily.HelperClasses.NotesList
 import peter.mitchell.tododaily.databinding.FragmentNotesBinding
+import peter.mitchell.tododaily.ui.notifications.NotificationsFragmentDirections
 
 class NotesFragment : Fragment() {
 
@@ -28,6 +31,11 @@ class NotesFragment : Fragment() {
         _binding = FragmentNotesBinding.inflate(inflater, container, false)
         val root: View = binding.root
         mainBinding?.fragmentLabel?.setText("Notes")
+
+        _binding.manageNotesButton.setOnClickListener {
+            val intent = Intent(requireContext(), ManageNotes::class.java)
+            startActivity(intent)
+        }
 
         return root
     }
@@ -82,7 +90,15 @@ class NotesFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+
+        if (!notesShown) {
+            val action = NotesFragmentDirections.actionNavigationNotesToNavigationHome()
+            view?.findNavController()?.navigate(action)
+        }
+
         notesList = NotesList()
         refreshNotes()
+
+        updateBottomNavVisibilities()
     }
 }

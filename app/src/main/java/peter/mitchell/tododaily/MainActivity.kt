@@ -1,6 +1,7 @@
 package peter.mitchell.tododaily
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -35,18 +36,18 @@ lateinit var dailyNotifications : DailyNotifications
 var todoLists : TodoLists? = null // only used in to-do section, but kept in memory to not have to read every time
 var notesList : NotesList? = null
 
-//FIXME
-//val dailyInformationFile = File("${requireContext().filesDir.path}/dailyInformation.txt")
-//val tempFile = File("${requireContext().filesDir.path}/tempDailyInformation.txt")
-val dailyInformationFile = File("/data/data/peter.mitchell.tododaily/files/dailyInformation.txt")
-val tempFile = File("/data/data/peter.mitchell.tododaily/files/tempDailyInformation.txt")
-val notificationsFile = File("/data/data/peter.mitchell.tododaily/files/dailyNotifications.txt")
-val nextNotificationIntentFile = File("/data/data/peter.mitchell.tododaily/files/nextNotificationIntent.txt")
-val settingsFile = File("/data/data/peter.mitchell.tododaily/files/settings.txt")
-val settingsBackupFile = File("/data/data/peter.mitchell.tododaily/files/settingsBackup.txt")
-val todosFile = File("/data/data/peter.mitchell.tododaily/files/todos.txt")
+val internalDataPath = "${Environment.getDataDirectory().absolutePath}/data/peter.mitchell.tododaily/files/"
+val exportPath = "${Environment.getExternalStorageDirectory().path}/${Environment.DIRECTORY_DOWNLOADS}/"
+
+val dailyInformationFile = File("${internalDataPath}dailyInformation.txt")
+val tempFile = File("${internalDataPath}tempDailyInformation.txt")
+val notificationsFile = File("${internalDataPath}dailyNotifications.txt")
+val nextNotificationIntentFile = File("${internalDataPath}nextNotificationIntent.txt")
+val settingsFile = File("${internalDataPath}settings.txt")
+val settingsBackupFile = File("${internalDataPath}settingsBackup.txt")
+val todosFile = File("${internalDataPath}todos.txt")
 //val exportFileName = "/storage/emulated/0/Download/dailyInformationExport.txt"
-val exportFileName = "${Environment.getExternalStorageDirectory().path}/${Environment.DIRECTORY_DOWNLOADS}/dailyInformationExport.csv"
+val exportFileName = "${exportPath}dailyInformationExport.csv"
 
 var notifFragment : Fragment? = null
 enum class fragments { home, todo, notes, notifs }
@@ -69,14 +70,17 @@ var exportLabelLine = true
 var exportOrderDefault = "nvit"
 var exportCustomDefault = ""
 // --- to-do ---
+var todoShown = true
 var todoColumns = 3
 var todoTextSize = 18f
 // --- notes ---
+var notesShown = true
 var notesColumns = 2
 var notesTextSize = 18f
 var listsColumns = 2
 var listsTextSize = 18f
 // --- notifs ---
+var notificationsShown = true
 var oneTimeNotifsColumns = 2
 var oneTimeNotifsTextSize = 18f
 var dailyNotifsColumns = 2
@@ -84,13 +88,14 @@ var dailyNotifsTextSize = 18f
 var notificationsFullNameMode = true
 var snoozeTime = 5
 
+var navigationView : BottomNavigationView? = null
+
 var mainBinding: ActivityMainBinding? = null
 
 class MainActivity : AppCompatActivity() {
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.i("tdd-MainActivity", "onCreate run in MainActivity")
         super.onCreate(savedInstanceState)
 
         mainBinding = ActivityMainBinding.inflate(layoutInflater)
@@ -111,6 +116,9 @@ class MainActivity : AppCompatActivity() {
 
         supportActionBar?.hide();
 
+        navigationView = navView
+        updateBottomNavVisibilities()
+
         dailyNotifications = DailyNotifications(this)
 
         mainBinding!!.helpButton.setOnClickListener {
@@ -121,6 +129,7 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this as Context, SettingsActivity::class.java)
             startActivity(intent)
         }
+
     }
 
 }
@@ -275,14 +284,17 @@ fun readSettings() {
             exportOrderDefault = splitSettings[inputNum++]
             exportCustomDefault = splitSettings[inputNum++]
             // -- To-do --
+            todoShown = splitSettings[inputNum++].toBoolean()
             todoColumns = splitSettings[inputNum++].toInt()
             todoTextSize = splitSettings[inputNum++].toFloat()
             // -- Notes --
+            notesShown = splitSettings[inputNum++].toBoolean()
             notesColumns = splitSettings[inputNum++].toInt()
             notesTextSize = splitSettings[inputNum++].toFloat()
             listsColumns = splitSettings[inputNum++].toInt()
             listsTextSize = splitSettings[inputNum++].toFloat()
             // -- Notifs --
+            notificationsShown = splitSettings[inputNum++].toBoolean()
             oneTimeNotifsColumns = splitSettings[inputNum++].toInt()
             oneTimeNotifsTextSize = splitSettings[inputNum++].toFloat()
             dailyNotifsColumns = splitSettings[inputNum++].toInt()
@@ -294,6 +306,7 @@ fun readSettings() {
             readBackupSettings()
         }
     }
+
     settingsRead = true
 }
 
@@ -314,14 +327,17 @@ fun saveSettings() {
     settingsFile.appendText("$exportOrderDefault\n")
     settingsFile.appendText("$exportCustomDefault\n")
     // -- To-do --
+    settingsFile.appendText("$todoShown\n")
     settingsFile.appendText("$todoColumns\n")
     settingsFile.appendText("$todoTextSize\n")
     // -- Notes --
+    settingsFile.appendText("$notesShown\n")
     settingsFile.appendText("$notesColumns\n")
     settingsFile.appendText("$notesTextSize\n")
     settingsFile.appendText("$listsColumns\n")
     settingsFile.appendText("$listsTextSize\n")
     // -- Notifs --
+    settingsFile.appendText("$notificationsShown\n")
     settingsFile.appendText("$oneTimeNotifsColumns\n")
     settingsFile.appendText("$oneTimeNotifsTextSize\n")
     settingsFile.appendText("$dailyNotifsColumns\n")
@@ -359,14 +375,17 @@ fun readBackupSettings() {
                 else if (splitTitle == "exportOrderDefault") exportOrderDefault = splitValue
                 else if (splitTitle == "exportCustomDefault") exportCustomDefault = splitValue
                 // -- To-do --
+                else if (splitTitle == "todoShown") todoShown = splitValue.toBoolean()
                 else if (splitTitle == "todoColumns") todoColumns = splitValue.toInt()
                 else if (splitTitle == "todoTextSize") todoTextSize = splitValue.toFloat()
                 // -- Notes --
+                else if (splitTitle == "notesShown") notesShown = splitValue.toBoolean()
                 else if (splitTitle == "notesColumns") notesColumns = splitValue.toInt()
                 else if (splitTitle == "notesTextSize") notesTextSize = splitValue.toFloat()
                 else if (splitTitle == "listsColumns") listsColumns = splitValue.toInt()
                 else if (splitTitle == "listsTextSize") listsTextSize = splitValue.toFloat()
                 // -- Notifs --
+                else if (splitTitle == "notificationsShown") notificationsShown = splitValue.toBoolean()
                 else if (splitTitle == "oneTimeNotifsColumns") oneTimeNotifsColumns = splitValue.toInt()
                 else if (splitTitle == "oneTimeNotifsTextSize") oneTimeNotifsTextSize = splitValue.toFloat()
                 else if (splitTitle == "dailyNotifsColumns") dailyNotifsColumns = splitValue.toInt()
@@ -400,20 +419,31 @@ fun saveBackupSettings() {
     settingsBackupFile.appendText("exportOrderDefault $exportOrderDefault\n")
     settingsBackupFile.appendText("exportCustomDefault $exportCustomDefault\n")
     // -- To-do --
+    settingsBackupFile.appendText("todoShown $todoShown\n")
     settingsBackupFile.appendText("todoColumns $todoColumns\n")
     settingsBackupFile.appendText("todoTextSize $todoTextSize\n")
     // -- Notes --
+    settingsBackupFile.appendText("notesShown $notesShown\n")
     settingsBackupFile.appendText("notesColumns $notesColumns\n")
     settingsBackupFile.appendText("notesTextSize $notesTextSize\n")
     settingsBackupFile.appendText("listsColumns $listsColumns\n")
     settingsBackupFile.appendText("listsTextSize $listsTextSize\n")
     // -- Notifs --
+    settingsBackupFile.appendText("notificationsShown $notificationsShown\n")
     settingsBackupFile.appendText("oneTimeNotifsColumns $oneTimeNotifsColumns\n")
     settingsBackupFile.appendText("oneTimeNotifsTextSize $oneTimeNotifsTextSize\n")
     settingsBackupFile.appendText("dailyNotifsColumns $dailyNotifsColumns\n")
     settingsBackupFile.appendText("dailyNotifsTextSize $dailyNotifsTextSize\n")
     settingsBackupFile.appendText("notificationsFullNameMode $notificationsFullNameMode\n")
     settingsBackupFile.appendText("snoozeTime $snoozeTime\n")
+}
+
+fun updateBottomNavVisibilities() {
+    if (navigationView != null && settingsRead) {
+        navigationView!!.menu.findItem(R.id.navigation_dashboard).isVisible = todoShown
+        navigationView!!.menu.findItem(R.id.navigation_notes).isVisible = notesShown
+        navigationView!!.menu.findItem(R.id.navigation_notifications).isVisible = notificationsShown
+    }
 }
 
 fun canExport(activity: Activity, context: Context) : Boolean {
@@ -429,8 +459,8 @@ fun canExport(activity: Activity, context: Context) : Boolean {
     return true
 }
 
-fun getExportFile() : File? {
-    var exportFile = File(exportFileName)
+fun getExportFile(fileName : String) : File? {
+    var exportFile = File(fileName)
 
     if (exportFile.exists()) {
         var copyNum = 1

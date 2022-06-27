@@ -264,4 +264,60 @@ class NotesList {
         return true
     }
 
+    fun moveNoteFrom(i : Int, to : Int) {
+        // move the note, then save
+
+        if (i == to || i >= notesFiles.size || to >= notesFiles.size) return
+
+        var tempName = notesFiles[i]
+
+        if (i < to) {
+            for (j in i .. to) {
+                if (j < to) {
+                    notesFiles[j] = notesFiles[j+1]
+                } else if (j == to) {
+                    notesFiles[j] = tempName
+                }
+            }
+        } else if (to < i) {
+            for (j in i downTo to) {
+                if (j > to) {
+                    notesFiles[j] = notesFiles[j-1]
+                } else if (j == to) {
+                    notesFiles[j] = tempName
+                }
+            }
+        }
+
+        saveNotesList()
+    }
+
+    fun moveListFrom(i : Int, to : Int) {
+        // move the note, then save
+
+        if (i == to || i >= listsFiles.size || to >= listsFiles.size) return
+
+        var tempName = listsFiles[i]
+
+        if (i < to) {
+            for (j in i .. to) {
+                if (j < to) {
+                    listsFiles[j] = listsFiles[j+1]
+                } else if (j == to) {
+                    listsFiles[j] = tempName
+                }
+            }
+        } else if (to < i) {
+            for (j in i downTo to) {
+                if (j > to) {
+                    listsFiles[j] = listsFiles[j-1]
+                } else if (j == to) {
+                    listsFiles[j] = tempName
+                }
+            }
+        }
+
+        saveNotesList()
+    }
+
 }

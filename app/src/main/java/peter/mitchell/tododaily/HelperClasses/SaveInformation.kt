@@ -512,12 +512,13 @@ class SaveInformation {
                 var i : Int = -1
 
                 if (strFormat[j] == 'n' || strFormat[j] == 'v' || strFormat[j] == 'i' || strFormat[j] == 't') {
+                    i = 0
                     strRead = strFormat[j]
                     var currentIndex = j+1
                     while (currentIndex < strFormat.length && strFormat[currentIndex].isDigit()) {
                         try {
                             i *= 10
-                            i = strFormat[currentIndex].digitToInt()
+                            i += strFormat[currentIndex].digitToInt()
                         } catch (e: NumberFormatException) {
                             i /= 10
                             break

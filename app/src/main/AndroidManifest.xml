@@ -39,6 +39,10 @@
             android:screenOrientation="user" />
 
         <activity
+            android:name="peter.mitchell.tododaily.ui.notes.ManageNotes"
+            android:screenOrientation="user" />
+
+        <activity
             android:name="peter.mitchell.tododaily.ui.notes.EditNotes"
             android:screenOrientation="user" />
 

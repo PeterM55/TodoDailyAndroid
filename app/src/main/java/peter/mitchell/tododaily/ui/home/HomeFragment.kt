@@ -24,6 +24,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.view.marginRight
 import androidx.fragment.app.Fragment
+import androidx.navigation.findNavController
+import androidx.work.WorkManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -32,6 +34,7 @@ import peter.mitchell.tododaily.MainActivity
 import peter.mitchell.tododaily.HelperClasses.SaveInformation
 import peter.mitchell.tododaily.HelperClasses.TextGridLayout
 import peter.mitchell.tododaily.databinding.FragmentHomeBinding
+import peter.mitchell.tododaily.ui.notifications.NotificationsFragmentDirections
 import java.io.File
 import java.time.LocalDate
 
@@ -55,6 +58,7 @@ class HomeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        Log.i("tdd-HomeFragment", "onCreateView run in HomeFragment")
         /*val homeViewModel =
             ViewModelProvider(this).get(HomeViewModel::class.java)*/
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
@@ -64,6 +68,7 @@ class HomeFragment : Fragment() {
         mainBinding?.fragmentLabel?.setText("Home")
 
         readSettings()
+        updateBottomNavVisibilities()
 
         if (saveInformation.length == 0) {
             readTodaysDailyInformationFile()
@@ -373,7 +378,7 @@ class HomeFragment : Fragment() {
                 if (!canExport(requireActivity(), requireContext()))
                     return@setPositiveButton
 
-                var exportFile : File? = getExportFile()
+                var exportFile : File? = getExportFile(exportFileName)
 
                 if (exportFile == null)
                     return@setPositiveButton
@@ -387,6 +392,7 @@ class HomeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+
         reloadReminderInput()
 
         // if the app is open overnight, and opened the next day
@@ -402,6 +408,8 @@ class HomeFragment : Fragment() {
             homeScrollView.smoothScrollTo(0, 0)
             initialSetupDone = true
         }
+
+        updateBottomNavVisibilities()
     }
 
     override fun onDestroyView() {
