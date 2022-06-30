@@ -160,7 +160,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:calendarTextColor="@color/textDark"
-            android:background="@color/white"
+            android:background="@color/backgroundDark"
             />
 
         <TimePicker
@@ -169,7 +169,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:numbersTextColor="@color/textDark"
-            android:background="@color/white"/>
+            android:background="@color/backgroundDark"/>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"

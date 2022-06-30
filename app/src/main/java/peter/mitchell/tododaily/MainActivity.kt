@@ -16,11 +16,14 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.new_notification.*
 import peter.mitchell.tododaily.HelperClasses.NotesList
 import peter.mitchell.tododaily.databinding.ActivityMainBinding
 import peter.mitchell.tododaily.HelperClasses.SaveInformation
@@ -30,6 +33,7 @@ import peter.mitchell.tododaily.ui.notifications.DailyNotifications
 import java.io.File
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 var saveInformation : SaveInformation = SaveInformation()
 lateinit var dailyNotifications : DailyNotifications
@@ -85,10 +89,12 @@ var oneTimeNotifsColumns = 2
 var oneTimeNotifsTextSize = 18f
 var dailyNotifsColumns = 2
 var dailyNotifsTextSize = 18f
+var mainQuickTimerTime = 20
 var notificationsFullNameMode = true
 var snoozeTime = 5
 
 var navigationView : BottomNavigationView? = null
+//var quickTimerButtonCopy :
 
 var mainBinding: ActivityMainBinding? = null
 
@@ -102,6 +108,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(mainBinding!!.root)
 
         val navView: BottomNavigationView = mainBinding!!.navView
+        //quickTimerButtonCopy =
 
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
         // Passing each menu ID as a set of Ids because each
@@ -121,10 +128,30 @@ class MainActivity : AppCompatActivity() {
 
         dailyNotifications = DailyNotifications(this)
 
+        mainBinding!!.quickTimerButton.setOnClickListener {
+            readNotifications()
+            dailyNotifications.refreshNotifications(this)
+
+            val notificationDateTime : LocalDateTime = LocalDateTime.now().plusMinutes(60)
+            notificationDateTime.minusSeconds(notificationDateTime.second.toLong())
+            notificationDateTime.minusNanos(notificationDateTime.nano.toLong())
+            dailyNotifications.addOneTimeNotification(
+                "Main Quick Timer",
+                notificationDateTime,
+                "Main Quick Timer",
+                "Your Main quick timer has expired"
+            )
+            dailyNotifications.setSystemNotification(dailyNotifications.oneTimeNotificationsLength-1)
+
+            dailyNotifications.refreshNotifications(this)
+            saveNotifications()
+        }
+
         mainBinding!!.helpButton.setOnClickListener {
             val intent = Intent(this as Context, HelpActivity::class.java)
             startActivity(intent)
         }
+
         mainBinding!!.optionsButton.setOnClickListener {
             val intent = Intent(this as Context, SettingsActivity::class.java)
             startActivity(intent)
@@ -442,7 +469,9 @@ fun updateBottomNavVisibilities() {
     if (navigationView != null && settingsRead) {
         navigationView!!.menu.findItem(R.id.navigation_dashboard).isVisible = todoShown
         navigationView!!.menu.findItem(R.id.navigation_notes).isVisible = notesShown
+
         navigationView!!.menu.findItem(R.id.navigation_notifications).isVisible = notificationsShown
+        mainBinding!!.quickTimerButton.isVisible = notificationsShown
     }
 }
 

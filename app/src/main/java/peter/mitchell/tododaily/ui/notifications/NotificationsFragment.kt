@@ -27,6 +27,7 @@ import androidx.work.WorkManager
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.fragment_notifications.*
+import kotlinx.android.synthetic.main.new_notification.*
 import peter.mitchell.tododaily.*
 import peter.mitchell.tododaily.HelperClasses.SaveInformation
 import peter.mitchell.tododaily.databinding.FragmentNotificationsBinding
@@ -72,6 +73,7 @@ class NotificationsFragment : Fragment() {
             reloadDailyNotifications()
         }
 
+        setupQuickTimers()
 
         notifFragment = this
         return root
@@ -92,16 +94,29 @@ class NotificationsFragment : Fragment() {
     private fun reloadOneTimeNotifications() {
         _binding.oneTimeNotificationsGrid.setCustomColumnCount(oneTimeNotifsColumns)
         _binding.oneTimeNotificationsGrid.setTextSize(oneTimeNotifsTextSize)
+        _binding.systemNotificationsGrid.setTextSize(oneTimeNotifsTextSize)
 
         _binding.oneTimeNotificationsGrid.reset()
+        _binding.systemNotificationsGrid.reset()
         for (i in 0 until dailyNotifications.oneTimeNotificationsLength) {
-            _binding.oneTimeNotificationsGrid.addString(requireContext(), dailyNotifications.getOneTimeString(i))
+            if (dailyNotifications.isSystemNotification[i]) {
+                _binding.systemNotificationsGrid.addString(requireContext(), dailyNotifications.getOneTimeString(i))
 
-            _binding.oneTimeNotificationsGrid.textGrid[i].setOnClickListener {
-                val intent = Intent(activity as Context, NewNotification::class.java)
-                intent.putExtra("oneTimeNotification", true)
-                intent.putExtra("index", i)
-                startActivity(intent)
+                _binding.systemNotificationsGrid.textGrid[i].setOnClickListener {
+                    val intent = Intent(activity as Context, NewNotification::class.java)
+                    intent.putExtra("oneTimeNotification", true)
+                    intent.putExtra("index", i)
+                    startActivity(intent)
+                }
+            } else {
+                _binding.oneTimeNotificationsGrid.addString(requireContext(), dailyNotifications.getOneTimeString(i))
+
+                _binding.oneTimeNotificationsGrid.textGrid[i].setOnClickListener {
+                    val intent = Intent(activity as Context, NewNotification::class.java)
+                    intent.putExtra("oneTimeNotification", true)
+                    intent.putExtra("index", i)
+                    startActivity(intent)
+                }
             }
         }
     }
@@ -126,6 +141,108 @@ class NotificationsFragment : Fragment() {
         }
     }
 
+    private fun setupQuickTimers() {
+        _binding.quickTimerButton5m.setOnClickListener {
+            var notificationDateTime : LocalDateTime = LocalDateTime.now().plusMinutes(5)
+            notificationDateTime = notificationDateTime.minusSeconds(notificationDateTime.second.toLong())
+            notificationDateTime = notificationDateTime.minusNanos(notificationDateTime.nano.toLong())
+            dailyNotifications.addOneTimeNotification(
+                "5m Quick Timer",
+                notificationDateTime,
+                "5m Quick Timer",
+                "Your 5m quick timer has expired"
+            )
+            dailyNotifications.setSystemNotification(dailyNotifications.oneTimeNotificationsLength-1)
+
+            dailyNotifications.refreshNotifications(requireContext())
+
+            reloadNextNotification()
+            reloadOneTimeNotifications()
+            saveNotifications()
+
+        }
+
+        _binding.quickTimerButton10m.setOnClickListener {
+            var notificationDateTime : LocalDateTime = LocalDateTime.now().plusMinutes(10)
+            notificationDateTime = notificationDateTime.minusSeconds(notificationDateTime.second.toLong())
+            notificationDateTime = notificationDateTime.minusNanos(notificationDateTime.nano.toLong())
+            dailyNotifications.addOneTimeNotification(
+                "10m Quick Timer",
+                notificationDateTime,
+                "10m Quick Timer",
+                "Your 10m quick timer has expired"
+            )
+            dailyNotifications.setSystemNotification(dailyNotifications.oneTimeNotificationsLength-1)
+
+            dailyNotifications.refreshNotifications(requireContext())
+
+            reloadNextNotification()
+            reloadOneTimeNotifications()
+            saveNotifications()
+
+        }
+
+        _binding.quickTimerButton20m.setOnClickListener {
+            var notificationDateTime : LocalDateTime = LocalDateTime.now().plusMinutes(20)
+            notificationDateTime = notificationDateTime.minusSeconds(notificationDateTime.second.toLong())
+            notificationDateTime = notificationDateTime.minusNanos(notificationDateTime.nano.toLong())
+            dailyNotifications.addOneTimeNotification(
+                "20m Quick Timer",
+                notificationDateTime,
+                "20m Quick Timer",
+                "Your 20m quick timer has expired"
+            )
+            dailyNotifications.setSystemNotification(dailyNotifications.oneTimeNotificationsLength-1)
+
+            dailyNotifications.refreshNotifications(requireContext())
+
+            reloadNextNotification()
+            reloadOneTimeNotifications()
+            saveNotifications()
+
+        }
+
+        _binding.quickTimerButton30m.setOnClickListener {
+            var notificationDateTime : LocalDateTime = LocalDateTime.now().plusMinutes(30)
+            notificationDateTime = notificationDateTime.minusSeconds(notificationDateTime.second.toLong())
+            notificationDateTime = notificationDateTime.minusNanos(notificationDateTime.nano.toLong())
+            dailyNotifications.addOneTimeNotification(
+                "30m Quick Timer",
+                notificationDateTime,
+                "30m Quick Timer",
+                "Your 30m quick timer has expired"
+            )
+            dailyNotifications.setSystemNotification(dailyNotifications.oneTimeNotificationsLength-1)
+
+            dailyNotifications.refreshNotifications(requireContext())
+
+            reloadNextNotification()
+            reloadOneTimeNotifications()
+            saveNotifications()
+
+        }
+
+        _binding.quickTimerButton60m.setOnClickListener {
+            var notificationDateTime : LocalDateTime = LocalDateTime.now().plusMinutes(60)
+            notificationDateTime = notificationDateTime.minusSeconds(notificationDateTime.second.toLong())
+            notificationDateTime = notificationDateTime.minusNanos(notificationDateTime.nano.toLong())
+            dailyNotifications.addOneTimeNotification(
+                "60m Quick Timer",
+                notificationDateTime,
+                "60m Quick Timer",
+                "Your 16m quick timer has expired"
+            )
+            dailyNotifications.setSystemNotification(dailyNotifications.oneTimeNotificationsLength-1)
+
+            dailyNotifications.refreshNotifications(requireContext())
+
+            reloadNextNotification()
+            reloadOneTimeNotifications()
+            saveNotifications()
+
+        }
+    }
+
     override fun onResume() {
         super.onResume()
 
@@ -138,6 +255,7 @@ class NotificationsFragment : Fragment() {
             view?.findNavController()?.navigate(action)
         }
 
+        Log.i("tdd-tempDebug=====","size1: ${dailyNotifications.oneTimeNotificationsLength}")
         readNotifications()
 
         dailyNotifications.refreshNotifications(requireContext())
@@ -147,7 +265,6 @@ class NotificationsFragment : Fragment() {
         reloadDailyNotifications()
 
         updateBottomNavVisibilities()
-
     }
 
     override fun onDestroyView() {

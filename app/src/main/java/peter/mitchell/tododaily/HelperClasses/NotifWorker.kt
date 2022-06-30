@@ -41,6 +41,7 @@ class NotifWorker(contextIn: Context, workerParams: WorkerParameters) : Worker(c
             if (fileText.isNotEmpty()) {
 
                 notificationId = fileText.toInt()
+                Log.i("tdd-sendingNotif===0", "$notificationId")
 
                 if (fileText.toInt() >= dailyNotificationsTemp.dailyNotificationsLength) {
                     notificationIndex = fileText.toInt()-dailyNotificationsTemp.dailyNotificationsLength
@@ -66,19 +67,20 @@ class NotifWorker(contextIn: Context, workerParams: WorkerParameters) : Worker(c
             notificationTitle = dailyNotificationsTemp.dailyNotificationTitles[notificationIndex]
             notificationDesc = dailyNotificationsTemp.dailyNotificationDescriptions[notificationIndex]
         }
+        Log.i("tdd-sendingNotif===1", "$notificationTitle - $notificationDesc - $notificationIndex")
 
         // --- Setup the action when the snooze button is pressed ---
         val snoozeIntent = Intent(context, TodoDailyNotification::class.java)
         snoozeIntent.putExtra("snooze?", true)
+        snoozeIntent.putExtra("snoozeIndex", notificationIndex)
+        snoozeIntent.putExtra("snoozeIsOneTime", oneTimeNotification)
         if (oneTimeNotification) {
-            snoozeIntent.putExtra("snoozeName", dailyNotificationsTemp.oneTimeNotificationNames[notificationIndex]+"-Snoozed")
-            snoozeIntent.putExtra("snoozeTitle", dailyNotificationsTemp.oneTimeNotificationTitles[notificationIndex])
-            snoozeIntent.putExtra("snoozeDesc", dailyNotificationsTemp.oneTimeNotificationDescriptions[notificationIndex])
+            snoozeIntent.putExtra("snoozeName", dailyNotificationsTemp.oneTimeNotificationNames[notificationIndex])
         } else {
-            snoozeIntent.putExtra("snoozeName", dailyNotificationsTemp.dailyNotificationNames[notificationIndex]+"-Snoozed")
-            snoozeIntent.putExtra("snoozeTitle", dailyNotificationsTemp.dailyNotificationTitles[notificationIndex])
-            snoozeIntent.putExtra("snoozeDesc", dailyNotificationsTemp.dailyNotificationDescriptions[notificationIndex])
+            snoozeIntent.putExtra("snoozeName", dailyNotificationsTemp.dailyNotificationNames[notificationIndex])
         }
+        snoozeIntent.putExtra("snoozeTitle", notificationTitle)
+        snoozeIntent.putExtra("snoozeDesc", notificationDesc)
 
         val snoozePendingIntent = PendingIntent.getBroadcast(
             context,

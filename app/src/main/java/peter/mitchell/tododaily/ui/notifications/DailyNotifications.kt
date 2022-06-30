@@ -58,6 +58,8 @@ class DailyNotifications(context : Context) {
     var oneTimeNotificationTitles : ArrayList<String> = ArrayList()
     var oneTimeNotificationDescriptions : ArrayList<String> = ArrayList()
 
+    var isSystemNotification : ArrayList<Boolean> = ArrayList()
+
     fun addDailyNotification(name : String, time : LocalTime, title : String, desc : String, swappingIndex : Int = -1) : Boolean {
         for (i in 0 until dailyNotificationsLength) {
             if (time == dailyNotificationTimes[i]) {
@@ -99,6 +101,7 @@ class DailyNotifications(context : Context) {
         oneTimeNotificationTimes.add(time)
         oneTimeNotificationTitles.add(title)
         oneTimeNotificationDescriptions.add(desc)
+        isSystemNotification.add(false)
         oneTimeNotificationsLength++
 
         if (swappingIndex != -1) {
@@ -174,6 +177,10 @@ class DailyNotifications(context : Context) {
         return nextNotification
     }
 
+    fun setSystemNotification(i : Int) {
+        isSystemNotification[i] = true
+    }
+
     fun removeDailyNotification(i : Int) {
         dailyNotificationNames.removeAt(i)
         dailyNotificationTimes.removeAt(i)
@@ -187,6 +194,7 @@ class DailyNotifications(context : Context) {
         oneTimeNotificationTimes.removeAt(i)
         oneTimeNotificationTitles.removeAt(i)
         oneTimeNotificationDescriptions.removeAt(i)
+        isSystemNotification.removeAt(i)
         oneTimeNotificationsLength--
     }
 
@@ -239,6 +247,7 @@ class DailyNotifications(context : Context) {
         var tempTime = oneTimeNotificationTimes[i]
         var tempTitle = oneTimeNotificationTitles[i]
         var tempDesc = oneTimeNotificationDescriptions[i]
+        var tempIsSystem = isSystemNotification[i]
 
         if (i < to) {
             for (j in i .. to) {
@@ -247,11 +256,13 @@ class DailyNotifications(context : Context) {
                     oneTimeNotificationTimes[j] = oneTimeNotificationTimes[j+1]
                     oneTimeNotificationTitles[j] = oneTimeNotificationTitles[j+1]
                     oneTimeNotificationDescriptions[j] = oneTimeNotificationDescriptions[j+1]
+                    isSystemNotification[j] = isSystemNotification[j+1]
                 } else if (j == to) {
                     oneTimeNotificationNames[j] = tempName
                     oneTimeNotificationTimes[j] = tempTime
                     oneTimeNotificationTitles[j] = tempTitle
                     oneTimeNotificationDescriptions[j] = tempDesc
+                    isSystemNotification[j] = tempIsSystem
                 }
             }
         } else if (to < i) {
@@ -261,11 +272,13 @@ class DailyNotifications(context : Context) {
                     oneTimeNotificationTimes[j] = oneTimeNotificationTimes[j-1]
                     oneTimeNotificationTitles[j] = oneTimeNotificationTitles[j-1]
                     oneTimeNotificationDescriptions[j] = oneTimeNotificationDescriptions[j-1]
+                    isSystemNotification[j] = isSystemNotification[j-1]
                 } else if (j == to) {
                     oneTimeNotificationNames[j] = tempName
                     oneTimeNotificationTimes[j] = tempTime
                     oneTimeNotificationTitles[j] = tempTitle
                     oneTimeNotificationDescriptions[j] = tempDesc
+                    isSystemNotification[j] = tempIsSystem
                 }
             }
         }
@@ -288,6 +301,7 @@ class DailyNotifications(context : Context) {
         oneTimeNotificationTimes = ArrayList()
         oneTimeNotificationTitles = ArrayList()
         oneTimeNotificationDescriptions = ArrayList()
+        isSystemNotification = ArrayList()
     }
 
     public fun getOneTimeString(i : Int) : String {
@@ -296,7 +310,7 @@ class DailyNotifications(context : Context) {
 
     public fun fromString(str : String) {
         resetData()
-        Log.i("DailyNitifications.fromString", str)
+        Log.i("tdd.DailyNitifications.fromString", str)
 
         var i : Int = 0
         var j : Int = 0
@@ -335,19 +349,23 @@ class DailyNotifications(context : Context) {
                     } else if (j%4 == 3) {
                         dailyNotificationDescriptions.add(currentString.toString().replace("\"\"", "\""))
                         dailyNotificationsLength++
+                        j = -1
                     }
 
                 } else {
 
-                    if (j%4 == 0) {
+                    if (j%5 == 0) {
                         oneTimeNotificationNames.add(currentString.toString().replace("\"\"", "\""))
-                    } else if (j%4 == 1) {
+                    } else if (j%5 == 1) {
                         oneTimeNotificationTimes.add(LocalDateTime.parse(currentString.toString()))
-                    } else if (j%4 == 2) {
+                    } else if (j%5 == 2) {
                         oneTimeNotificationTitles.add(currentString.toString().replace("\"\"", "\""))
-                    } else if (j%4 == 3) {
+                    } else if (j%5 == 3) {
                         oneTimeNotificationDescriptions.add(currentString.toString().replace("\"\"", "\""))
+                    } else if (j%5 == 4) {
+                        isSystemNotification.add(currentString.toString().toBoolean())
                         oneTimeNotificationsLength++
+                        j = -1
                     }
 
                 }
@@ -368,10 +386,40 @@ class DailyNotifications(context : Context) {
         }
         returnString.append("\n")
         for (i in 0 until oneTimeNotificationsLength) {
-            returnString.append("\"${oneTimeNotificationNames[i]}\",${oneTimeNotificationTimes[i].toString()},\"${oneTimeNotificationTitles[i]}\",\"${oneTimeNotificationDescriptions[i]}\",")
+            returnString.append("\"${oneTimeNotificationNames[i]}\",${oneTimeNotificationTimes[i].toString()},\"${oneTimeNotificationTitles[i]}\",\"${oneTimeNotificationDescriptions[i]}\",${isSystemNotification[i]},")
         }
 
+        //Log.i("tdd.DailyNitifications.toString", returnString.toString())
+
         return returnString.toString()
+    }
+
+    public fun snoozeTimer(i : Int, isOneTime : Boolean, snoozeName : String, snoozeTitle : String, snoozeDesc : String) {
+        if (i == -1) return
+
+        var newName = ""
+        if (isOneTime) {
+            newName = "$i-"+oneTimeNotificationNames[i]+"-Snoozed"
+        } else {
+            newName = "$i-"+dailyNotificationNames[i]+"-Snoozed"
+        }
+
+        for (i in 0 until oneTimeNotificationsLength) {
+            if (isSystemNotification[i] && oneTimeNotificationNames[i] == newName) {
+                // extend the time because it already exists
+                oneTimeNotificationTimes[i] = LocalDateTime.now().plusMinutes(snoozeTime.toLong())
+                return
+            }
+        }
+
+        if (isOneTime) {
+            addOneTimeNotification("$i-"+oneTimeNotificationNames[i]+"-Snoozed", LocalDateTime.now().plusMinutes(snoozeTime.toLong()), oneTimeNotificationTitles[i], oneTimeNotificationDescriptions[i])
+        } else {
+            addOneTimeNotification("$i-"+dailyNotificationNames[i]+"-Snoozed", LocalDateTime.now().plusMinutes(snoozeTime.toLong()), dailyNotificationTitles[i], dailyNotificationDescriptions[i])
+        }
+
+        setSystemNotification(oneTimeNotificationsLength-1)
+
     }
 
     /**
@@ -427,8 +475,6 @@ class DailyNotifications(context : Context) {
         var secondsToTimer : Long = ChronoUnit.SECONDS.between(LocalDateTime.now(),nextNotification)
 
         val testWorkTag = "notificationDailyTag"
-
-        Log.i("tdd-----", "${nextNotification.toString()} is in $secondsToTimer seconds")
         //Toast.makeText(context, "${nextNotification.toString()} is in $secondsToTimer seconds", Toast.LENGTH_SHORT).show()
 
         val notificationWork : OneTimeWorkRequest = OneTimeWorkRequest.Builder(NotifWorker::class.java)
@@ -438,6 +484,12 @@ class DailyNotifications(context : Context) {
 
         WorkManager.getInstance(context).enqueue(notificationWork)
 
+        if (!dailyInformationFile.exists()) {
+            dailyInformationFile.parentFile!!.mkdirs()
+            dailyInformationFile.createNewFile()
+        }
+        nextNotificationIntentFile.writeText(notificationIndex.toString())
+
         Log.i("tdd-refreshNotifs", "Next alarm (${nextNotification.toLocalTime().toString()}) in: ${secondsToTimer} seconds")
         //Toast.makeText(context, "Next alarm in: ${(timeToTimer-System.currentTimeMillis())/1000} seconds", Toast.LENGTH_SHORT).show()
 
@@ -446,14 +498,14 @@ class DailyNotifications(context : Context) {
 
     fun deletePastOneTimeAlarms() {
 
-        Log.i("-----", "Deleting past one times")
+        Log.i("tdd.deletePastOneTimes", "Deleting past one times")
 
         var i : Int = 0
 
         while(i < oneTimeNotificationsLength) {
 
             if (!oneTimeNotificationTimes[i].isAfter(LocalDateTime.now())) {
-                Log.i("-----", "Deleting: ${oneTimeNotificationTimes[i]}")
+                Log.i("tdd.deletePastOneTimes", "Deleting: ${oneTimeNotificationTimes[i]}")
                 removeOneTimeNotification(i)
             }
 

@@ -21,6 +21,8 @@ class NewNotification : AppCompatActivity() {
 
     var oneTimeNotification : Boolean = false
     var editNotificationIndex : Int = -1
+    var systemOffsetIndex : Int = -1
+    var editingSystemNotification : Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,6 +57,7 @@ class NewNotification : AppCompatActivity() {
                 )
                 timePicker.hour = dailyNotifications.oneTimeNotificationTimes[editNotificationIndex].hour
                 timePicker.minute = dailyNotifications.oneTimeNotificationTimes[editNotificationIndex].minute
+                editingSystemNotification = dailyNotifications.isSystemNotification[editNotificationIndex]
             } else {
                 notificationNameInput.setText(dailyNotifications.dailyNotificationNames[editNotificationIndex])
                 notificationTitleInput.setText(dailyNotifications.dailyNotificationTitles[editNotificationIndex])
@@ -73,7 +76,11 @@ class NewNotification : AppCompatActivity() {
         var indexArray : ArrayList<String> = ArrayList()
         if (oneTimeNotification) {
             for (i in 0 until dailyNotifications.oneTimeNotificationsLength) {
-                indexArray.add("$i: ${dailyNotifications.oneTimeNotificationNames[i]}")
+                if (!dailyNotifications.isSystemNotification[i] || (dailyNotifications.isSystemNotification[i] && editingSystemNotification) )
+                    indexArray.add("$i: ${dailyNotifications.oneTimeNotificationNames[i]}")
+
+                if (i == editNotificationIndex)
+                    systemOffsetIndex = indexArray.size-1
             }
             if (editNotificationIndex == -1)
                 indexArray.add("End: new")
@@ -90,7 +97,10 @@ class NewNotification : AppCompatActivity() {
             android.R.layout.simple_list_item_1,
             indexArray.toArray()
         )
-        if (editNotificationIndex != -1)
+
+        if (systemOffsetIndex != -1)
+            notificationIndexInput.setSelection(systemOffsetIndex)
+        else if (editNotificationIndex != -1)
             notificationIndexInput.setSelection(editNotificationIndex)
         else
             notificationIndexInput.setSelection(indexArray.size-1)
@@ -175,7 +185,17 @@ class NewNotification : AppCompatActivity() {
         if (!notificationRepeatInput.isChecked) {
             if (editNotificationIndex == -1)
                 editNotificationIndex = dailyNotifications.oneTimeNotificationsLength-1
-            dailyNotifications.oneTimeMoveFrom(editNotificationIndex, notificationIndexInput.selectedItemPosition)
+
+            var newIndex = notificationIndexInput.selectedItemPosition
+            for (i in 0 until notificationIndexInput.selectedItemPosition+1) {
+                if (i >= dailyNotifications.isSystemNotification.size) break
+
+                if (editingSystemNotification != dailyNotifications.isSystemNotification[i]) {
+                    newIndex++
+                }
+            }
+
+            dailyNotifications.oneTimeMoveFrom(editNotificationIndex, newIndex)
         } else {
             if (editNotificationIndex == -1)
                 editNotificationIndex = dailyNotifications.dailyNotificationsLength-1
@@ -184,7 +204,6 @@ class NewNotification : AppCompatActivity() {
 
 
         saveNotifications()
-
         finish()
 
     }

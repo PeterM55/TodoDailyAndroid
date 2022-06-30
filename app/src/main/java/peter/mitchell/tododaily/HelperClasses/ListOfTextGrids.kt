@@ -79,6 +79,7 @@ class ListOfTextGrids @JvmOverloads constructor(
             var constraintLayout : RelativeLayout = RelativeLayout(context)
             constraintLayout.id = View.generateViewId()
 
+            constraintLayoutParams.topMargin = (10*resources.displayMetrics.density).toInt()
             constraintLayout.layoutParams = constraintLayoutParams
 
             var sectionTitle : TextView = TextView(context)
@@ -91,6 +92,7 @@ class ListOfTextGrids @JvmOverloads constructor(
                 sectionTitle.setTextColor(resources.getColor(R.color.textLight))
             sectionTitle.textAlignment = TextView.TEXT_ALIGNMENT_TEXT_START
             sectionTitle.minHeight = 30
+            sectionTitle.setTypeface(null, Typeface.BOLD)
             sectionTitle.id = View.generateViewId()
             val titleTextLayoutParamsCopy : RelativeLayout.LayoutParams = RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.WRAP_CONTENT, // width
