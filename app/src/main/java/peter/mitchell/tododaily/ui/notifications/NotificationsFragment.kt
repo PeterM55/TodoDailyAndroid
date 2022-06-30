@@ -24,6 +24,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.work.WorkManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.fragment_notifications.*
@@ -32,6 +33,7 @@ import peter.mitchell.tododaily.*
 import peter.mitchell.tododaily.HelperClasses.SaveInformation
 import peter.mitchell.tododaily.databinding.FragmentNotificationsBinding
 import peter.mitchell.tododaily.ui.home.ManageDailyNotifications
+import java.io.File
 import java.time.*
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -42,6 +44,9 @@ class NotificationsFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+
+    private enum class ReadyToDelete { daily, oneTime, system }
+    private var readyToDelete : ReadyToDelete? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -61,9 +66,18 @@ class NotificationsFragment : Fragment() {
             intent.putExtra("oneTimeNotification", true)
             startActivity(intent)
         }
+        _binding.deleteAllOneTimesButton.setOnClickListener {
+            readyToDelete = ReadyToDelete.oneTime
+            showDeleteAllDialog()
+        }
+
         _binding.dailyNotificationsButton.setOnClickListener {
             val intent = Intent(activity as Context, NewNotification::class.java)
             startActivity(intent)
+        }
+        _binding.deleteAllDailyButton.setOnClickListener {
+            readyToDelete = ReadyToDelete.daily
+            showDeleteAllDialog()
         }
 
         _binding.dailyNotificationsToggle.setOnClickListener {
@@ -71,6 +85,10 @@ class NotificationsFragment : Fragment() {
             saveSettings()
 
             reloadDailyNotifications()
+        }
+        _binding.deleteAllSystemButton.setOnClickListener {
+            readyToDelete = ReadyToDelete.system
+            showDeleteAllDialog()
         }
 
         setupQuickTimers()
@@ -139,6 +157,47 @@ class NotificationsFragment : Fragment() {
                 startActivity(intent)
             }
         }
+    }
+
+    private fun showDeleteAllDialog() {
+
+        MaterialAlertDialogBuilder(requireContext()).setTitle("Are you sure?")
+            .setMessage("This will delete all of your notifications in the selected category!")
+            .setNegativeButton("Cancel") { dialog, which ->
+                readyToDelete = null
+            }.setPositiveButton("Delete") { dialog, which ->
+
+                if (readyToDelete == ReadyToDelete.daily) {
+                    for (i in 0 until dailyNotifications.dailyNotificationsLength) {
+                        dailyNotifications.removeDailyNotification(i)
+                    }
+                    saveNotifications()
+                } else if (readyToDelete == ReadyToDelete.oneTime) {
+                    var i = 0
+                    while (i < dailyNotifications.oneTimeNotificationsLength) {
+                        if (!dailyNotifications.isSystemNotification[i]) {
+                            dailyNotifications.removeOneTimeNotification(i)
+                        } else
+                            i++
+                    }
+                } else if (readyToDelete == ReadyToDelete.system) {
+                    var i = 0
+                    while (i < dailyNotifications.oneTimeNotificationsLength) {
+                        if (dailyNotifications.isSystemNotification[i]) {
+                            dailyNotifications.removeOneTimeNotification(i)
+                        } else
+                            i++
+                    }
+
+                }
+
+                readyToDelete = null
+                reloadNextNotification()
+                reloadDailyNotifications()
+                reloadOneTimeNotifications()
+                saveNotifications()
+
+            }.show()
     }
 
     private fun setupQuickTimers() {

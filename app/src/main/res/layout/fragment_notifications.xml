@@ -47,7 +47,8 @@
                     android:id="@+id/oneTimeNotificationsTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="One Time Notifications"
+                    android:layout_gravity="center_vertical"
+                    android:text="One Time Notifs"
                     android:textSize="20dp"
                     android:textColor="@color/textDark"
                     android:textStyle="bold"
@@ -57,7 +58,19 @@
                     android:id="@+id/oneTimeNotificationsButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
                     android:text="New"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
+
+                    android:layout_marginLeft="10dp"/>
+
+                <Button
+                    android:id="@+id/deleteAllOneTimesButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="Delete All"
                     android:minHeight="0dp"
                     android:minWidth="0dp"
 
@@ -87,6 +100,7 @@
                     android:id="@+id/dailyNotificationsTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
                     android:text="Daily Notifications"
                     android:textSize="20dp"
                     android:textColor="@color/textDark"
@@ -100,12 +114,24 @@
                     android:id="@+id/dailyNotificationsButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
                     android:text="New"
                     android:minHeight="0dp"
                     android:minWidth="0dp"
 
                     app:layout_constraintTop_toBottomOf="@+id/oneTimeNotificationsGrid"
                     app:layout_constraintLeft_toRightOf="@+id/dailyNotificationsTitle"
+
+                    android:layout_marginLeft="10dp"/>
+
+                <Button
+                    android:id="@+id/deleteAllDailyButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="Delete All"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
 
                     android:layout_marginLeft="10dp"/>
 
@@ -146,6 +172,7 @@
                     android:id="@+id/systemNotificationsTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
                     android:text="System Notifications"
                     android:textSize="20dp"
                     android:textColor="@color/textDark"
@@ -154,6 +181,17 @@
                     app:layout_constraintTop_toBottomOf="@+id/oneTimeNotificationsGrid"
                     app:layout_constraintLeft_toLeftOf="parent"
                     />
+
+                <Button
+                    android:id="@+id/deleteAllSystemButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:text="Delete All"
+                    android:minHeight="0dp"
+                    android:minWidth="0dp"
+
+                    android:layout_marginLeft="10dp"/>
 
             </LinearLayout>
 
