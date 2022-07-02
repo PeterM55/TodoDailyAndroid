@@ -414,7 +414,7 @@ class HomeFragment : Fragment() {
 
             }.setPositiveButton("Export") { dialog, which ->
 
-                if (!canExport(requireActivity(), requireContext()))
+                /*if (!canExport(requireActivity(), requireContext()))
                     return@setPositiveButton
 
                 var exportFile : File? = getExportFile(exportFileName)
@@ -424,7 +424,9 @@ class HomeFragment : Fragment() {
 
                 dailyInformationFile.forEachLine {
                     exportFile.appendText(it+"\n")
-                }
+                }*/
+
+                exportDailyInformation(requireActivity(), requireContext())
 
             }.show()
     }

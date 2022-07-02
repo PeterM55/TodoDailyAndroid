@@ -505,88 +505,15 @@ class ManageDailyNotifications : AppCompatActivity() {
     }
 
     private fun customExportSubmit() {
-        if (!dailyInformationFile.exists())
-            return
-
-        if (!canExport(this, this))
-            return
-
-        var exportFile : File? = getExportFile(exportFileName)
-
-        if (exportFile == null)
-            return
-
-        if (exportLabelLine) {
-            var colInfo : ArrayList<SaveInformation.ValueInfo> = ArrayList()
-            var tempSaveInformation : SaveInformation = SaveInformation()
-
-            exportFile.writeText("")
-
-            if (customExportInput.text.isEmpty()) {
-                colInfo = tempSaveInformation.setupColInfoForOrder()
-                exportFile.appendText("Date,")
-                for (i in 0 until colInfo.size) {
-                    exportFile.appendText("${colInfo[i].name},")
-                }
-                exportFile.appendText("\n")
-            }
-
-            dailyInformationFile.forEachLine {
-                tempSaveInformation.fromString(it)
-
-                if (customExportInput.text.isNotEmpty()) {
-                    exportFile.appendText(tempSaveInformation.exportToCustomByNames(customExportInput.text.toString(), colInfo)+"\n")
-                } else {
-                    exportFile.appendText(tempSaveInformation.exportToOrderByNames(customOrderInput.text.toString(), colInfo)+"\n")
-                }
-            }
-
-        } else {
-            var tempSaveInformation : SaveInformation = SaveInformation()
-
-            exportFile.writeText("")
-
-            dailyInformationFile.forEachLine {
-                tempSaveInformation.fromString(it)
-
-                if (customExportInput.text.isNotEmpty()) {
-                    exportFile.appendText(tempSaveInformation.exportToCustomString(customExportInput.text.toString())+"\n")
-                } else {
-                    exportFile.appendText(tempSaveInformation.exportToCustomOrder(customOrderInput.text.toString())+"\n")
-                }
-            }
-        }
-
-
-
-        /*var putLabel = !exportLabelLine
-
-        var tempSaveInformation : SaveInformation = SaveInformation()
-
-        exportFile.writeText("")
-
-        dailyInformationFile.forEachLine {
-            tempSaveInformation.fromString(it)
-
-            if (customExportInput.text.isNotEmpty()) {
-                exportFile.appendText(tempSaveInformation.exportToCustomString(customExportInput.text.toString(), !putLabel)+"\n")
-            } else {
-                exportFile.appendText(tempSaveInformation.exportToCustomOrder(customOrderInput.text.toString(), !putLabel)+"\n")
-            }
-
-            if (!putLabel) {
-                putLabel = true
-            }
-        }*/
+        exportDailyInformation(
+            this, this,
+            labelExportCheck.isChecked, customOrderInput.text.toString(),
+            customExportInput.text.toString(), defaultExportCheck.isChecked
+        )
 
         // set to default if all worked
         if (defaultExportCheck.isChecked) {
-            if (customExportInput.text.toString().isNotEmpty()) {
-                exportCustomDefault = customExportInput.text.toString().replace('\n',' ')
-            } else {
-                exportOrderDefault = customOrderInput.text.toString().replace('\n',' ')
-                exportCustomDefault = ""
-            }
+            // default is done in exportDailyInformation, presets need to be done here
             saveExportPresetPressed()
             defaultPreset = exportPresetsInput.selectedItemPosition
             saveSettings()
@@ -616,14 +543,8 @@ class ManageDailyNotifications : AppCompatActivity() {
                 )
             }
 
-
             if (defaultExportCheck.isChecked) {
-                if (customExportInput.text.toString().isNotEmpty()) {
-                    exportCustomDefault = customExportInput.text.toString().replace('\n',' ')
-                } else {
-                    exportOrderDefault = customOrderInput.text.toString().replace('\n',' ')
-                    exportCustomDefault = ""
-                }
+                setDefaultExport(labelExportCheck.isChecked, customOrderInput.text.toString(), customExportInput.text.toString())
                 saveSettings()
 
                 defaultPreset = exportPresets.size-1
@@ -645,12 +566,7 @@ class ManageDailyNotifications : AppCompatActivity() {
             }
 
             if (defaultExportCheck.isChecked) {
-                if (customExportInput.text.toString().isNotEmpty()) {
-                    exportCustomDefault = customExportInput.text.toString().replace('\n',' ')
-                } else {
-                    exportOrderDefault = customOrderInput.text.toString().replace('\n',' ')
-                    exportCustomDefault = ""
-                }
+                setDefaultExport(labelExportCheck.isChecked, customOrderInput.text.toString(), customExportInput.text.toString())
                 defaultPreset = exportPresetsInput.selectedItemPosition
                 saveSettings()
             }

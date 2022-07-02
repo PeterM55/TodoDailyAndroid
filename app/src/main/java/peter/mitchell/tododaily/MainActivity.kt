@@ -23,6 +23,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.manage_daily_information.*
 import kotlinx.android.synthetic.main.new_notification.*
 import peter.mitchell.tododaily.HelperClasses.NotesList
 import peter.mitchell.tododaily.databinding.ActivityMainBinding
@@ -73,7 +74,7 @@ var homeTextSize = 18f
 var startOfWeek : DayOfWeek = DayOfWeek.MONDAY
 var selectHoldText = true
 var exportLabelLine = true
-var exportOrderDefault = "nvit"
+var exportOrderDefault = "v"
 var exportCustomDefault = ""
 // --- to-do ---
 var todoShown = true
@@ -263,6 +264,101 @@ fun readTodaysDailyInformationFile() {
         }
 
     }
+}
+
+/** Export the information, if they are null the defaults (in settings) will be used
+ * @param activity used to check permissions
+ * @param context used to check permissions
+ * @param lineLabelIn whether the label line should be created
+ * @param exportOrderIn the order text to export (won't be used if exportCustomIn is not "")
+ * @param exportCustomIn the custom text to export
+ * @param setAsDefault whether to set the export as the default
+ */
+fun exportDailyInformation(activity: Activity, context: Context,
+                           lineLabelIn : Boolean? = null, exportOrderIn : String? = null,
+                           exportCustomIn : String? = null, setAsDefault : Boolean = false
+) {
+    if (!dailyInformationFile.exists() || !canExport(activity, context))
+        return
+
+    var exportFile : File? = getExportFile(exportFileName)
+
+    if (exportFile == null)
+        return
+
+    var lineLabel = true
+    var exportOrder = ""
+    var exportCustom = ""
+
+    if (lineLabelIn == null) lineLabel = exportLabelLine
+    else lineLabel = lineLabelIn
+
+    if (exportOrderIn == null) exportOrder = exportOrderDefault
+    else exportOrder = exportOrderIn
+
+    if (exportCustomIn == null) exportCustom = exportCustomDefault
+    else exportCustom = exportCustomIn
+
+    // -- do the actual export --
+    if (lineLabel) {
+        var colInfo : ArrayList<SaveInformation.ValueInfo> = ArrayList()
+        var tempSaveInformation : SaveInformation = SaveInformation()
+
+        exportFile.writeText("")
+
+        if (exportCustom.isEmpty()) {
+            colInfo = tempSaveInformation.setupColInfoForOrder()
+            exportFile.appendText("Date,")
+            for (i in 0 until colInfo.size) {
+                exportFile.appendText("${colInfo[i].name},")
+            }
+            exportFile.appendText("\n")
+        }
+
+        dailyInformationFile.forEachLine {
+            tempSaveInformation.fromString(it)
+
+            if (exportCustom.isNotEmpty()) {
+                exportFile.appendText(tempSaveInformation.exportToCustomByNames(exportCustom, colInfo)+"\n")
+            } else {
+                exportFile.appendText(tempSaveInformation.exportToOrderByNames(exportOrder, colInfo)+"\n")
+            }
+        }
+
+    } else {
+        var tempSaveInformation : SaveInformation = SaveInformation()
+
+        exportFile.writeText("")
+
+        dailyInformationFile.forEachLine {
+            tempSaveInformation.fromString(it)
+
+            if (exportCustom.isNotEmpty()) {
+                exportFile.appendText(tempSaveInformation.exportToCustomString(exportCustom)+"\n")
+            } else {
+                exportFile.appendText(tempSaveInformation.exportToCustomOrder(exportOrder)+"\n")
+            }
+        }
+    }
+
+    if (setAsDefault) {
+        setDefaultExport(lineLabel, exportOrder, exportCustom)
+    }
+
+}
+
+/** sets the default export settings
+ */
+fun setDefaultExport(lineLabel : Boolean, exportOrder : String, exportCustom : String) {
+    exportLabelLine = lineLabel
+    if (exportCustomDefault.isNotEmpty()) {
+        exportOrderDefault = ""
+        exportCustomDefault = exportCustom.replace('\n',' ')
+    } else {
+        exportOrderDefault = exportOrder.replace('\n',' ')
+        exportCustomDefault = ""
+    }
+    saveSettings()
 }
 
 /**
