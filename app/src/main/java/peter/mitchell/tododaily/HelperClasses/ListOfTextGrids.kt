@@ -31,7 +31,10 @@ class ListOfTextGrids @JvmOverloads constructor(
     var sectionOpened : ArrayList<Boolean> = ArrayList()
 
     var columnCount = 2
+    var sectionsColumnCount = 2
     var customTextSize = 18f
+
+    private var showAddButtons = true
 
     private val titleTextLayoutParams : RelativeLayout.LayoutParams = RelativeLayout.LayoutParams(
         resources.displayMetrics.widthPixels-62*2-34, // width //RelativeLayout.LayoutParams.WRAP_CONTENT
@@ -157,7 +160,7 @@ class ListOfTextGrids @JvmOverloads constructor(
             this.addView(constraintLayout)
 
             var sectionGrid : TextGridLayout = TextGridLayout(context)
-            sectionGrid.setCustomColumnCount(3)
+            sectionGrid.setCustomColumnCount(sectionsColumnCount)
             //sectionGrid.
             this.addView(sectionGrid)
 
@@ -209,6 +212,15 @@ class ListOfTextGrids @JvmOverloads constructor(
     }
 
     /**
+     * @param i the index
+     * @param visible whether the section should be visible
+     */
+    public fun setSectionVisible(i : Int, visible : Boolean) {
+        relativeLayouts[i].isVisible = visible
+        sectionGrids[i].isVisible = visible
+    }
+
+    /**
      * I have no idea why it breaks unless I call this.
      */
     fun randomRefresh() {
@@ -222,7 +234,14 @@ class ListOfTextGrids @JvmOverloads constructor(
         }
     }
 
+    fun setShowAddButtons(visible : Boolean) {
+        showAddButtons = visible
+        for (i in 0 until sectionAddButtons.size)
+            sectionAddButtons[i].isVisible = showAddButtons
+    }
+
     fun setCustomColumnCount(count : Int) {
+        sectionsColumnCount = count
         for (i in 0 until sectionGrids.size) {
             sectionGrids[i].setCustomColumnCount(count)
         }

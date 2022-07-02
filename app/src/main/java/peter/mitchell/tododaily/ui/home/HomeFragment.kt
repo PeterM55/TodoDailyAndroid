@@ -34,7 +34,6 @@ import peter.mitchell.tododaily.MainActivity
 import peter.mitchell.tododaily.HelperClasses.SaveInformation
 import peter.mitchell.tododaily.HelperClasses.TextGridLayout
 import peter.mitchell.tododaily.databinding.FragmentHomeBinding
-import peter.mitchell.tododaily.ui.notifications.NotificationsFragmentDirections
 import java.io.File
 import java.time.LocalDate
 
@@ -52,6 +51,16 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding
 
     private var initialSetupDone = false
+
+    class SelectedViewValue(i : Int, name : String, type : SaveInformation.InformationFormat) {
+        var valueIndex : Int = i
+        var valueName : String = name
+        var valueType : SaveInformation.InformationFormat = type
+    }
+    var selectedViewValue : SelectedViewValue? = null
+
+    var selectedValueDates : ArrayList<LocalDate> = ArrayList()
+    var selectedValueValues : ArrayList<String> = ArrayList()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -137,6 +146,34 @@ class HomeFragment : Fragment() {
             reloadDateSpinner()
         }
 
+        _binding.viewValueButton.setOnClickListener {
+
+            if (!dailyInformationFile.exists())
+                return@setOnClickListener
+
+            val i = viewValueSelect.selectedItemPosition
+            selectedViewValue = SelectedViewValue(i, saveInformation.names[i], saveInformation.formats[i])
+
+            dailyInformationFile.forEachLine {
+                if (it.isNullOrEmpty())
+                    return@forEachLine
+
+                val lineInfo : SaveInformation = SaveInformation()
+                if (!lineInfo.fromString(it))
+                    return@forEachLine
+
+                var newI = lineInfo.getValueIndex(i, selectedViewValue!!.valueName, selectedViewValue!!.valueType)
+
+                if (newI != null) {
+                    selectedValueDates.add(lineInfo.date)
+                    selectedValueValues.add(lineInfo.getDisplayValue(newI))
+                }
+
+            }
+
+            reloadMainReminders()
+        }
+
         // this is done in onResume, which runs after onCreate
         /*reloadReminderInput()
         reloadMainReminders()*/
@@ -147,78 +184,80 @@ class HomeFragment : Fragment() {
     /** Reloads the main reminders grid */
     private fun reloadMainReminders() {
 
-        if (homeColumns != _binding.mainGridLayout.columnCount) {
-            _binding.mainGridLayout.setCustomColumnCount(homeColumns)
-            _binding.weeklyGridLayout.setCustomColumnCount(homeColumns)
-            _binding.monthlyGridLayout.setCustomColumnCount(homeColumns)
-            _binding.yearlyGridLayout.setCustomColumnCount(homeColumns)
-            _binding.neverGridLayout.setCustomColumnCount(homeColumns)
-        }
+        viewValueSelect.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, saveInformation.names)
 
-        if (homeTextSize != _binding.mainGridLayout.customTextSize) {
-            _binding.mainGridLayout.setTextSize(homeTextSize)
-            _binding.weeklyGridLayout.setTextSize(homeTextSize)
-            _binding.monthlyGridLayout.setTextSize(homeTextSize)
-            _binding.yearlyGridLayout.setTextSize(homeTextSize)
-            _binding.neverGridLayout.setTextSize(homeTextSize)
-        }
 
-        mainGridLayout.reset()
-        weeklyGridLayout.reset()
-        monthlyGridLayout.reset()
-        yearlyGridLayout.reset()
-        neverGridLayout.reset()
 
-        var eachCount : Array<Int> = arrayOf(0,0,0,0,0)
-        for (i in 0 until saveInformation.length) {
+            _binding.dailyInformationGrid.setupTitles(
+                arrayListOf("Daily", "Weekly", "Monthly", "Yearly", "Never",)
+            )
 
-            var textGridLayout : TextGridLayout
-            var currentIndex : Int = 0
+            _binding.dailyInformationGrid.setCustomColumnCount(homeColumns)
+            _binding.dailyInformationGrid.setTextSize(homeTextSize)
+            _binding.dailyInformationGrid.setShowAddButtons(false)
 
-            if (saveInformation.repeatTime[i] == SaveInformation.RepeatFormat.Daily) {
-                textGridLayout = mainGridLayout
-                currentIndex = eachCount[0]++
-            } else if (saveInformation.repeatTime[i] == SaveInformation.RepeatFormat.Weekly) {
-                textGridLayout = weeklyGridLayout
-                currentIndex = eachCount[1]++
-            } else if (saveInformation.repeatTime[i] == SaveInformation.RepeatFormat.Monthly) {
-                textGridLayout = monthlyGridLayout
-                currentIndex = eachCount[2]++
-            } else if (saveInformation.repeatTime[i] == SaveInformation.RepeatFormat.Yearly) {
-                textGridLayout = yearlyGridLayout
-                currentIndex = eachCount[3]++
-            } else { // (saveInformation.repeatTime[i] == SaveInformation.RepeatFormat.Never)
-                textGridLayout = neverGridLayout
-                currentIndex = eachCount[4]++
+            for (i in 0 until _binding.dailyInformationGrid.sectionGrids.size) {
+                _binding.dailyInformationGrid.sectionGrids[i].reset()
             }
 
-            textGridLayout.addString(requireContext(), saveInformation.names[i] + ": " + saveInformation.getDisplayValue(i))
+            var eachCount: Array<Int> = arrayOf(0, 0, 0, 0, 0)
+            for (i in 0 until saveInformation.length) {
 
-            textGridLayout.textGrid[currentIndex].setOnClickListener {
-                if (saveInformation.formats[i] == SaveInformation.InformationFormat.checkBox) {
-                    saveInformation.toggleBox(i)
-                    saveDailyInformationFile()
-                    reloadMainReminders()
-                } else {
-                    showInputDialog(i, saveInformation.names[i] + ": ")
+                var textGridLayout: TextGridLayout
+                var currentIndex: Int = 0
+
+                if (saveInformation.repeatTime[i] == SaveInformation.RepeatFormat.Daily) {
+                    textGridLayout = _binding.dailyInformationGrid.sectionGrids[0]
+                    currentIndex = eachCount[0]++
+                } else if (saveInformation.repeatTime[i] == SaveInformation.RepeatFormat.Weekly) {
+                    textGridLayout = _binding.dailyInformationGrid.sectionGrids[1]
+                    currentIndex = eachCount[1]++
+                } else if (saveInformation.repeatTime[i] == SaveInformation.RepeatFormat.Monthly) {
+                    textGridLayout = _binding.dailyInformationGrid.sectionGrids[2]
+                    currentIndex = eachCount[2]++
+                } else if (saveInformation.repeatTime[i] == SaveInformation.RepeatFormat.Yearly) {
+                    textGridLayout = _binding.dailyInformationGrid.sectionGrids[3]
+                    currentIndex = eachCount[3]++
+                } else { // (saveInformation.repeatTime[i] == SaveInformation.RepeatFormat.Never)
+                    textGridLayout = _binding.dailyInformationGrid.sectionGrids[4]
+                    currentIndex = eachCount[4]++
+                }
+
+                textGridLayout.addString(
+                    requireContext(),
+                    saveInformation.names[i] + ": " + saveInformation.getDisplayValue(i)
+                )
+
+                textGridLayout.textGrid[currentIndex].setOnClickListener {
+                    if (saveInformation.formats[i] == SaveInformation.InformationFormat.checkBox) {
+                        saveInformation.toggleBox(i)
+                        saveDailyInformationFile()
+                        reloadMainReminders()
+                    } else {
+                        showInputDialog(i, saveInformation.names[i] + ": ")
+                    }
                 }
             }
+
+            for (i in 0 until _binding.dailyInformationGrid.sectionGrids.size) {
+                _binding.dailyInformationGrid.setSectionVisible(i, eachCount[i] > 0)
+            }
+
+            currentDateText.setText("Selected date: ${saveInformation.date.toString()}")
+        if (selectedViewValue != null) {
+
+            _binding.viewValueGrid.reset()
+            _binding.viewValueGrid.setCustomColumnCount(maxOf(2, homeColumns- homeColumns%2))
+            _binding.viewValueGrid.setTextSize(homeTextSize)
+
+            for (i in 0 until selectedValueDates.size) {
+                _binding.viewValueGrid.addString(requireContext(), selectedValueDates[i].toString())
+                _binding.viewValueGrid.addString(requireContext(), selectedValueValues[i])
+            }
+
         }
 
-        dailyInformationTitle.isVisible = (eachCount[0] > 0)
-        mainGridLayout.isVisible = (eachCount[0] > 0)
 
-        weeklyInformationTitle.isVisible = (eachCount[1] > 0)
-        weeklyGridLayout.isVisible = (eachCount[1] > 0)
-
-        monthlyInformationTitle.isVisible = (eachCount[2] > 0)
-        monthlyGridLayout.isVisible = (eachCount[2] > 0)
-
-        yearlyInformationTitle.isVisible = (eachCount[3] > 0)
-        yearlyGridLayout.isVisible = (eachCount[3] > 0)
-
-        neverInformationTitle.isVisible = (eachCount[4] > 0)
-        neverGridLayout.isVisible = (eachCount[4] > 0)
 
     }
 
@@ -392,6 +431,9 @@ class HomeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+
+        _binding.selectPastDateButton.isVisible = true
+        _binding.selectPastDateSpinner.isVisible = false
 
         reloadReminderInput()
 

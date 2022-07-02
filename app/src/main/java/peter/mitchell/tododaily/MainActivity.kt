@@ -45,6 +45,7 @@ val exportPath = "${Environment.getExternalStorageDirectory().path}/${Environmen
 
 val dailyInformationFile = File("${internalDataPath}dailyInformation.txt")
 val tempFile = File("${internalDataPath}tempDailyInformation.txt")
+val tempFile2 = File("${internalDataPath}tempDailyInformation2.txt")
 val notificationsFile = File("${internalDataPath}dailyNotifications.txt")
 val nextNotificationIntentFile = File("${internalDataPath}nextNotificationIntent.txt")
 val settingsFile = File("${internalDataPath}settings.txt")
@@ -52,6 +53,7 @@ val settingsBackupFile = File("${internalDataPath}settingsBackup.txt")
 val todosFile = File("${internalDataPath}todos.txt")
 //val exportFileName = "/storage/emulated/0/Download/dailyInformationExport.txt"
 val exportFileName = "${exportPath}dailyInformationExport.csv"
+val importFileName = "${exportPath}todoDailyImport.txt"
 
 var notifFragment : Fragment? = null
 enum class fragments { home, todo, notes, notifs }

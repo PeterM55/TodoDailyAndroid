@@ -8,45 +8,55 @@
     android:paddingBottom="20dp"
     android:background="@color/backgroundDark">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_width="match_parent">
+        android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/manageMainRemindersTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Delete Titles"
-            android:textSize="20dp"
-            android:textColor="@color/textDark"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            />
+        <!--  ===== Delete Titles ===== -->
 
-        <Button
-            android:id="@+id/toggleMainReminders"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/deleteAllMainRemindersButton"
-            android:text="▼"
-            android:textSize="15dp"
-            android:minHeight="0dp"
-            android:minWidth="0dp"
-            android:layout_marginRight="10dp"
-            />
+            android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/deleteAllMainRemindersButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            android:text="Delete All"
-            android:textSize="15dp"
-            android:minHeight="0dp"
-            android:minWidth="0dp"
-            />
+            <TextView
+                android:id="@+id/manageMainRemindersTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Delete Titles"
+                android:textSize="20dp"
+                android:textColor="@color/textDark"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                />
+
+            <Button
+                android:id="@+id/toggleMainReminders"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/deleteAllMainRemindersButton"
+                android:text="◀"
+                android:textSize="15dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:layout_marginRight="10dp"
+                />
+
+            <Button
+                android:id="@+id/deleteAllMainRemindersButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:text="Del. All"
+                android:textSize="15dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                />
+        </LinearLayout>
 
         <peter.mitchell.tododaily.HelperClasses.TextGridLayout
             android:id="@+id/manageMainReminders"
@@ -57,38 +67,38 @@
             app:layout_constraintLeft_toLeftOf="parent"
             />
 
-        <TextView
-            android:id="@+id/rearrangeTitles"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Rearrange"
-            android:textSize="20dp"
-            android:textColor="@color/textDark"
-            app:layout_constraintTop_toBottomOf="@id/manageMainReminders"
-            app:layout_constraintLeft_toLeftOf="parent"
-            />
+        <!--  ===== Rearrange Titles ===== -->
 
-        <Button
-            android:id="@+id/toggleRearrangeTitles"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/manageMainReminders"
-            app:layout_constraintRight_toRightOf="parent"
-            android:text="◀"
-            android:textSize="15dp"
-            android:minHeight="0dp"
-            android:minWidth="0dp"
-            />
+            android:orientation="horizontal">
 
-        <!--<Button
-            android:id="@+id/deleteAllTitlesButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/manageMainReminders"
-            app:layout_constraintRight_toRightOf="parent"
-            android:text="Delete All"
-            android:textSize="15dp"
-            />-->
+            <TextView
+                android:id="@+id/rearrangeTitles"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Rearrange"
+                android:textSize="20dp"
+                android:textColor="@color/textDark"
+                app:layout_constraintTop_toBottomOf="@id/manageMainReminders"
+                app:layout_constraintLeft_toLeftOf="parent"
+                />
+
+            <Button
+                android:id="@+id/toggleRearrangeTitles"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/manageMainReminders"
+                app:layout_constraintRight_toRightOf="parent"
+                android:text="◀"
+                android:textSize="15dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                />
+
+        </LinearLayout>
 
         <peter.mitchell.tododaily.HelperClasses.TextGridLayout
             android:id="@+id/manageAllTitles"
@@ -100,54 +110,64 @@
             app:layout_constraintLeft_toLeftOf="parent"
             />
 
-        <TextView
-            android:id="@+id/manageDatesTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Dates"
-            android:textSize="20dp"
-            android:textColor="@color/textDark"
-            app:layout_constraintTop_toBottomOf="@id/manageAllTitles"
-            app:layout_constraintLeft_toLeftOf="parent"
-            />
+        <!--  ===== Delete Dates ===== -->
 
-        <Button
-            android:id="@+id/toggleManageDatesButton"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/manageAllTitles"
-            app:layout_constraintRight_toLeftOf="@id/toggleManageDatesVisibilityButton"
-            android:text="Toggle Delete\nMode"
-            android:textSize="11dp"
-            android:minHeight="0dp"
-            android:minWidth="0dp"
-            android:layout_marginRight="10dp"
-            />
+            android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/toggleManageDatesVisibilityButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/manageAllTitles"
-            app:layout_constraintRight_toLeftOf="@id/deleteAllDatesButton"
-            android:text="◀"
-            android:textSize="15dp"
-            android:minHeight="0dp"
-            android:minWidth="0dp"
-            android:layout_marginRight="10dp"
-            />
+            <TextView
+                android:id="@+id/manageDatesTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Dates"
+                android:textSize="20dp"
+                android:textColor="@color/textDark"
+                app:layout_constraintTop_toBottomOf="@id/manageAllTitles"
+                app:layout_constraintLeft_toLeftOf="parent"
+                />
 
-        <Button
-            android:id="@+id/deleteAllDatesButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/manageAllTitles"
-            app:layout_constraintRight_toRightOf="parent"
-            android:text="Delete All"
-            android:textSize="15dp"
-            android:minHeight="0dp"
-            android:minWidth="0dp"
-            />
+            <Button
+                android:id="@+id/toggleManageDatesButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/manageAllTitles"
+                app:layout_constraintRight_toLeftOf="@id/toggleManageDatesVisibilityButton"
+                android:text="Toggle Mode"
+                android:textSize="11dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:layout_marginRight="10dp"
+                />
+
+            <Button
+                android:id="@+id/toggleManageDatesVisibilityButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/manageAllTitles"
+                app:layout_constraintRight_toLeftOf="@id/deleteAllDatesButton"
+                android:text="◀"
+                android:textSize="15dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:layout_marginRight="10dp"
+                />
+
+            <Button
+                android:id="@+id/deleteAllDatesButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/manageAllTitles"
+                app:layout_constraintRight_toRightOf="parent"
+                android:text="Del. All"
+                android:textSize="15dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                />
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/toggleManageDatesText"
@@ -170,28 +190,38 @@
             app:layout_constraintLeft_toLeftOf="parent"
             />
 
-        <TextView
-            android:id="@+id/addDatesTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Add Date"
-            android:textSize="20dp"
-            android:textColor="@color/textDark"
-            app:layout_constraintTop_toBottomOf="@id/manageDatesList"
-            app:layout_constraintLeft_toLeftOf="parent"
-            />
+        <!--  ===== Add Dates ===== -->
 
-        <Button
-            android:id="@+id/addDateVisibilityButton"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/manageDatesList"
-            app:layout_constraintRight_toRightOf="parent"
-            android:text="◀"
-            android:textSize="15dp"
-            android:minHeight="0dp"
-            android:minWidth="0dp"
-            />
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/addDatesTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Add Date"
+                android:textSize="20dp"
+                android:textColor="@color/textDark"
+                app:layout_constraintTop_toBottomOf="@id/manageDatesList"
+                app:layout_constraintLeft_toLeftOf="parent"
+                />
+
+            <Button
+                android:id="@+id/addDateVisibilityButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/manageDatesList"
+                app:layout_constraintRight_toRightOf="parent"
+                android:text="◀"
+                android:textSize="15dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                />
+
+        </LinearLayout>
 
         <DatePicker
             android:id="@+id/addDateInput"
@@ -208,6 +238,7 @@
             android:id="@+id/addDateButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             app:layout_constraintTop_toBottomOf="@id/addDateInput"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -215,175 +246,246 @@
             android:textSize="16dp"
             />
 
-        <TextView
-            android:id="@+id/exportOptionsTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Export Options"
-            android:textSize="20dp"
-            android:textColor="@color/textDark"
-            app:layout_constraintTop_toBottomOf="@id/addDateButton"
-            app:layout_constraintLeft_toLeftOf="parent"
-            />
-
-        <Button
-            android:id="@+id/exportOptionsExpandButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/addDateButton"
-            app:layout_constraintRight_toRightOf="parent"
-            android:text="◀"
-            android:textSize="15dp"
-            android:minHeight="0dp"
-            android:minWidth="0dp"
-            />
+        <!-- ===== Import Options ===== -->
 
         <LinearLayout
-            android:id="@+id/exportPresetLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-
-            app:layout_constraintTop_toBottomOf="@id/exportOptionsExpandButton"
-            app:layout_constraintLeft_toLeftOf="parent">
+            android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/exportPresetsTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-
-                android:text="Export Presets: "
-                android:textSize="18dp"
-                android:textColor="@color/textDark"
-                />
-
-            <Spinner
-                android:id="@+id/exportPresetsInput"
+                android:id="@+id/importOptionsTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textSize="18dp"
-
+                android:text="Import Options"
+                android:textSize="20dp"
+                android:textColor="@color/textDark"
+                app:layout_constraintTop_toBottomOf="@id/addDateButton"
+                app:layout_constraintLeft_toLeftOf="parent"
                 />
+
+            <Button
+                android:id="@+id/importOptionsExpandButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/addDateButton"
+                app:layout_constraintRight_toRightOf="parent"
+                android:text="◀"
+                android:textSize="15dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                />
+
         </LinearLayout>
 
-        <CheckBox
-            android:id="@+id/labelExportCheck"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="Include Label Line?"
-            app:layout_constraintTop_toBottomOf="@id/exportPresetLayout"
-            app:layout_constraintLeft_toLeftOf="parent"
-            />
-
         <TextView
-            android:id="@+id/exportExplanation1"
+            android:id="@+id/importText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="n = name, v = value, i = info type, t = time recorded"
+            android:text="This option will import the data from a file todoDailyImport.txt in the downloads folder.\nThis will not override current values of the same name, but will combine data from the same date.\nThe data must be in the format of Raw Data like the preset from export."
             android:textSize="15dp"
             android:textColor="@color/textDark"
-            app:layout_constraintTop_toBottomOf="@id/labelExportCheck"
-            app:layout_constraintLeft_toLeftOf="parent"
             />
 
-        <TextView
-            android:id="@+id/customOrderTitle"
+        <Button
+            android:id="@+id/importButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Order: "
-            android:textSize="18dp"
-            android:textColor="@color/textDark"
-            app:layout_constraintTop_toBottomOf="@id/exportExplanation1"
-            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_gravity="center_horizontal"
+            android:text="Import"
+            android:textSize="16sp"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
             />
 
-        <EditText
-            android:id="@+id/customOrderInput"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="ntiv"
-            android:hint="ntiv"
-            android:textColor="@color/textDark"
-            android:textColorHint="@color/textDark"
-            app:layout_constraintTop_toBottomOf="@id/exportExplanation1"
-            app:layout_constraintLeft_toLeftOf="@+id/customOrderTitle"
-            android:layout_marginTop="10dp"
-            />
+        <!-- ===== Export Options ===== -->
 
-        <TextView
-            android:id="@+id/customExportTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Custom: "
-            android:textSize="18dp"
-            android:textColor="@color/textDark"
-            app:layout_constraintTop_toBottomOf="@id/customOrderInput"
-            app:layout_constraintLeft_toLeftOf="parent"
-            />
-
-        <EditText
-            android:id="@+id/customExportInput"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="75dp"
-            android:hint="v1,n1,v3..."
-            android:textColor="@color/textDark"
-            android:textColorHint="@color/textDark"
-            app:layout_constraintTop_toBottomOf="@id/customExportTitle"
-            app:layout_constraintLeft_toLeftOf="parent"
-            />
-
-        <Button
-            android:id="@+id/deleteExportPreset"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/customExportInput"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@+id/saveExportPreset"
-            android:text="Delete\nPreset"
-            android:textSize="10dp"
-            android:minHeight="0dp"
-            android:minWidth="0dp"
-            />
+            android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/saveExportPreset"
-            android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/exportOptionsTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Export Options"
+                android:textSize="20dp"
+                android:textColor="@color/textDark"
+                app:layout_constraintTop_toBottomOf="@id/addDateButton"
+                app:layout_constraintLeft_toLeftOf="parent"
+                />
+
+            <Button
+                android:id="@+id/exportOptionsExpandButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/addDateButton"
+                app:layout_constraintRight_toRightOf="parent"
+                android:text="◀"
+                android:textSize="15dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                />
+
+        </LinearLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/customExportInput"
-            app:layout_constraintLeft_toRightOf="@+id/deleteExportPreset"
-            app:layout_constraintRight_toLeftOf="@+id/defaultExportCheck"
-            android:text="Save\nPreset"
-            android:textSize="10dp"
-            android:minHeight="0dp"
-            android:minWidth="0dp"
-            />
+            android:layout_width="match_parent">
 
-        <CheckBox
-            android:id="@+id/defaultExportCheck"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="default"
-            app:layout_constraintTop_toBottomOf="@id/customExportInput"
-            app:layout_constraintLeft_toRightOf="@+id/saveExportPreset"
-            app:layout_constraintRight_toLeftOf="@id/exportButton"
-            />
+            <LinearLayout
+                android:id="@+id/exportPresetLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
 
-        <Button
-            android:id="@+id/exportButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/customExportInput"
-            app:layout_constraintLeft_toRightOf="@+id/defaultExportCheck"
-            app:layout_constraintRight_toRightOf="parent"
-            android:text="Export"
-            android:textSize="16dp"
-            />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent">
+
+                <TextView
+                    android:id="@+id/exportPresetsTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text="Export Presets: "
+                    android:textSize="18dp"
+                    android:textColor="@color/textDark"
+                    />
+
+                <Spinner
+                    android:id="@+id/exportPresetsInput"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="18dp"
+
+                    />
+            </LinearLayout>
+
+            <CheckBox
+                android:id="@+id/labelExportCheck"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="Include Label Line?"
+                app:layout_constraintTop_toBottomOf="@id/exportPresetLayout"
+                app:layout_constraintLeft_toLeftOf="parent"
+                />
+
+            <TextView
+                android:id="@+id/exportExplanation1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="n = name, v = value, i = info type, t = time recorded"
+                android:textSize="15dp"
+                android:textColor="@color/textDark"
+                app:layout_constraintTop_toBottomOf="@id/labelExportCheck"
+                app:layout_constraintLeft_toLeftOf="parent"
+                />
+
+            <TextView
+                android:id="@+id/customOrderTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Order: "
+                android:textSize="18dp"
+                android:textColor="@color/textDark"
+                app:layout_constraintTop_toBottomOf="@id/exportExplanation1"
+                app:layout_constraintLeft_toLeftOf="parent"
+                />
+
+            <EditText
+                android:id="@+id/customOrderInput"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ntiv"
+                android:hint="ntiv"
+                android:textColor="@color/textDark"
+                android:textColorHint="@color/textDark"
+                app:layout_constraintTop_toBottomOf="@id/exportExplanation1"
+                app:layout_constraintLeft_toLeftOf="@+id/customOrderTitle"
+                android:layout_marginTop="10dp"
+                />
+
+            <TextView
+                android:id="@+id/customExportTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Custom: "
+                android:textSize="18dp"
+                android:textColor="@color/textDark"
+                app:layout_constraintTop_toBottomOf="@id/customOrderInput"
+                app:layout_constraintLeft_toLeftOf="parent"
+                />
+
+            <EditText
+                android:id="@+id/customExportInput"
+                android:layout_width="match_parent"
+                android:layout_height="75dp"
+                android:hint="v1,n1,v3..."
+                android:textColor="@color/textDark"
+                android:textColorHint="@color/textDark"
+                app:layout_constraintTop_toBottomOf="@id/customExportTitle"
+                app:layout_constraintLeft_toLeftOf="parent"
+                />
+
+            <Button
+                android:id="@+id/deleteExportPreset"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/customExportInput"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toLeftOf="@+id/saveExportPreset"
+                android:text="Delete\nPreset"
+                android:textSize="10dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                />
+
+            <Button
+                android:id="@+id/saveExportPreset"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/customExportInput"
+                app:layout_constraintLeft_toRightOf="@+id/deleteExportPreset"
+                app:layout_constraintRight_toLeftOf="@+id/defaultExportCheck"
+                android:text="Save\nPreset"
+                android:textSize="10dp"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                />
+
+            <CheckBox
+                android:id="@+id/defaultExportCheck"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="default"
+                app:layout_constraintTop_toBottomOf="@id/customExportInput"
+                app:layout_constraintLeft_toRightOf="@+id/saveExportPreset"
+                app:layout_constraintRight_toLeftOf="@id/exportButton"
+                />
+
+            <Button
+                android:id="@+id/exportButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/customExportInput"
+                app:layout_constraintLeft_toRightOf="@+id/defaultExportCheck"
+                app:layout_constraintRight_toRightOf="parent"
+                android:text="Export"
+                android:textSize="16dp"
+                />
 
 
 
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
+
+
 </ScrollView>

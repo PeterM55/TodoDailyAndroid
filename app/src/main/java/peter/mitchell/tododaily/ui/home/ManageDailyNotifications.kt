@@ -21,6 +21,7 @@ import kotlinx.android.synthetic.main.manage_daily_information.*
 import kotlinx.coroutines.selects.select
 import peter.mitchell.tododaily.*
 import peter.mitchell.tododaily.HelperClasses.SaveInformation
+import peter.mitchell.tododaily.ui.notifications.NotificationsFragment
 import java.io.File
 import java.lang.NumberFormatException
 import java.time.LocalDate
@@ -38,6 +39,7 @@ class ManageDailyNotifications : AppCompatActivity() {
     var rearrangeTitlesVisible : Boolean = false
     var manageDatesVisible : Boolean = false
     var addDatesVisible : Boolean = false
+    var importVisible : Boolean = false
     var exportVisible : Boolean = false
 
     val exportPresetsFile = File("/data/data/peter.mitchell.tododaily/files/exportPresets.txt")
@@ -174,6 +176,14 @@ class ManageDailyNotifications : AppCompatActivity() {
 
         reloadExportPresetsInput()
 
+        importOptionsExpandButton.setOnClickListener {
+            importVisible = !importVisible
+            reloadVisibilities()
+        }
+        importButton.setOnClickListener {
+            importSubmit()
+        }
+
         exportPresetsInput.onItemSelectedListener = object :
             AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
@@ -277,6 +287,9 @@ class ManageDailyNotifications : AppCompatActivity() {
         addDateInput.isVisible = addDatesVisible
         addDateButton.isVisible = addDatesVisible
 
+        importText.isVisible = importVisible
+        importButton.isVisible = importVisible
+
         exportPresetsTitle.isVisible = exportVisible
         exportPresetsInput.isVisible = exportVisible
         val exportPresetNew = exportPresetsInput.selectedItemPosition == 0 || exportPresetsInput.selectedItemPosition > 2
@@ -316,6 +329,11 @@ class ManageDailyNotifications : AppCompatActivity() {
             addDateVisibilityButton.setText("▼")
         else
             addDateVisibilityButton.setText("◀")
+
+        if (importVisible)
+            importOptionsExpandButton.setText("▼")
+        else
+            importOptionsExpandButton.setText("◀")
 
         if (exportVisible)
             exportOptionsExpandButton.setText("▼")
@@ -476,7 +494,19 @@ class ManageDailyNotifications : AppCompatActivity() {
 
     }
 
+    private  fun importSubmit() {
+
+        MaterialAlertDialogBuilder(this).setTitle("Are you sure?")
+            .setMessage("This will import all dates in the file todoDailyImport.txt in the downloads file.\nDates that exist will COMBINE")
+            .setNegativeButton("Cancel") { dialog, which ->
+            }.setPositiveButton("Import") { dialog, which ->
+                saveInformation.importData(this, this)
+            }.show()
+    }
+
     private fun customExportSubmit() {
+        if (!dailyInformationFile.exists())
+            return
 
         if (!canExport(this, this))
             return
@@ -486,7 +516,50 @@ class ManageDailyNotifications : AppCompatActivity() {
         if (exportFile == null)
             return
 
-        var putLabel = !exportLabelLine
+        if (exportLabelLine) {
+            var colInfo : ArrayList<SaveInformation.ValueInfo> = ArrayList()
+            var tempSaveInformation : SaveInformation = SaveInformation()
+
+            exportFile.writeText("")
+
+            if (customExportInput.text.isEmpty()) {
+                colInfo = tempSaveInformation.setupColInfoForOrder()
+                exportFile.appendText("Date,")
+                for (i in 0 until colInfo.size) {
+                    exportFile.appendText("${colInfo[i].name},")
+                }
+                exportFile.appendText("\n")
+            }
+
+            dailyInformationFile.forEachLine {
+                tempSaveInformation.fromString(it)
+
+                if (customExportInput.text.isNotEmpty()) {
+                    exportFile.appendText(tempSaveInformation.exportToCustomByNames(customExportInput.text.toString(), colInfo)+"\n")
+                } else {
+                    exportFile.appendText(tempSaveInformation.exportToOrderByNames(customOrderInput.text.toString(), colInfo)+"\n")
+                }
+            }
+
+        } else {
+            var tempSaveInformation : SaveInformation = SaveInformation()
+
+            exportFile.writeText("")
+
+            dailyInformationFile.forEachLine {
+                tempSaveInformation.fromString(it)
+
+                if (customExportInput.text.isNotEmpty()) {
+                    exportFile.appendText(tempSaveInformation.exportToCustomString(customExportInput.text.toString())+"\n")
+                } else {
+                    exportFile.appendText(tempSaveInformation.exportToCustomOrder(customOrderInput.text.toString())+"\n")
+                }
+            }
+        }
+
+
+
+        /*var putLabel = !exportLabelLine
 
         var tempSaveInformation : SaveInformation = SaveInformation()
 
@@ -504,7 +577,7 @@ class ManageDailyNotifications : AppCompatActivity() {
             if (!putLabel) {
                 putLabel = true
             }
-        }
+        }*/
 
         // set to default if all worked
         if (defaultExportCheck.isChecked) {

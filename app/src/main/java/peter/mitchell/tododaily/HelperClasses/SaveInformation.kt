@@ -1,10 +1,15 @@
 package peter.mitchell.tododaily.HelperClasses
 
+import android.app.Activity
+import android.content.Context
 import android.os.Build
 import android.text.InputType
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
-import peter.mitchell.tododaily.startOfWeek
+import peter.mitchell.tododaily.*
+import java.io.File
+import java.lang.Exception
 import java.lang.StringBuilder
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -129,6 +134,29 @@ class SaveInformation {
 
     public fun getRawValue(i : Int) : String {
         return values[i]
+    }
+
+    public fun getValueIndex(i : Int, name : String, format : InformationFormat) : Int? {
+
+        if ( i >= 0 && i < length && names[i] == name && formats[i] == format ) {
+            return i
+        }
+
+        var newI = getValueByName(name)
+        if (newI != null && formats[newI] == format ) {
+            return newI
+        }
+
+        return null
+    }
+
+    public fun getValueByName(name : String) : Int? {
+        for (i in 0 until names.size) {
+            if (name == names[i]) {
+                return i
+            }
+        }
+        return null
     }
 
     public fun setValue(i : Int, value : String) : Boolean {
@@ -352,6 +380,117 @@ class SaveInformation {
         repeatTime.add(tempRepeatTime)
     }
 
+    public fun importData(activity : Activity, context : Context) : Boolean {
+
+        if (!canExport(activity, context))
+            return false
+
+        var importFile = File(importFileName)
+        if (!importFile.exists()) {
+            Toast.makeText(context, "Could not find import file", Toast.LENGTH_SHORT).show()
+            return false
+        }
+
+        if (!tempFile.exists()) {
+            tempFile.parentFile!!.mkdirs()
+            tempFile.createNewFile()
+        }
+        tempFile.writeText("")
+
+        if (dailyInformationFile.exists()) {
+            dailyInformationFile.forEachLine {
+                tempFile.appendText(it)
+            }
+        }
+
+        var malformedFile = false
+
+        importFile.forEachLine {
+            if (malformedFile) return@forEachLine
+
+            var tempSaveInformation : SaveInformation = SaveInformation()
+            if (!tempSaveInformation.fromString(it)) {
+                Toast.makeText(context, "Could not import file, malformed. It MUST be raw data export format", Toast.LENGTH_SHORT).show()
+                malformedFile = true
+                return@forEachLine
+            }
+
+            if (!tempFile2.exists()) {
+                tempFile2.parentFile!!.mkdirs()
+                tempFile2.createNewFile()
+            }
+            tempFile2.writeText("")
+
+            var currentWritten : Boolean = false;
+            tempFile.forEachLine {
+
+                if (!currentWritten) {
+                    var lineDate: LocalDate = LocalDate.parse(it.split(",")[0])
+
+                    if (tempSaveInformation.date > lineDate) {
+                        tempFile2.appendText(tempSaveInformation.toString() + "\n")
+                        tempFile2.appendText(it + "\n")
+                        currentWritten = true
+                    } else if (tempSaveInformation.date == lineDate) {
+                        var tempSaveInformation2 : SaveInformation = SaveInformation()
+                        if (!tempSaveInformation2.fromString(it)) {
+                            malformedFile = true
+                            Toast.makeText(context, "Unknown error.", Toast.LENGTH_SHORT).show()
+                            return@forEachLine
+                        }
+
+                        for (i in 0 until tempSaveInformation.length) {
+                            if (!tempSaveInformation2.names.contains(tempSaveInformation.names[i])) {
+                                if (!tempSaveInformation2.addValue(
+                                    tempSaveInformation.names[i],
+                                    tempSaveInformation.formats[i],
+                                    tempSaveInformation.repeatTime[i],
+                                )) {
+                                    Toast.makeText(context, "Could not import file, malformed. value contains wrong format", Toast.LENGTH_SHORT).show()
+                                    malformedFile = true
+                                    return@forEachLine
+                                }
+                            }
+                        }
+
+                        tempFile2.appendText(tempSaveInformation2.toString() + "\n")
+                        currentWritten = true
+                    } else {
+                        tempFile2.appendText(it + "\n")
+                    }
+
+                } else {
+                    tempFile2.appendText(it + "\n")
+                }
+
+            }
+
+            if (!currentWritten) {
+                tempFile2.appendText(tempSaveInformation.toString() + "\n")
+            }
+
+            if (!tempFile.delete()) {
+                Log.e("tdd-Importing: ", "Failed to save, permission denied")
+                Toast.makeText(context, "Could not import file, could not delete a temporary file", Toast.LENGTH_SHORT).show()
+                tempFile2.delete()
+                malformedFile = true
+                return@forEachLine
+            }
+
+            tempFile2.renameTo(tempFile)
+        }
+
+        if (malformedFile) {
+            tempFile.delete()
+            return false
+        }
+
+        // rename the temp file to dailyInformation file and return true
+        tempFile.renameTo(dailyInformationFile)
+
+        return true
+    }
+
     public fun fromString(str : String) : Boolean {
         resetData()
         Log.i("SaveInformation.fromString", str)
@@ -445,8 +584,226 @@ class SaveInformation {
         return returnStr.toString()
     }
 
+    class ValueInfo(valueName : String, valueFormat : InformationFormat?) {
+        val name : String = valueName
+        val format : InformationFormat? = valueFormat
+    }
+
+    /** Loops through daily information file setting up colInfo. This is used because you cannot re-
+     * write the start of a file once you have written the rest, meaning the column labels must be
+     * created before the rest can be written. I believe this is the most efficient way.
+     *
+     * @return the setup colInfo for the export custom order
+     */
+    public fun setupColInfoForOrder() : ArrayList<ValueInfo> {
+        if (!dailyInformationFile.exists()) return ArrayList()
+        val colInfo = ArrayList<ValueInfo>()
+        val tempSaveInformation : SaveInformation = SaveInformation()
+
+        // for each line in the file, check if it exists in the colInfo, add it if it doesn't
+        dailyInformationFile.forEachLine {
+            tempSaveInformation.fromString(it)
+
+            for (i in 0 until tempSaveInformation.length) {
+                var containsName = false
+                for (j in 0 until colInfo.size) {
+                    if (tempSaveInformation.names[i] == colInfo[j].name) {
+                        containsName = true
+                        break
+                    }
+                }
+                if (!containsName)
+                    colInfo.add(ValueInfo(tempSaveInformation.names[i], tempSaveInformation.formats[i]))
+            }
+
+        }
+
+        return colInfo
+    }
+
+    public fun exportToOrderByNames(strFormat : String, colInfo : ArrayList<ValueInfo>) : String {
+
+        // remove invalid characters in strFormat
+        val validChars = arrayOf('n', 'v', 'i', 't', ',', )
+        var remIndex = 0
+        while (remIndex < strFormat.length) {
+            if (!validChars.contains(strFormat[remIndex]))
+                strFormat.removeRange(remIndex, remIndex+1)
+            else
+                remIndex++
+        }
+
+        // update the colinfo, loop through current and check what colinfo is missing
+        /*for (i in 0 until length) {
+            var containsName = false
+            for (j in 0 until colInfo.size) {
+                if (names[i] == colInfo[j].name) {
+                    containsName = true
+                    break
+                }
+            }
+            if (!containsName)
+                colInfo.add(ValueInfo(names[i], formats[i]))
+        }*/
+
+        // loop through colInfo and add the ones listed
+
+        var returnStr : StringBuilder = StringBuilder()
+        returnStr.append("$date,")
+
+        for (i in 0 until colInfo.size) {
+
+            var newI = getValueIndex(i, colInfo[i].name, colInfo[i].format!!)
+
+            if (newI != null) {
+
+                for (j in strFormat.indices) {
+                    if (strFormat[j] == 'n') {
+                        returnStr.append("${names[newI]},")
+                    } else if (strFormat[j] == 'v') {
+                        if (formats[newI] == InformationFormat.text) {
+                            returnStr.append("\"${values[newI].replace("\"","\"\"").replace("\n"," ")}\",")
+                        } else {
+                            returnStr.append("${values[newI]},")
+                        }
+                    } else if (strFormat[j] == 'i') {
+                        returnStr.append("${informationFormatEnumToString(formats[newI])}-${repeatTimeEnumToString(repeatTime[newI])},")
+                    } else if (strFormat[j] == 't') {
+                        returnStr.append("${timeRead[newI]},")
+                    } else if (strFormat[j] == ',') {
+                        returnStr.append(',')
+                    }
+                }
+
+            } else {
+                for (j in strFormat.indices) {
+                    returnStr.append(',')
+                }
+            }
+
+        }
+
+        return returnStr.toString()
+
+    }
+
+    public fun exportToCustomByNames(strFormat : String, colInfo : ArrayList<ValueInfo>) : String {
+        var returnStr = StringBuilder()
+
+        // update the colinfo only if colInfo is EMPTY (first line)
+        if (colInfo.size == 0) {
+            if (length == 0)
+                return ""
+
+            returnStr.append("Date,")
+
+            /*for (i in 0 until length) {
+                colOffsets.add(-1)
+            }*/
+
+            var j = 0
+            while (j < strFormat.length) {
+
+                var strRead : Char = ' '
+                var i : Int = -1
+
+                if (strFormat[j] == 'n' || strFormat[j] == 'v' || strFormat[j] == 'i' || strFormat[j] == 't') {
+                    i = 0
+                    strRead = strFormat[j]
+                    var currentIndex = j+1
+                    while (currentIndex < strFormat.length && strFormat[currentIndex].isDigit()) {
+                        try {
+                            i *= 10
+                            i += strFormat[currentIndex].digitToInt()
+                        } catch (e: NumberFormatException) {
+                            i /= 10
+                            break
+                        }
+                        currentIndex++
+                    }
+                    j = currentIndex-1
+                    i -= 1
+                }
+
+                if (strFormat[j] == ',') {
+                    returnStr.append(',')
+                    colInfo.add(ValueInfo(",", null))
+                } else if (i == -1) {
+                    // do nothing
+                } else if (strRead == 'n') {
+                    returnStr.append("${names[i]} Name,")
+                    colInfo.add(ValueInfo(names[i], formats[i]))
+                    //colOffsets[i] = colInfo.size-1
+                } else if (strRead == 'v') {
+                    returnStr.append("${names[i]},")
+                    colInfo.add(ValueInfo(names[i], formats[i]))
+                } else if (strRead == 'i') {
+                    returnStr.append("${names[i]} Save Format,")
+                    colInfo.add(ValueInfo(names[i], formats[i]))
+                } else if (strRead == 't') {
+                    returnStr.append("${names[i]} Time Read,")
+                    colInfo.add(ValueInfo(names[i], formats[i]))
+                }
+
+                j++
+            }
+
+            returnStr.append("\n")
+
+            /*for (i in length-1 downTo 0) {
+                if (colOffsets[i] == -1)
+                    colOffsets.removeAt(i)
+            }*/
+        }
+
+        // loop through colInfo and add the ones listed
+        returnStr.append("$date,")
+
+        var j = 0
+        for (i in 0 until colInfo.size) {
+
+            if (colInfo[i].format == null) {
+                returnStr.append(colInfo[i].name)
+            } else {
+                val newI = getValueIndex(-1, colInfo[i].name, colInfo[i].format!!)
+                while (j < strFormat.length && !(strFormat[j] == 'n' || strFormat[j] == 'v' ||
+                        strFormat[j] == 'i' || strFormat[j] == 't')
+                ) {
+                    j++
+                }
+
+                if (j == strFormat.length) {
+                    Log.e("SaveInformation.exportToCustomByNames", "Unknown error, j exceeded length")
+                    return ""
+                }
+
+                if (newI == null) {
+                    returnStr.append(",")
+                } else if (strFormat[j] == 'n') {
+                    returnStr.append("${names[newI]},")
+                } else if (strFormat[j] == 'v') {
+                    if (formats[newI] == InformationFormat.text) {
+                        returnStr.append("\"${values[newI].replace("\"","\"\"").replace("\n"," ")}\",")
+                    } else {
+                        returnStr.append("${values[newI]},")
+                    }
+                } else if (strFormat[j] == 'i') {
+                    returnStr.append("${informationFormatEnumToString(formats[newI])}-${repeatTimeEnumToString(repeatTime[newI])},")
+                } else if (strFormat[j] == 't') {
+                    returnStr.append("${timeRead[newI]},")
+                }
+
+            }
+
+        }
+
+        return returnStr.toString()
+    }
+
     public fun exportToCustomOrder(strFormat : String, addColLabel : Boolean = false) : String {
         var returnStr : StringBuilder = StringBuilder()
+
+        var doneIndexes = ArrayList<Int>()
 
         if (addColLabel) {
 
@@ -591,7 +948,7 @@ class SaveInformation {
                 } else if (strRead == 'i') {
                     returnStr.append("${informationFormatEnumToString(formats[i])}-${repeatTimeEnumToString(repeatTime[i])},")
                 } else if (strRead == 't') {
-                    returnStr.append("${timeRead[i]}")
+                    returnStr.append("${timeRead[i]},")
                 }
             }
 
