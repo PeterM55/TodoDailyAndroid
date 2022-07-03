@@ -131,6 +131,16 @@
                     app:layout_constraintLeft_toLeftOf="parent"
                     />
 
+                <Button
+                    android:id="@+id/hideViewValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:minHeight="0dp"
+
+                    android:text="Hide"
+                    android:textSize="16sp" />
+
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/mainConstraintLayout"
                     android:layout_width="match_parent"
