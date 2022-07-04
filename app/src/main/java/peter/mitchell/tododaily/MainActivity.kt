@@ -1,17 +1,14 @@
 package peter.mitchell.tododaily
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -22,14 +19,10 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.manage_daily_information.*
-import kotlinx.android.synthetic.main.new_notification.*
 import peter.mitchell.tododaily.HelperClasses.NotesList
 import peter.mitchell.tododaily.databinding.ActivityMainBinding
 import peter.mitchell.tododaily.HelperClasses.SaveInformation
 import peter.mitchell.tododaily.HelperClasses.TodoLists
-import peter.mitchell.tododaily.ui.home.ManageDailyNotifications
 import peter.mitchell.tododaily.ui.notifications.DailyNotifications
 import java.io.File
 import java.time.DayOfWeek
@@ -52,17 +45,12 @@ val nextNotificationIntentFile = File("${internalDataPath}nextNotificationIntent
 val settingsFile = File("${internalDataPath}settings.txt")
 val settingsBackupFile = File("${internalDataPath}settingsBackup.txt")
 val todosFile = File("${internalDataPath}todos.txt")
-//val exportFileName = "/storage/emulated/0/Download/dailyInformationExport.txt"
 val exportFileName = "${exportPath}dailyInformationExport.csv"
 val importFileName = "${exportPath}todoDailyImport.txt"
 
 var notifFragment : Fragment? = null
 enum class fragments { home, todo, notes, notifs }
 var currentFragment : fragments = fragments.home
-
-const val androidBarsSize : Int = 20+41
-const val toolBarSize : Int = 47
-//const val bottomBarSize : Int =
 
 // ----- Settings -----
 // --- overall settings ---
@@ -97,7 +85,6 @@ var notificationsFullNameMode = true
 var snoozeTime = 5
 
 var navigationView : BottomNavigationView? = null
-//var quickTimerButtonCopy :
 
 var mainBinding: ActivityMainBinding? = null
 
@@ -242,6 +229,9 @@ fun saveDailyInformationFile() {
     tempFile.renameTo(dailyInformationFile)
 }
 
+/** Read the daily information for today
+ * this sets the SaveInformation variable
+ */
 fun readTodaysDailyInformationFile() {
 
     if (!dailyInformationFile.exists()) {
@@ -363,10 +353,7 @@ fun setDefaultExport(lineLabel : Boolean, exportOrder : String, exportCustom : S
 
 /**
  * Reads the data of the notification file, and saves them in dailyNotifications
- *
- * file format:
- * first line: list of names,times,titles,descriptions with times in the format of 00:00:00
- * second line: same, but with localDateTime
+ * (Just calls fromString in daily notifications)
  */
 fun readNotifications() {
     if (!notificationsFile.exists()) {
@@ -376,6 +363,9 @@ fun readNotifications() {
     }
 }
 
+/** Saves the provided DailyNotifications object to the notificationsFile
+ * (creates the directories if needed)
+ */
 fun saveNotifications(notificationSource : DailyNotifications = dailyNotifications) {
     if (!notificationsFile.exists()) {
         notificationsFile.parentFile!!.mkdirs()
@@ -385,9 +375,11 @@ fun saveNotifications(notificationSource : DailyNotifications = dailyNotificatio
     notificationsFile.writeText(notificationSource.toString())
 }
 
-/**
- * List:
- * notificationsFullNameMode
+/** Reads the settings file
+ * goes line by line reading the settings, if they are malformed it calls readBackupSettings
+ * (lines are not labeled to save time reading, I know it isn't really necessary, but I did anyway)
+ * readBackupSettings does use labels, which is important if more settings need to be added to keep
+ * the old ones
  */
 fun readSettings() {
     if (settingsRead || !settingsFile.exists()) {
@@ -435,6 +427,9 @@ fun readSettings() {
     settingsRead = true
 }
 
+/** Saves the settings to the settings file
+ * simply goes line by line writing the text
+ */
 fun saveSettings() {
     if (!settingsFile.exists()) {
         settingsFile.parentFile!!.mkdirs()
@@ -473,6 +468,9 @@ fun saveSettings() {
     saveBackupSettings()
 }
 
+/** Reads the backup settings file
+ * goes line by line, checking the string against each option, saving it to the one it matches.
+ */
 fun readBackupSettings() {
 
     if (!settingsBackupFile.exists()) {
@@ -527,6 +525,9 @@ fun readBackupSettings() {
 
 }
 
+/** Saves the backup settings file
+ * applies a name to each line so they can be identified when reading
+ */
 fun saveBackupSettings() {
     if (!settingsBackupFile.exists()) {
         settingsBackupFile.parentFile!!.mkdirs()
@@ -563,6 +564,8 @@ fun saveBackupSettings() {
     settingsBackupFile.appendText("snoozeTime $snoozeTime\n")
 }
 
+/** Shows/Hides the bottom nav menu items
+ */
 fun updateBottomNavVisibilities() {
     if (navigationView != null && settingsRead) {
         navigationView!!.menu.findItem(R.id.navigation_dashboard).isVisible = todoShown
@@ -573,6 +576,13 @@ fun updateBottomNavVisibilities() {
     }
 }
 
+/** Checks for permissions to export, asking if false
+ * Checks for both read and write permissions for exporting/importing files
+ *
+ * @param activity needed for permissions check
+ * @param context needed for permissions check
+ * @return whether the permission has been granted
+ */
 fun canExport(activity: Activity, context: Context) : Boolean {
     if (!hasWriteStoragePermission(activity)) {
         Toast.makeText(context,"No write permission :( ", Toast.LENGTH_SHORT).show()
@@ -586,6 +596,63 @@ fun canExport(activity: Activity, context: Context) : Boolean {
     return true
 }
 
+/** Part of canExport, checks/asks for write permissions
+ *
+ * @param activity needed for permissions check
+ * @return whether the permission has been granted
+ */
+private fun hasWriteStoragePermission(activity : Activity): Boolean {
+
+    if (ContextCompat.checkSelfPermission(
+            activity,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ) != PackageManager.PERMISSION_GRANTED
+    ) {
+        Log.i("##hasWriteStoragePermission##", "Write permission requested")
+        ActivityCompat.requestPermissions(
+            activity,
+            arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+            101
+        )
+    }
+    return ContextCompat.checkSelfPermission(
+        activity,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE
+    ) == PackageManager.PERMISSION_GRANTED
+}
+
+/** Part of canExport, checks/asks for read permissions
+ *
+ * @param activity needed for permissions check
+ * @return whether the permission has been granted
+ */
+private fun hasReadStoragePermission(activity: Activity): Boolean {
+
+    if (!(ContextCompat.checkSelfPermission(
+            activity,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_GRANTED)
+    ) {
+        Log.i("##hasReadStoragePermission##", "Read permission requested")
+        ActivityCompat.requestPermissions(
+            activity,
+            arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+            102
+        )
+    }
+    return ContextCompat.checkSelfPermission(
+        activity,
+        Manifest.permission.READ_EXTERNAL_STORAGE
+    ) == PackageManager.PERMISSION_GRANTED
+}
+
+/** uses the fileName to create an absolute path for the export file
+ * gets the name that can work for the export file, if it exists it counts the number in brackets
+ * like when windows creates a copy.
+ *
+ * @param fileName the name of the file, do not include the path
+ * @return the final path to be used
+ */
 fun getExportFile(fileName : String) : File? {
     var exportFile = File(fileName)
 
@@ -615,44 +682,4 @@ fun getExportFile(fileName : String) : File? {
     } else
         return null
     return exportFile
-}
-
-private fun hasWriteStoragePermission(activity : Activity): Boolean {
-
-    if (ContextCompat.checkSelfPermission(
-            activity,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-        ) != PackageManager.PERMISSION_GRANTED
-    ) {
-        Log.i("##hasWriteStoragePermission##", "Write permission requested")
-        ActivityCompat.requestPermissions(
-            activity,
-            arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-            101
-        )
-    }
-    return ContextCompat.checkSelfPermission(
-        activity,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE
-    ) == PackageManager.PERMISSION_GRANTED
-}
-
-private fun hasReadStoragePermission(activity: Activity): Boolean {
-
-    if (!(ContextCompat.checkSelfPermission(
-            activity,
-            Manifest.permission.READ_EXTERNAL_STORAGE
-        ) == PackageManager.PERMISSION_GRANTED)
-    ) {
-        Log.i("##hasReadStoragePermission##", "Read permission requested")
-        ActivityCompat.requestPermissions(
-            activity,
-            arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-            102
-        )
-    }
-    return ContextCompat.checkSelfPermission(
-        activity,
-        Manifest.permission.READ_EXTERNAL_STORAGE
-    ) == PackageManager.PERMISSION_GRANTED
 }

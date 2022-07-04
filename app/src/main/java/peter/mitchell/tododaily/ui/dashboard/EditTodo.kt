@@ -33,7 +33,7 @@ class EditTodo : AppCompatActivity() {
             todoSection.setText("Section Comes Before: ")
             notificationNameTitle.setText("Section Title: ")
             todoNameInput.setText(todoLists!!.getSectionTitle(myIndexI))
-            extraInfoLayout.isVisible = false
+            //extraInfoLayout.isVisible = false
 
         } else if (myIndexJ != -1)
             todoNameInput.setText(todoLists!!.getTodo(myIndexI,myIndexJ))
@@ -63,6 +63,8 @@ class EditTodo : AppCompatActivity() {
                     todoLists!!.setSectionTitle(myIndexI, todoNameInput.text.toString())
                 else
                     todoLists!!.removeSection(myIndexI)
+
+                todoLists!!.moveSectionFrom(myIndexI, todoSectionInput.selectedItemPosition)
             } else if (myIndexJ == -1) {
                 if (todoNameInput.text.toString() != "")
                     todoLists!!.addTodo(myIndexI, todoNameInput.text.toString())

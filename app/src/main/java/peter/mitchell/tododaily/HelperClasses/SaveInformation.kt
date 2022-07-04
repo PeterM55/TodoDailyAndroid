@@ -198,6 +198,10 @@ class SaveInformation {
         return InputType.TYPE_CLASS_TEXT
     }
 
+    public fun isNumber(format : InformationFormat) : Boolean {
+        return format == InformationFormat.integer || format == InformationFormat.onePointDecimal || format == InformationFormat.twoPointDecimal || format == InformationFormat.decimal
+    }
+
     public fun informationFormatStringToEnum(str : String) : InformationFormat {
         var infoFormat : InformationFormat = InformationFormat.text
 

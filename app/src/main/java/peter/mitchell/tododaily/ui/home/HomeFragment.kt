@@ -35,7 +35,10 @@ import peter.mitchell.tododaily.HelperClasses.SaveInformation
 import peter.mitchell.tododaily.HelperClasses.TextGridLayout
 import peter.mitchell.tododaily.databinding.FragmentHomeBinding
 import java.io.File
+import java.lang.NumberFormatException
+import java.lang.StringBuilder
 import java.time.LocalDate
+import kotlin.math.round
 
 
 class HomeFragment : Fragment() {
@@ -46,8 +49,6 @@ class HomeFragment : Fragment() {
     private var dateList : ArrayList<String> = ArrayList()
     private var currentDate = LocalDate.now()
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding
 
     private var initialSetupDone = false
@@ -68,8 +69,7 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         Log.i("tdd-HomeFragment", "onCreateView run in HomeFragment")
-        /*val homeViewModel =
-            ViewModelProvider(this).get(HomeViewModel::class.java)*/
+
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
         imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -305,6 +305,7 @@ class HomeFragment : Fragment() {
 
         } else {
             _binding.viewValueGrid.reset()
+            _binding.viewValueOverview.isVisible = false
         }
 
 
@@ -332,6 +333,7 @@ class HomeFragment : Fragment() {
         }
     }
 
+    /** Reloads the date spinner */
     private fun reloadDateSpinner() {
 
         if (!dailyInformationFile.exists()) {
@@ -418,11 +420,17 @@ class HomeFragment : Fragment() {
         }
     }
 
+    /** Reloads the view value grid */
     private fun reloadViewValue() {
         if (selectedViewValue == null) return
 
         selectedValueDates.clear()
         selectedValueValues.clear()
+
+        var count = 0
+        var total : Float? = null
+        var max : Float? = null
+        var min : Float? = null
 
         dailyInformationFile.forEachLine {
             if (it.isNullOrEmpty())
@@ -432,14 +440,49 @@ class HomeFragment : Fragment() {
             if (!lineInfo.fromString(it))
                 return@forEachLine
 
-            var newI = lineInfo.getValueIndex(selectedViewValue!!.valueIndex, selectedViewValue!!.valueName, selectedViewValue!!.valueType)
+            val newI = lineInfo.getValueIndex(selectedViewValue!!.valueIndex, selectedViewValue!!.valueName, selectedViewValue!!.valueType)
 
             if (newI != null) {
                 selectedValueDates.add(lineInfo.date)
                 selectedValueValues.add(lineInfo.getDisplayValue(newI))
+                if (lineInfo.getRawValue(newI) != "")
+                    count++
+
+                if (selectedViewValue!!.valueType == SaveInformation.InformationFormat.checkBox) {
+                    if (lineInfo.getRawValue(newI) == "1") {
+                        if (total == null) total = 0f
+                        total = total!! + 1
+                    }
+                } else if (lineInfo.isNumber(selectedViewValue!!.valueType)) {
+                    try {
+                        val floatVal = lineInfo.getRawValue(newI).toFloat()
+
+                        if (total == null) total = 0f
+                        total = total!! + floatVal
+
+                        if (max == null || floatVal > max!!)
+                            max = floatVal
+                        if (min == null || floatVal < min!!)
+                            min = floatVal
+                    } catch (e : NumberFormatException) {
+                        // do nothing
+                    }
+                }
+
             }
 
         }
+
+        val stringBuilder = StringBuilder()
+        stringBuilder.append("Count: $count")
+        if (total != null) stringBuilder.append(", Total: $total")
+        if (total != null && max != null) stringBuilder.append(", Avg: ${round(total!!/count*100)/100f}")
+        if (total != null && max == null) stringBuilder.append(", %: ${total!!/count}")
+        if (max != null) stringBuilder.append(", Max: $max")
+        if (min != null) stringBuilder.append(", Min: $min")
+
+        _binding.viewValueOverview.text = stringBuilder.toString()
+        _binding.viewValueOverview.isVisible = true
 
         reloadMainReminders()
     }
@@ -478,6 +521,7 @@ class HomeFragment : Fragment() {
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
     }
 
+    /** Shows a dialog for confirming an the export */
     private fun showExportDialog() {
 
         if (!dailyInformationFile.exists()) {

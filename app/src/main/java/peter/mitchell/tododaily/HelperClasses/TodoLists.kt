@@ -101,6 +101,38 @@ class TodoLists {
         saveTodos()
     }
 
+    public fun moveSectionFrom(i : Int, to : Int) {
+
+        if (i == to || i >= sectionTitles.size || to >= sectionTitles.size) return
+
+        var tempName = sectionTitles[i]
+        var tempArr = sectionTodos[i]
+
+        if (i < to) {
+            for (j in i .. to) {
+                if (j < to) {
+                    sectionTitles[j] = sectionTitles[j+1]
+                    sectionTodos[j] = sectionTodos[j+1]
+                } else if (j == to) {
+                    sectionTitles[j] = tempName
+                    sectionTodos[j] = tempArr
+                }
+            }
+        } else if (to < i) {
+            for (j in i downTo to) {
+                if (j > to) {
+                    sectionTitles[j] = sectionTitles[j-1]
+                    sectionTodos[j] = sectionTodos[j-1]
+                } else if (j == to) {
+                    sectionTitles[j] = tempName
+                    sectionTodos[j] = tempArr
+                }
+            }
+        }
+
+        saveTodos()
+    }
+
     private fun readTodos() {
         if (!todosFile.exists()) {
             return

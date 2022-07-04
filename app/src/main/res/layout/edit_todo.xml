@@ -88,6 +88,9 @@
                 />
         </LinearLayout>
 
+        <!-- To do extra information may be added in future,
+        But I think it's un-needed
+
         <LinearLayout
             android:id="@+id/extraInfoLayout"
             android:layout_width="match_parent"
@@ -96,7 +99,7 @@
                 android:id="@+id/notificationTitleTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Todo Extra Info: "
+                android:text="To do Extra Info: "
                 android:textSize="20dp"
                 android:textColor="@color/textDark"
 
@@ -109,7 +112,7 @@
                 android:id="@+id/notificationTitleInput"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:hint="Todo Extra Info"
+                android:hint="To do Extra Info"
                 android:textColor="@color/textDark"
                 android:textColorHint="@color/textDark"
 
@@ -117,7 +120,7 @@
                 app:layout_constraintRight_toRightOf="parent"
                 android:gravity="center_vertical"
                 />
-        </LinearLayout>
+        </LinearLayout>-->
 
         <LinearLayout
             android:layout_width="match_parent"

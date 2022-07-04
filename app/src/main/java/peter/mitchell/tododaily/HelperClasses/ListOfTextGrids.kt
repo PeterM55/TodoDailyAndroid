@@ -1,20 +1,13 @@
 package peter.mitchell.tododaily.HelperClasses
 
 import android.content.Context
-import android.graphics.Color
 import android.graphics.Typeface
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
-import android.view.textclassifier.TextClassifier
 import android.widget.*
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.view.isVisible
 import peter.mitchell.tododaily.R
 import peter.mitchell.tododaily.darkMode
-import peter.mitchell.tododaily.todoColumns
-import java.lang.reflect.Array
 
 class ListOfTextGrids @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
@@ -37,11 +30,11 @@ class ListOfTextGrids @JvmOverloads constructor(
     private var showAddButtons = true
 
     private val titleTextLayoutParams : RelativeLayout.LayoutParams = RelativeLayout.LayoutParams(
-        resources.displayMetrics.widthPixels-62*2-34, // width //RelativeLayout.LayoutParams.WRAP_CONTENT
+        resources.displayMetrics.widthPixels-62*2-34, // width
         RelativeLayout.LayoutParams.WRAP_CONTENT,
     )
     private val titleButtonLayoutParams : RelativeLayout.LayoutParams = RelativeLayout.LayoutParams(
-        (55*resources.displayMetrics.density).toInt(), // width (resources.displayMetrics.density)
+        (55*resources.displayMetrics.density).toInt(), // width
         (40*resources.displayMetrics.density).toInt(),
     )
     private val addButtonLayoutParams : RelativeLayout.LayoutParams = RelativeLayout.LayoutParams(
@@ -50,7 +43,7 @@ class ListOfTextGrids @JvmOverloads constructor(
     )
     private val constraintLayoutParams : RelativeLayout.LayoutParams = RelativeLayout.LayoutParams(
         RelativeLayout.LayoutParams.MATCH_PARENT, // width
-        (40*resources.displayMetrics.density).toInt(), //FrameLayout.LayoutParams.WRAP_CONTENT
+        (40*resources.displayMetrics.density).toInt(),
     )
 
     init {
@@ -60,7 +53,8 @@ class ListOfTextGrids @JvmOverloads constructor(
         titleButtonLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
     }
 
-    fun clearSetup() {
+    /** Removes all grids and buttons */
+    private fun clearSetup() {
         for (i in 0 until listContent.size) {
             this.removeView(relativeLayouts[i])
             this.removeView(sectionGrids[i])
@@ -74,16 +68,19 @@ class ListOfTextGrids @JvmOverloads constructor(
         listContent.clear()
     }
 
+    /** Clears the setup, and adds the listed titles
+     * @param titles the arraylist of titles to be used
+     */
     fun setupTitles(titles : ArrayList<String>) {
 
         clearSetup()
 
         for (i in 0 until titles.size) {
-            var constraintLayout : RelativeLayout = RelativeLayout(context)
-            constraintLayout.id = View.generateViewId()
+            var relativeLayout : RelativeLayout = RelativeLayout(context)
+            relativeLayout.id = View.generateViewId()
 
             constraintLayoutParams.topMargin = (10*resources.displayMetrics.density).toInt()
-            constraintLayout.layoutParams = constraintLayoutParams
+            relativeLayout.layoutParams = constraintLayoutParams
 
             var sectionTitle : TextView = TextView(context)
             sectionTitle.setText(titles[i])
@@ -152,12 +149,12 @@ class ListOfTextGrids @JvmOverloads constructor(
             constraintSet.constrainWidth(constraintLayout.id, ConstraintSet.WRAP_CONTENT)*/
 
 
-            constraintLayout.addView(sectionTitle)
-            constraintLayout.addView(sectionButton)
-            constraintLayout.addView(sectionAddButton)
+            relativeLayout.addView(sectionTitle)
+            relativeLayout.addView(sectionButton)
+            relativeLayout.addView(sectionAddButton)
             //constraintSet.applyTo(constraintLayout)
 
-            this.addView(constraintLayout)
+            this.addView(relativeLayout)
 
             var sectionGrid : TextGridLayout = TextGridLayout(context)
             sectionGrid.setCustomColumnCount(sectionsColumnCount)
@@ -182,7 +179,7 @@ class ListOfTextGrids @JvmOverloads constructor(
             }
 
             // set global variables
-            relativeLayouts.add(constraintLayout)
+            relativeLayouts.add(relativeLayout)
             titleText.add(sectionTitle)
             sectionButtons.add(sectionButton)
             sectionAddButtons.add(sectionAddButton)
