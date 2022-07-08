@@ -98,9 +98,9 @@ class EditNotes : AppCompatActivity() {
 
         } else {
             if (isList)
-                notesList!!.deleteOldList(fileIndex)
+                notesList!!.deleteList(fileIndex)
             else
-                notesList!!.deleteOldNote(fileIndex)
+                notesList!!.deleteNote(fileIndex)
             finish()
         }
     }

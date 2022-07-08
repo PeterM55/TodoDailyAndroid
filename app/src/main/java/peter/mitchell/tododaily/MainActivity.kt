@@ -80,7 +80,7 @@ var oneTimeNotifsColumns = 2
 var oneTimeNotifsTextSize = 18f
 var dailyNotifsColumns = 2
 var dailyNotifsTextSize = 18f
-var mainQuickTimerTime = 20
+var mainQuickTimerTime = 15
 var notificationsFullNameMode = true
 var snoozeTime = 5
 
@@ -122,7 +122,9 @@ class MainActivity : AppCompatActivity() {
             readNotifications()
             dailyNotifications.refreshNotifications(this)
 
-            val notificationDateTime : LocalDateTime = LocalDateTime.now().plusMinutes(60)
+            val notificationDateTime : LocalDateTime = LocalDateTime.now().plusMinutes(
+                mainQuickTimerTime.toLong()
+            )
             notificationDateTime.minusSeconds(notificationDateTime.second.toLong())
             notificationDateTime.minusNanos(notificationDateTime.nano.toLong())
             dailyNotifications.addOneTimeNotification(
@@ -416,6 +418,7 @@ fun readSettings() {
             oneTimeNotifsTextSize = splitSettings[inputNum++].toFloat()
             dailyNotifsColumns = splitSettings[inputNum++].toInt()
             dailyNotifsTextSize = splitSettings[inputNum++].toFloat()
+            mainQuickTimerTime = splitSettings[inputNum++].toInt()
             notificationsFullNameMode = splitSettings[inputNum++].toBoolean()
             snoozeTime = splitSettings[inputNum++].toInt()
         } catch (e : Exception) {
@@ -462,6 +465,7 @@ fun saveSettings() {
     settingsFile.appendText("$oneTimeNotifsTextSize\n")
     settingsFile.appendText("$dailyNotifsColumns\n")
     settingsFile.appendText("$dailyNotifsTextSize\n")
+    settingsFile.appendText("$mainQuickTimerTime\n")
     settingsFile.appendText("$notificationsFullNameMode\n")
     settingsFile.appendText("$snoozeTime\n")
 
@@ -513,6 +517,7 @@ fun readBackupSettings() {
                 else if (splitTitle == "oneTimeNotifsTextSize") oneTimeNotifsTextSize = splitValue.toFloat()
                 else if (splitTitle == "dailyNotifsColumns") dailyNotifsColumns = splitValue.toInt()
                 else if (splitTitle == "dailyNotifsTextSize") dailyNotifsTextSize = splitValue.toFloat()
+                else if (splitTitle == "mainQuickTimerTime") mainQuickTimerTime = splitValue.toInt()
                 else if (splitTitle == "notificationsFullNameMode") notificationsFullNameMode = splitValue.toBoolean()
                 else if (splitTitle == "snoozeTime") snoozeTime = splitValue.toInt()
             }
@@ -560,6 +565,7 @@ fun saveBackupSettings() {
     settingsBackupFile.appendText("oneTimeNotifsTextSize $oneTimeNotifsTextSize\n")
     settingsBackupFile.appendText("dailyNotifsColumns $dailyNotifsColumns\n")
     settingsBackupFile.appendText("dailyNotifsTextSize $dailyNotifsTextSize\n")
+    settingsBackupFile.appendText("mainQuickTimerTime $mainQuickTimerTime\n")
     settingsBackupFile.appendText("notificationsFullNameMode $notificationsFullNameMode\n")
     settingsBackupFile.appendText("snoozeTime $snoozeTime\n")
 }

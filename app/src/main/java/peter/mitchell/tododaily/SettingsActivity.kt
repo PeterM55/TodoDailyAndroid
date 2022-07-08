@@ -92,8 +92,9 @@ var snoozeTime = 5
         "One Text Size",
         "Daily Columns",
         "Daily Text Size",
+        "Main Quick Timer Time",
         "Daily View Mode",
-        "Snooze time (minutes)",
+        "Snooze Time (minutes)",
     )
     var settingsTypeList = arrayOf(
         // -- All --
@@ -131,6 +132,7 @@ var snoozeTime = 5
         SettingType.TextSize,
         SettingType.ColumnCount,
         SettingType.TextSize,
+        SettingType.Integer,
         SettingType.Toggle,
         SettingType.Integer,
     )
@@ -364,6 +366,8 @@ var snoozeTime = 5
         (settingsList[countingIndex++] as Spinner).setSelection(dailyNotifsColumns-1)
         //"Daily Text Size",
         (settingsList[countingIndex++] as EditText).setText(dailyNotifsTextSize.toString())
+        //"mainQuickTimerTime",
+        (settingsList[countingIndex++] as EditText).setText(mainQuickTimerTime.toString())
         //"Daily View Mode",
         (settingsList[countingIndex++] as TextView).text = getBooleanString(notificationsFullNameMode)
         //"Snooze time (minutes)",
@@ -433,6 +437,8 @@ var snoozeTime = 5
         dailyNotifsColumns = (settingsList[countingIndex++] as Spinner).selectedItem.toString().toInt()
         //"Daily Text Size",
         dailyNotifsTextSize = (settingsList[countingIndex++] as EditText).text.toString().toFloat()
+        //"mainQuickTimerTime",
+        mainQuickTimerTime = (settingsList[countingIndex++] as EditText).text.toString().toInt()
         //"Daily View Mode",
         notificationsFullNameMode = getStringBoolean((settingsList[countingIndex++] as TextView).text.toString())
         //"Snooze time (minutes)",

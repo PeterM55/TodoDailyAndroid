@@ -76,13 +76,13 @@ class ListOfTextGrids @JvmOverloads constructor(
         clearSetup()
 
         for (i in 0 until titles.size) {
-            var relativeLayout : RelativeLayout = RelativeLayout(context)
+            val relativeLayout : RelativeLayout = RelativeLayout(context)
             relativeLayout.id = View.generateViewId()
 
             constraintLayoutParams.topMargin = (10*resources.displayMetrics.density).toInt()
             relativeLayout.layoutParams = constraintLayoutParams
 
-            var sectionTitle : TextView = TextView(context)
+            val sectionTitle : TextView = TextView(context)
             sectionTitle.setText(titles[i])
             sectionTitle.textSize = 24f
             sectionTitle.setTypeface(null, Typeface.BOLD)
@@ -100,12 +100,12 @@ class ListOfTextGrids @JvmOverloads constructor(
             )
             sectionTitle.layoutParams = titleTextLayoutParamsCopy
 
-            var sectionAddButton : Button = Button(context)
+            val sectionAddButton : Button = Button(context)
             sectionAddButton.setText("+")
             sectionAddButton.layoutParams = titleButtonLayoutParams
             sectionAddButton.id = View.generateViewId()
 
-            var sectionButton : Button = Button(context)
+            val sectionButton : Button = Button(context)
             sectionOpened.add(true)
             sectionButton.setText("▼")
             sectionButton.layoutParams = titleButtonLayoutParams
@@ -116,49 +116,18 @@ class ListOfTextGrids @JvmOverloads constructor(
             sectionAddButton.minWidth = 0
             sectionButton.minWidth = 0
 
-            var tempLayout : RelativeLayout.LayoutParams = addButtonLayoutParams
+            val tempLayout : RelativeLayout.LayoutParams = addButtonLayoutParams
             tempLayout.addRule(RelativeLayout.LEFT_OF, sectionButton.id)
-           // tempLayout.addRule(RelativeLayout.RIGHT_OF, sectionTitle.id)
             sectionAddButton.layoutParams = tempLayout
-
-            /*constraintSet.clone(constraintLayout)
-
-            constraintSet.constrainHeight(sectionTitle.id, ConstraintSet.WRAP_CONTENT)
-            constraintSet.constrainWidth(sectionTitle.id, ConstraintSet.WRAP_CONTENT)
-            constraintSet.connect(sectionTitle.id,ConstraintSet.TOP,ConstraintSet.PARENT_ID,ConstraintSet.TOP,0)
-            constraintSet.connect(sectionTitle.id,ConstraintSet.LEFT,ConstraintSet.PARENT_ID,ConstraintSet.LEFT,0)
-            //constraintSet.connect(sectionTitle.id,ConstraintSet.RIGHT,sectionAddButton.id,ConstraintSet.LEFT,0)
-            constraintSet.connect(sectionTitle.id,ConstraintSet.BOTTOM,ConstraintSet.PARENT_ID,ConstraintSet.BOTTOM,0)
-
-            constraintSet.constrainHeight(sectionButton.id, ConstraintSet.WRAP_CONTENT)
-            constraintSet.constrainWidth(sectionButton.id, ConstraintSet.WRAP_CONTENT)
-            constraintSet.connect(sectionButton.id,ConstraintSet.TOP,ConstraintSet.PARENT_ID,ConstraintSet.TOP,0)
-            constraintSet.connect(sectionButton.id,ConstraintSet.LEFT,sectionAddButton.id,ConstraintSet.RIGHT,0)
-            constraintSet.connect(sectionButton.id,ConstraintSet.RIGHT,ConstraintSet.PARENT_ID,ConstraintSet.RIGHT,0)
-            constraintSet.connect(sectionButton.id,ConstraintSet.BOTTOM,ConstraintSet.PARENT_ID,ConstraintSet.BOTTOM,0)
-
-            constraintSet.constrainHeight(sectionAddButton.id, ConstraintSet.WRAP_CONTENT)
-            constraintSet.constrainWidth(sectionAddButton.id, ConstraintSet.WRAP_CONTENT)
-            constraintSet.connect(sectionAddButton.id,ConstraintSet.TOP,ConstraintSet.PARENT_ID,ConstraintSet.TOP,0)
-            //constraintSet.connect(sectionButton.id,ConstraintSet.LEFT,sectionTitle.id,ConstraintSet.RIGHT,0)
-            //constraintSet.connect(sectionAddButton.id,ConstraintSet.RIGHT,ConstraintSet.PARENT_ID,ConstraintSet.RIGHT,0)
-            constraintSet.connect(sectionAddButton.id,ConstraintSet.RIGHT,sectionButton.id,ConstraintSet.LEFT,0)
-            constraintSet.connect(sectionAddButton.id,ConstraintSet.BOTTOM,ConstraintSet.PARENT_ID,ConstraintSet.BOTTOM,0)
-
-            constraintSet.constrainHeight(constraintLayout.id, ConstraintSet.MATCH_CONSTRAINT)
-            constraintSet.constrainWidth(constraintLayout.id, ConstraintSet.WRAP_CONTENT)*/
-
 
             relativeLayout.addView(sectionTitle)
             relativeLayout.addView(sectionButton)
             relativeLayout.addView(sectionAddButton)
-            //constraintSet.applyTo(constraintLayout)
 
             this.addView(relativeLayout)
 
-            var sectionGrid : TextGridLayout = TextGridLayout(context)
+            val sectionGrid : TextGridLayout = TextGridLayout(context)
             sectionGrid.setCustomColumnCount(sectionsColumnCount)
-            //sectionGrid.
             this.addView(sectionGrid)
 
             sectionButton.setOnClickListener {
@@ -172,10 +141,8 @@ class ListOfTextGrids @JvmOverloads constructor(
                 }
 
                 // for some reason the layout resets every time the button is hit, so has to be reset here
-                var tempLayout2 : RelativeLayout.LayoutParams = addButtonLayoutParams
+                val tempLayout2 : RelativeLayout.LayoutParams = addButtonLayoutParams
                 tempLayout2.addRule(RelativeLayout.LEFT_OF, sectionButton.id)
-                //tempLayout2.addRule(RelativeLayout.RIGHT_OF, sectionTitle.id)
-                randomRefresh()
             }
 
             // set global variables
@@ -189,15 +156,17 @@ class ListOfTextGrids @JvmOverloads constructor(
         }
     }
 
+    /** Setup the content of the text grids
+     * @param strings arraylist of arraylists of strings, inner arraylists are put in each grid
+     * @return whether it worked
+     */
     fun setupContent(strings : ArrayList<ArrayList<String>>) : Boolean {
         if (titleText.size != strings.size) return false
 
         for (i in 0 until strings.size) {
-
             sectionGrids[i].reset()
 
             for (j in 0 until strings[i].size) {
-
                 sectionGrids[i].addString(context, strings[i][j])
                 listContent[i].add(sectionGrids[i].textGrid[j])
 
@@ -217,26 +186,18 @@ class ListOfTextGrids @JvmOverloads constructor(
         sectionGrids[i].isVisible = visible
     }
 
-    /**
-     * I have no idea why it breaks unless I call this.
+    /** Set whether the add buttons should be shown for each section
+     * @param visible whether they should be visible
      */
-    fun randomRefresh() {
-        for (i in 0 until sectionButtons.size) {
-            /*// for some reason the layout resets every time the button is hit, so has to be reset here
-            var tempLayout2: RelativeLayout.LayoutParams = addButtonLayoutParams
-            tempLayout2.addRule(RelativeLayout.LEFT_OF, sectionButtons[i].id)*/
-
-            //titleText[i].layoutParams.width = RelativeLayout.LayoutParams.WRAP_CONTENT
-            //titleText[i].
-        }
-    }
-
     fun setShowAddButtons(visible : Boolean) {
         showAddButtons = visible
         for (i in 0 until sectionAddButtons.size)
             sectionAddButtons[i].isVisible = showAddButtons
     }
 
+    /** Sets the column count for the grids
+     * @param count The column count
+     */
     fun setCustomColumnCount(count : Int) {
         sectionsColumnCount = count
         for (i in 0 until sectionGrids.size) {
@@ -245,6 +206,9 @@ class ListOfTextGrids @JvmOverloads constructor(
         columnCount = count
     }
 
+    /** Set the text size of the content of the grids
+     * @param size The text size
+     */
     fun setTextSize(size : Float) {
         for (i in 0 until sectionGrids.size) {
             sectionGrids[i].setTextSize(size)
