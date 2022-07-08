@@ -137,6 +137,8 @@ class MainActivity : AppCompatActivity() {
 
             dailyNotifications.refreshNotifications(this)
             saveNotifications()
+
+            notifFragment?.onResume()
         }
 
         mainBinding!!.helpButton.setOnClickListener {
