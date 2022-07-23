@@ -6,6 +6,9 @@ import java.io.File
 import java.lang.Exception
 import java.lang.StringBuilder
 
+/** Reads and stores a list of text files sorted into notes files and list files
+ *
+ */
 class NotesList {
 
     private val notesListFile : File = File("${internalDataPath}notesList.txt")
@@ -103,7 +106,7 @@ class NotesList {
         }
 
         for (i in 0 until notesFiles.size) {
-            Log.i("saveNotesList", "Saving: ${notesFiles[i]}")
+            Log.i("tdd-saveNotesList", "Saving: ${notesFiles[i]}")
             if (notesFiles[i].isNotEmpty())
                 stringBuilder.append(notesFiles[i]+"|")
         }

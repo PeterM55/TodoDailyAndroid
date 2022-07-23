@@ -17,7 +17,11 @@ import java.lang.StringBuilder
 import java.time.*
 import java.time.temporal.TemporalField
 
-class NewNotification : AppCompatActivity() {
+/** Edit notification is an activity that allows the user to create or edit notifications. They show
+ * up the same way but when editing the index and whether it is a one time must be provided in the
+ * intent, and the fields will be filled automatically.
+ */
+class EditNotification : AppCompatActivity() {
 
     var oneTimeNotification : Boolean = false
     var editNotificationIndex : Int = -1
@@ -39,10 +43,7 @@ class NewNotification : AppCompatActivity() {
 
         notificationRepeatInput.isChecked = !oneTimeNotification
         notificationRepeatInput.setOnClickListener {
-            //notificationRepeatInput.isChecked = !oneTimeNotification
             datePicker.isVisible = notificationRepeatInput.isChecked
-
-            // update: notificationIndexInput
         }
 
         if (editNotificationIndex != -1) {
@@ -106,17 +107,17 @@ class NewNotification : AppCompatActivity() {
             notificationIndexInput.setSelection(indexArray.size-1)
     }
 
+    /** takes the information from the inputs and saves them, moving the element if needed */
     private fun submitButton() {
         var notificationTime : LocalTime = LocalTime.of(timePicker.hour, timePicker.minute)
 
         if (!notificationRepeatInput.isChecked) {
 
-            //val notificationDate : LocalDate = LocalDate.of(datePicker.year, datePicker.month, datePicker.dayOfMonth)
             val notificationDateTime : LocalDateTime = LocalDateTime.of(LocalDate.of(datePicker.year, datePicker.month+1, datePicker.dayOfMonth),notificationTime)
 
             if (notificationDateTime.isBefore(LocalDateTime.now())) {
                 Toast.makeText(this, "Date/time is in the past", Toast.LENGTH_SHORT).show()
-                Log.i("newNotificationSubmitButton", "${notificationDateTime} is before: ${LocalDateTime.now()}")
+                Log.i("tdd.newNotificationSubmitButton", "${notificationDateTime} is before: ${LocalDateTime.now()}")
                 return
             }
 
@@ -170,18 +171,7 @@ class NewNotification : AppCompatActivity() {
             }
         }
 
-        // --- delete notification if swapped locations --- MOVED INTO DAILYNOTIFICATIONS
-        /*if (editNotificationIndex != -1 || oneTimeNotification == notificationRepeatInput.isChecked) {
-            if (oneTimeNotification) {
-                dailyNotifications.removeOneTimeNotification(editNotificationIndex)
-            } else {
-                dailyNotifications.removeDailyNotification(editNotificationIndex)
-            }
-        }*/
-
         // --- If notification index is set, then set the position ---
-
-
         if (!notificationRepeatInput.isChecked) {
             if (editNotificationIndex == -1)
                 editNotificationIndex = dailyNotifications.oneTimeNotificationsLength-1
@@ -208,6 +198,7 @@ class NewNotification : AppCompatActivity() {
 
     }
 
+    /** Deletes the notification being edited, if not created yet it exits the activity */
     private fun deleteButton() {
         if (oneTimeNotification) {
             dailyNotifications.removeOneTimeNotification(editNotificationIndex)

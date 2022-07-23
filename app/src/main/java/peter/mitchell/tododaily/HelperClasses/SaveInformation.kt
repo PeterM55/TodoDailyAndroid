@@ -2,24 +2,20 @@ package peter.mitchell.tododaily.HelperClasses
 
 import android.app.Activity
 import android.content.Context
-import android.os.Build
 import android.text.InputType
 import android.util.Log
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import peter.mitchell.tododaily.*
 import java.io.File
-import java.lang.Exception
 import java.lang.StringBuilder
-import java.text.SimpleDateFormat
 import java.time.LocalDate
-import java.util.*
 import kotlin.collections.ArrayList
 
-@RequiresApi(Build.VERSION_CODES.O)
+/** SaveInformation handles the daily information to be saved, This class stores the main purpose of
+ * this application. Values can be saved, exported, and of viewed in the HomeFragment
+ */
 class SaveInformation {
 
-    var dateFormat : SimpleDateFormat = SimpleDateFormat("dd/MM/yyyy")
     enum class InformationFormat {
         checkBox, integer, onePointDecimal, twoPointDecimal, decimal, text
     }
@@ -35,7 +31,7 @@ class SaveInformation {
     enum class RepeatFormat {
         Daily, Weekly, Monthly, Yearly, Never
     }
-    public val RepeatFormatStrings : Array<String> = arrayOf(
+    private val repeatFormatStrings : Array<String> = arrayOf(
         "Daily",
         "Weekly",
         "Monthly",
@@ -52,11 +48,19 @@ class SaveInformation {
 
     var repeatTime : ArrayList<RepeatFormat> = ArrayList(10)
 
-    public fun addValue(name : String, infoFormat : InformationFormat, repeat : RepeatFormat = RepeatFormat.Daily) : Boolean {
-        if (!verifyFormat("", infoFormat)) return false
+    /** Add a value to the arrays
+     *
+     * @param name The name of the element
+     * @param infoFormat The format of the element
+     * @param repeat How often the element should reset
+     * @param value The name of the element
+     * @return Whether it worked (only fails if format invalid)
+     */
+    public fun addValue(name : String, infoFormat : InformationFormat, repeat : RepeatFormat = RepeatFormat.Daily, value : String = "") : Boolean {
+        if (!verifyFormat(value, infoFormat)) return false
 
         names.add(name)
-        values.add("")
+        values.add(value)
         formats.add(infoFormat)
         timeRead.add(0)
         repeatTime.add(repeat)
@@ -132,33 +136,43 @@ class SaveInformation {
         return values[i]
     }
 
+    /** Simply gets the value from the array
+     *
+     * @param i the index
+     * @return the string at that index
+     */
     public fun getRawValue(i : Int) : String {
         return values[i]
     }
 
+    /** Gets the index of the value specified
+     *
+     * @param i The index you think it is at, -1 if unknown
+     * @param name the name to search for
+     * @param format the format to search for
+     * @return null if not fount, index if found
+     */
     public fun getValueIndex(i : Int, name : String, format : InformationFormat) : Int? {
 
         if ( i >= 0 && i < length && names[i] == name && formats[i] == format ) {
             return i
         }
 
-        var newI = getValueByName(name)
-        if (newI != null && formats[newI] == format ) {
-            return newI
-        }
-
-        return null
-    }
-
-    public fun getValueByName(name : String) : Int? {
-        for (i in 0 until names.size) {
-            if (name == names[i]) {
-                return i
+        for (j in 0 until names.size) {
+            if (name == names[j] && formats[j] == format ) {
+                return j
             }
         }
+
         return null
     }
 
+    /** Sets the value at the provided index, and sets the timeRead to now
+     *
+     * @param i the index to set
+     * @param value the value to set it to
+     * @return returns false if the value cannot be set due to incorrect format
+     */
     public fun setValue(i : Int, value : String) : Boolean {
         if (!verifyFormat(value, formats[i])) return false
 
@@ -168,7 +182,13 @@ class SaveInformation {
         return true
     }
 
+    /** Toggles the chceck box at the index, from 1 to 0, or anything else to 1
+     * if it is not a checkbox at that index, nothing is done
+     *
+     * @param i the index to toggle
+     */
     public fun toggleBox(i : Int) {
+        if (formats[i] != InformationFormat.checkBox) return
         if (values[i] == "1") {
             values[i] = "0"
             timeRead[i] = 0;
@@ -178,8 +198,13 @@ class SaveInformation {
         }
     }
 
+    /** Gets the input type at the given index (used for text box inputs)
+     *
+     * @param i the index
+     * @return the input type
+     */
     public fun getInputType(i : Int): Int {
-        if (i > formats.size)
+        if (i < 0 || i > formats.size)
             return InputType.TYPE_CLASS_TEXT;
 
         if (formats[i] == InformationFormat.checkBox) {
@@ -198,10 +223,20 @@ class SaveInformation {
         return InputType.TYPE_CLASS_TEXT
     }
 
+    /** Returns if the format provided is a number (integer or float/decimal)
+     *
+     * @param format the format to check
+     * @return Whether it is a number
+     */
     public fun isNumber(format : InformationFormat) : Boolean {
         return format == InformationFormat.integer || format == InformationFormat.onePointDecimal || format == InformationFormat.twoPointDecimal || format == InformationFormat.decimal
     }
 
+    /** Converts a string to an information format enum
+     *
+     * @param str the string to convert
+     * @return the information format
+     */
     public fun informationFormatStringToEnum(str : String) : InformationFormat {
         var infoFormat : InformationFormat = InformationFormat.text
 
@@ -222,6 +257,11 @@ class SaveInformation {
         return infoFormat
     }
 
+    /** Converts an information format to a string
+     *
+     * @param infoFormat the information format to convert
+     * @return the string it was converted to
+     */
     public fun informationFormatEnumToString(infoFormat : InformationFormat) : String {
         var str : String = informationFormatStrings[0]
 
@@ -242,34 +282,45 @@ class SaveInformation {
         return str
     }
 
+    /** Converts the repeat format to a string
+     *
+     * @param repeatFormat the repeat format to convert
+     * @return the string it was converted to
+     */
     public fun repeatTimeEnumToString(repeatFormat: RepeatFormat) : String {
         if (repeatFormat == RepeatFormat.Daily) {
-            return RepeatFormatStrings[0]
+            return repeatFormatStrings[0]
         } else if (repeatFormat == RepeatFormat.Weekly) {
-            return RepeatFormatStrings[1]
+            return repeatFormatStrings[1]
         } else if (repeatFormat == RepeatFormat.Monthly) {
-            return RepeatFormatStrings[2]
+            return repeatFormatStrings[2]
         } else if (repeatFormat == RepeatFormat.Yearly) {
-            return RepeatFormatStrings[3]
+            return repeatFormatStrings[3]
         } else { //(repeatFormat == RepeatFormat.Never)
-            return RepeatFormatStrings[4]
+            return repeatFormatStrings[4]
         }
     }
 
+    /** Converts a string to an repeat format enum
+     *
+     * @param str the string to convert
+     * @return the repeat format
+     */
     public fun repeatTimeStringToEnum(str: String) : RepeatFormat {
-        if (str == RepeatFormatStrings[0] || str == "") {
+        if (str == repeatFormatStrings[0] || str == "") {
             return RepeatFormat.Daily
-        } else if (str == RepeatFormatStrings[1]) {
+        } else if (str == repeatFormatStrings[1]) {
             return RepeatFormat.Weekly
-        } else if (str == RepeatFormatStrings[2]) {
+        } else if (str == repeatFormatStrings[2]) {
             return RepeatFormat.Monthly
-        } else if (str == RepeatFormatStrings[3]) {
+        } else if (str == repeatFormatStrings[3]) {
             return RepeatFormat.Yearly
         } else { // (str == RepeatFormatStrings[4])
             return RepeatFormat.Never
         }
     }
 
+    /** Resets all of the data in the object */
     public fun resetData() {
         date = LocalDate.now()
         length = 0
@@ -280,9 +331,10 @@ class SaveInformation {
         repeatTime = ArrayList(10)
     }
 
-    public fun clearValues(purge : Boolean = false) {
-        //values = ArrayList(length+3)
-        //timeRead = ArrayList(length+3)
+    /** clears all of the values, but leaves the names.
+     * Doesn't clear if not daily and not on the clear day
+     */
+    public fun clearValues() {
         for (i in 0 until length) {
 
             if (
@@ -299,6 +351,10 @@ class SaveInformation {
         }
     }
 
+    /** Removes the value at the given index, decrementing the length
+     *
+     * @param i the index to remove
+     */
     public fun deleteValue(i : Int) {
         names.removeAt(i)
         values.removeAt(i)
@@ -308,10 +364,17 @@ class SaveInformation {
         length -= 1
     }
 
+    /** copies the setup of the string provided, using fromString and clearing the values
+     * Resets the data first, and sets the date to the current day
+     *
+     * @param str the string to copy
+     * @return whether it worked
+     */
     public fun copySetup(str : String) : Boolean {
         resetData()
 
-        fromString(str)
+        if (!fromString(str))
+            return false
 
         date = LocalDate.now()
         clearValues()
@@ -319,6 +382,11 @@ class SaveInformation {
         return true
     }
 
+    /** Moves a value from one index to another
+     *
+     * @param i the starting index
+     * @param to the end index
+     */
     public fun moveFrom(i : Int, to : Int) {
 
         if (i == to || i >= length || to >= length) return
@@ -365,6 +433,10 @@ class SaveInformation {
 
     }
 
+    /** Moves a value from one index to the end of the list
+     *
+     * @param i the starting index
+     */
     public fun moveToEnd(i : Int) {
         var tempName = names[i]
         names.removeAt(i)
@@ -384,6 +456,13 @@ class SaveInformation {
         repeatTime.add(tempRepeatTime)
     }
 
+    /** Attempts to import the data from the importFileName file, returning false if failed for any
+     * reason
+     *
+     * @param activity needs activity to check/ask for permissions
+     * @param context needs context to check/ask for permissions
+     * @return whether it worked
+     */
     public fun importData(activity : Activity, context : Context) : Boolean {
 
         if (!canExport(activity, context))
@@ -495,9 +574,15 @@ class SaveInformation {
         return true
     }
 
+    /** Attempts to change this object to fit the string provided, returning false if failed for any
+     * reason
+     *
+     * @param str the string to change to
+     * @return whether it worked
+     */
     public fun fromString(str : String) : Boolean {
         resetData()
-        Log.i("SaveInformation.fromString", str)
+        Log.i("tdd-SaveInformation.fromString", str)
 
         var i : Int = 0
         var j : Int = 0
@@ -558,22 +643,13 @@ class SaveInformation {
             i++
         }
 
-
-        /*val splitLine = str.split(",")
-
-
-        date = LocalDate.parse(splitLine[i++])
-
-        while (i+4 <= splitLine.size) {
-            names.add(splitLine[i++])
-            values.add(splitLine[i++])
-            formats.add(informationFormatStringToEnum(splitLine[i++]))
-            timeRead.add(splitLine[i++].toLong())
-            length++
-        }*/
         return true
     }
 
+    /** Converts this object into a string of the same format as fromString uses
+     *
+     * @return a string of the same format as fromString uses
+     */
     public override fun toString() : String {
         var returnStr : StringBuilder = StringBuilder("$date,")
 
@@ -625,6 +701,23 @@ class SaveInformation {
         return colInfo
     }
 
+    /** Converts this object to a string in the format given. This exports to custom order, looping
+     * through the provided string, for each value. The string will usually take a format similar
+     * to: "vt" (Described below) which will put the value, then the time recorded for each value.
+     *
+     * The thing that differentiates this method from exportToCustomOrder is the fact it uses names
+     * of the columns to sort the information, instead of using the indexes. It will first go
+     * through all of the information in the file to get the names of the columns, then populate
+     * the data.
+     *
+     * n = name
+     * v = value
+     * i = information format
+     * t = time read
+     *
+     * @param strFormat the string containing the order of the export to be looped through
+     * @return the string to export
+     */
     public fun exportToOrderByNames(strFormat : String, colInfo : ArrayList<ValueInfo>) : String {
 
         // remove invalid characters in strFormat
@@ -636,19 +729,6 @@ class SaveInformation {
             else
                 remIndex++
         }
-
-        // update the colinfo, loop through current and check what colinfo is missing
-        /*for (i in 0 until length) {
-            var containsName = false
-            for (j in 0 until colInfo.size) {
-                if (names[i] == colInfo[j].name) {
-                    containsName = true
-                    break
-                }
-            }
-            if (!containsName)
-                colInfo.add(ValueInfo(names[i], formats[i]))
-        }*/
 
         // loop through colInfo and add the ones listed
 
@@ -691,6 +771,23 @@ class SaveInformation {
 
     }
 
+    /** Converts this object to a string in the format given. This exports to custom order, looping
+     * through the provided string, for each value. The string will usually take a format similar
+     * to: "vt" (Described below) which will put the value, then the time recorded for each value.
+     *
+     * The thing that differentiates this method from exportToCustomString is the fact it uses names
+     * of the columns to sort the information, instead of using the indexes. It will first go
+     * through all of the information in the FIRST LINE of the file to get the names of the columns,
+     * then populate the data.
+     *
+     * n = name
+     * v = value
+     * i = information format
+     * t = time read
+     *
+     * @param strFormat the string containing the order of the export to be looped through
+     * @return the string to export
+     */
     public fun exportToCustomByNames(strFormat : String, colInfo : ArrayList<ValueInfo>) : String {
         var returnStr = StringBuilder()
 
@@ -700,10 +797,6 @@ class SaveInformation {
                 return ""
 
             returnStr.append("Date,")
-
-            /*for (i in 0 until length) {
-                colOffsets.add(-1)
-            }*/
 
             var j = 0
             while (j < strFormat.length) {
@@ -753,11 +846,6 @@ class SaveInformation {
             }
 
             returnStr.append("\n")
-
-            /*for (i in length-1 downTo 0) {
-                if (colOffsets[i] == -1)
-                    colOffsets.removeAt(i)
-            }*/
         }
 
         // loop through colInfo and add the ones listed
@@ -804,6 +892,22 @@ class SaveInformation {
         return returnStr.toString()
     }
 
+    /** Converts this object to a string in the format given. This exports to custom order, looping
+     * through the provided string, for each value. The string will usually take a format similar
+     * to: "vt" (Described below) which will put the value, then the time recorded for each value.
+     *
+     * n = name
+     * v = value
+     * i = information format
+     * t = time read
+     *
+     * @param strFormat the string containing the order of the export to be looped through
+     * @param addColLabel (Unused/deprecated, new function made: exportToOrderByNames) Whether to
+     * add a label to the columns, this does all rows by index and not name, so if they have been
+     * moved in past records it will put records named differently under the wrong column label if
+     * it is at the same index.
+     * @return the string to export
+     */
     public fun exportToCustomOrder(strFormat : String, addColLabel : Boolean = false) : String {
         var returnStr : StringBuilder = StringBuilder()
 
@@ -859,6 +963,22 @@ class SaveInformation {
         return returnStr.toString()
     }
 
+    /** Converts this object to a string in the format given. This exports to a custom export,
+     * looping through the provided string, but NOT for each value. The string will usually take a
+     * format similar to: "v1v5t5" (Described below) which will put the value at index 0, then the
+     * value at index 4, then the time recorded for index 4.
+     * n = name
+     * v = value
+     * i = information format
+     * t = time read
+     *
+     * @param strFormat the string containing the order of the export to be looped through
+     * @param addColLabel (Unused/deprecated, new function made: exportToCustomByNames) Whether to
+     * add a label to the columns, this does all rows by index and not name, so if they have been
+     * moved in past records it will put records named differently under the wrong column label if
+     * it is at the same index.
+     * @return the string to export
+     */
     public fun exportToCustomString(strFormat: String, addColLabel : Boolean = false) : String? {
         var returnStr : StringBuilder = StringBuilder()
 

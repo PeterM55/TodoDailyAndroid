@@ -1,42 +1,26 @@
 package peter.mitchell.tododaily.ui.notifications
 
-import android.R
-import android.app.AlarmManager
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Context.NOTIFICATION_SERVICE
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.TextView
-import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.core.content.ContextCompat.getSystemService
-import androidx.core.view.size
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.work.WorkManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.fragment_notifications.*
-import kotlinx.android.synthetic.main.new_notification.*
 import peter.mitchell.tododaily.*
-import peter.mitchell.tododaily.HelperClasses.SaveInformation
 import peter.mitchell.tododaily.databinding.FragmentNotificationsBinding
-import peter.mitchell.tododaily.ui.home.ManageDailyNotifications
-import java.io.File
 import java.time.*
 
-@RequiresApi(Build.VERSION_CODES.O)
+/** The notifications fragment handles the viewing, creation, deletion, and management of
+ * notifications. Though creation, deletion, and management are handled in the Edit Notification
+ * activity, this object allows the user to open the activity using the index pressed.
+ */
 class NotificationsFragment : Fragment() {
 
     private lateinit var _binding: FragmentNotificationsBinding
@@ -53,16 +37,13 @@ class NotificationsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        /*val notificationsViewModel =
-            ViewModelProvider(this).get(NotificationsViewModel::class.java)*/
-
         _binding = FragmentNotificationsBinding.inflate(inflater, container, false)
         val root: View = binding.root
         mainBinding?.fragmentLabel?.setText("Notifications")
 
         // ----- Setup Buttons -----
         _binding.oneTimeNotificationsButton.setOnClickListener {
-            val intent = Intent(activity as Context, NewNotification::class.java)
+            val intent = Intent(activity as Context, EditNotification::class.java)
             intent.putExtra("oneTimeNotification", true)
             startActivity(intent)
         }
@@ -72,7 +53,7 @@ class NotificationsFragment : Fragment() {
         }
 
         _binding.dailyNotificationsButton.setOnClickListener {
-            val intent = Intent(activity as Context, NewNotification::class.java)
+            val intent = Intent(activity as Context, EditNotification::class.java)
             startActivity(intent)
         }
         _binding.deleteAllDailyButton.setOnClickListener {
@@ -97,9 +78,10 @@ class NotificationsFragment : Fragment() {
         return root
     }
 
+    /** Reload the next notification view field, using dailyNotifications.getNextNotificationTime */
     private fun reloadNextNotification() {
 
-        var nextNotification = dailyNotifications.getNextNotificationTime()
+        val nextNotification = dailyNotifications.getNextNotificationTime()
 
         if (nextNotification == null) {
             nextNotificationText.text = "No notifications found"
@@ -109,6 +91,7 @@ class NotificationsFragment : Fragment() {
 
     }
 
+    /** Reloads the one time and system notifications views */
     private fun reloadOneTimeNotifications() {
         _binding.oneTimeNotificationsGrid.setCustomColumnCount(oneTimeNotifsColumns)
         _binding.oneTimeNotificationsGrid.setTextSize(oneTimeNotifsTextSize)
@@ -116,29 +99,34 @@ class NotificationsFragment : Fragment() {
 
         _binding.oneTimeNotificationsGrid.reset()
         _binding.systemNotificationsGrid.reset()
+        var systemI = 0
+        var oneTimeI = 0
         for (i in 0 until dailyNotifications.oneTimeNotificationsLength) {
             if (dailyNotifications.isSystemNotification[i]) {
                 _binding.systemNotificationsGrid.addString(requireContext(), dailyNotifications.getOneTimeString(i))
 
-                _binding.systemNotificationsGrid.textGrid[i].setOnClickListener {
-                    val intent = Intent(activity as Context, NewNotification::class.java)
+                _binding.systemNotificationsGrid.textGrid[systemI].setOnClickListener {
+                    val intent = Intent(activity as Context, EditNotification::class.java)
                     intent.putExtra("oneTimeNotification", true)
                     intent.putExtra("index", i)
                     startActivity(intent)
                 }
+                systemI++
             } else {
                 _binding.oneTimeNotificationsGrid.addString(requireContext(), dailyNotifications.getOneTimeString(i))
 
-                _binding.oneTimeNotificationsGrid.textGrid[i].setOnClickListener {
-                    val intent = Intent(activity as Context, NewNotification::class.java)
+                _binding.oneTimeNotificationsGrid.textGrid[oneTimeI].setOnClickListener {
+                    val intent = Intent(activity as Context, EditNotification::class.java)
                     intent.putExtra("oneTimeNotification", true)
                     intent.putExtra("index", i)
                     startActivity(intent)
                 }
+                oneTimeI++
             }
         }
     }
 
+    /** Reloads the daily notifications view */
     private fun reloadDailyNotifications() {
         _binding.dailyNotificationsGrid.setCustomColumnCount(dailyNotifsColumns)
         _binding.dailyNotificationsGrid.setTextSize(dailyNotifsTextSize)
@@ -151,7 +139,7 @@ class NotificationsFragment : Fragment() {
             _binding.dailyNotificationsGrid.addString(requireContext(), "${dailyNotifications.dailyNotificationTimes[i].toString()}")
 
             _binding.dailyNotificationsGrid.textGrid[i].setOnClickListener {
-                val intent = Intent(activity as Context, NewNotification::class.java)
+                val intent = Intent(activity as Context, EditNotification::class.java)
                 intent.putExtra("oneTimeNotification", false)
                 intent.putExtra("index", i)
                 startActivity(intent)
@@ -159,6 +147,9 @@ class NotificationsFragment : Fragment() {
         }
     }
 
+    /** Shows the delete all dialog for confirming the deletions, readyToDelete determines which
+     * section is planning to be deleted
+     */
     private fun showDeleteAllDialog() {
 
         MaterialAlertDialogBuilder(requireContext()).setTitle("Are you sure?")
@@ -200,6 +191,9 @@ class NotificationsFragment : Fragment() {
             }.show()
     }
 
+    /** sets up the quick timers at the bottom of the fragment, most of the function is setting up
+     * the on click listeners
+     */
     private fun setupQuickTimers() {
         _binding.quickTimerButton5m.setOnClickListener {
             var notificationDateTime : LocalDateTime = LocalDateTime.now().plusMinutes(5)
@@ -289,7 +283,7 @@ class NotificationsFragment : Fragment() {
                 "60m Quick Timer",
                 notificationDateTime,
                 "60m Quick Timer",
-                "Your 16m quick timer has expired"
+                "Your 60m quick timer has expired"
             )
             dailyNotifications.setSystemNotification(dailyNotifications.oneTimeNotificationsLength-1)
 
@@ -314,7 +308,6 @@ class NotificationsFragment : Fragment() {
             view?.findNavController()?.navigate(action)
         }
 
-        Log.i("tdd-tempDebug=====","size1: ${dailyNotifications.oneTimeNotificationsLength}")
         readNotifications()
 
         dailyNotifications.refreshNotifications(requireContext())

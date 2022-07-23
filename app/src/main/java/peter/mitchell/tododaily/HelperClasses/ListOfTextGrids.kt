@@ -9,6 +9,11 @@ import androidx.core.view.isVisible
 import peter.mitchell.tododaily.R
 import peter.mitchell.tododaily.darkMode
 
+/** This class is a list of TextGridLayouts, another custom class
+ * + buttons are provided unless disabled, along with collapse section buttons
+ * the + buttons and on click listeners for the elements are not setup automatically
+ *
+ */
 class ListOfTextGrids @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
 ) : LinearLayout(context, attrs) {

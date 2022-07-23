@@ -21,6 +21,9 @@ import peter.mitchell.tododaily.dailyNotifications
 import peter.mitchell.tododaily.darkMode
 import peter.mitchell.tododaily.saveInformation
 
+/** A grid of text views, also used by listOfTextGrids to create an array of these
+ * This was created because gridView could not do all of the functions needed properly
+ */
 class TextGridLayout @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
 ) : GridLayout(context, attrs) {
@@ -42,6 +45,7 @@ class TextGridLayout @JvmOverloads constructor(
 
     }
 
+    /** Reset the view, removing all elements (but not resetting text size or column count) */
     public fun reset() {
         for (i in 0 until textGrid.size) {
             this.removeView(textGrid[i])
@@ -49,6 +53,11 @@ class TextGridLayout @JvmOverloads constructor(
         textGrid.clear()
     }
 
+    /** Add the string to the list
+     *
+     * @param context used to create the text view
+     * @param str the string to add
+     */
     public fun addString(context : Context, str : String) {
         textGrid.add(TextView(context))
         textGrid[textGrid.size-1].setText(str)
@@ -67,6 +76,11 @@ class TextGridLayout @JvmOverloads constructor(
         this.addView(textGrid[textGrid.size-1])
     }
 
+    /** sets the strings to be the contents of the arraylist
+     *
+     * @param context used to create the text views
+     * @param strings the array of strings
+     */
     public fun setAdapter(context : Context, strings : ArrayList<String>) {
         reset()
 
@@ -91,6 +105,10 @@ class TextGridLayout @JvmOverloads constructor(
         }
     }
 
+    /** Set the column count of the grid view
+     *
+     * @param count the number of columns
+     */
     fun setCustomColumnCount(count : Int) {
         if (count == columnCount) return
 
@@ -108,6 +126,10 @@ class TextGridLayout @JvmOverloads constructor(
         setAdapter(context, tempTextArrayList)
     }
 
+    /** Set the text size of the grid view
+     *
+     * @param size the text size
+     */
     fun setTextSize(size : Float) {
         for (i in 0 until textGrid.size) {
             textGrid[i].textSize = size

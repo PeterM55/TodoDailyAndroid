@@ -224,8 +224,7 @@ fun saveDailyInformationFile() {
     }
 
     if (!dailyInformationFile.delete()) {
-        //Toast.makeText(,"Could not save. Permission denied.", Toast.LENGTH_SHORT).show()
-            Log.e("Saving Daily: ", "Failed to save, permission denied")
+        Log.e("Saving Daily: ", "Failed to save, permission denied")
         tempFile.delete()
         return
     }
@@ -243,6 +242,7 @@ fun readTodaysDailyInformationFile() {
     } else {
 
         var latestLine: String = dailyInformationFile.inputStream().bufferedReader().readLine()
+
         if (latestLine.isNullOrEmpty())
             return
         var latestDate: LocalDate = LocalDate.parse(latestLine.split(",")[0])
@@ -275,7 +275,7 @@ fun exportDailyInformation(activity: Activity, context: Context,
     if (!dailyInformationFile.exists() || !canExport(activity, context))
         return
 
-    var exportFile : File? = getExportFile(exportFileName)
+    val exportFile : File? = getExportFile(exportFileName)
 
     if (exportFile == null)
         return
@@ -616,7 +616,7 @@ private fun hasWriteStoragePermission(activity : Activity): Boolean {
             Manifest.permission.WRITE_EXTERNAL_STORAGE
         ) != PackageManager.PERMISSION_GRANTED
     ) {
-        Log.i("##hasWriteStoragePermission##", "Write permission requested")
+        Log.i("tdd-hasWriteStoragePermission", "Write permission requested")
         ActivityCompat.requestPermissions(
             activity,
             arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
@@ -641,7 +641,7 @@ private fun hasReadStoragePermission(activity: Activity): Boolean {
             Manifest.permission.READ_EXTERNAL_STORAGE
         ) == PackageManager.PERMISSION_GRANTED)
     ) {
-        Log.i("##hasReadStoragePermission##", "Read permission requested")
+        Log.i("tdd-hasReadStoragePermission", "Read permission requested")
         ActivityCompat.requestPermissions(
             activity,
             arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),

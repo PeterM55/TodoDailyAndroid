@@ -22,6 +22,9 @@ import java.io.File
 import java.lang.NumberFormatException
 import java.time.LocalDate
 
+/** The manage notes activity allows the user to re-arrange and export the notes.
+ *
+ */
 class ManageNotes : AppCompatActivity() {
 
     private lateinit var imm: InputMethodManager
@@ -103,6 +106,11 @@ class ManageNotes : AppCompatActivity() {
         // end of onCreateView
     }
 
+    /** Allows a note to be moved from one index to another, a dialogue will be shown to take the
+     * input, then the moveFrom function will be called in notesList
+     *
+     * @param i the index to move
+     */
     private fun rearrangeNoteDialog(i : Int) {
 
         val builder: AlertDialog.Builder = android.app.AlertDialog.Builder(this)
@@ -133,6 +141,11 @@ class ManageNotes : AppCompatActivity() {
 
     }
 
+    /** Allows a list to be moved from one index to another, a dialogue will be shown to take the
+     * input, then the moveFrom function will be called in notesList
+     *
+     * @param i the index to move
+     */
     private fun rearrangeListDialog(i : Int) {
 
         val builder: AlertDialog.Builder = android.app.AlertDialog.Builder(this)
@@ -163,6 +176,11 @@ class ManageNotes : AppCompatActivity() {
 
     }
 
+    /** Will ask for confirmation of the export, then exports the pressed note to
+     * exportPath/notesFilesName.txt
+     *
+     * @param i the index to export
+     */
     private fun exportNoteDialog(i : Int) {
 
         MaterialAlertDialogBuilder(this).setTitle("Export?")
@@ -178,6 +196,11 @@ class ManageNotes : AppCompatActivity() {
 
     }
 
+    /** Will ask for confirmation of the export, then exports the pressed list to
+     * exportPath/notesFilesName.txt
+     *
+     * @param i the index to export
+     */
     private fun exportListDialog(i : Int) {
         MaterialAlertDialogBuilder(this).setTitle("Export?")
             .setMessage("This will export to your external downloads folder.")
@@ -191,6 +214,12 @@ class ManageNotes : AppCompatActivity() {
             }.show()
     }
 
+    /** Attempts to export the string given to the path specified
+     *
+     * @param fullPath the full path to the export
+     * @param text the text to put in the file
+     * @return whether it worked
+     */
     private fun attemptExport(fullPath : String, text : String) : Boolean {
         if (!canExport(this, this))
             return false

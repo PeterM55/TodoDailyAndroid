@@ -18,8 +18,8 @@
                 android:id="@+id/todoSection"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Todo Section: "
-                android:textSize="20dp"
+                android:text="@string/todo_section"
+                android:textSize="20sp"
                 android:textColor="@color/textDark"
 
                 android:gravity="center_vertical"
@@ -44,8 +44,8 @@
                 android:id="@+id/todoPosition"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Todo Position: "
-                android:textSize="20dp"
+                android:text="@string/todo_position"
+                android:textSize="20sp"
                 android:textColor="@color/textDark"
 
                 android:gravity="center_vertical"
@@ -69,8 +69,8 @@
                 android:id="@+id/notificationNameTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Todo Title: "
-                android:textSize="20dp"
+                android:text="@string/todo_title"
+                android:textSize="20sp"
                 android:textColor="@color/textDark"
 
                 android:gravity="center_vertical"
@@ -80,7 +80,7 @@
                 android:id="@+id/todoNameInput"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:hint="todo title"
+                android:hint="@string/todo_title_input_text"
                 android:textColor="@color/textDark"
                 android:textColorHint="@color/textDark"
 
@@ -131,7 +131,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="Delete"
+                android:text="@string/delete"
                 android:layout_marginLeft="50dp"
                 />
 
@@ -140,7 +140,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="Submit"
+                android:text="@string/submit"
                 android:layout_marginLeft="25dp"
                 />
 

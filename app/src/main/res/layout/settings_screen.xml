@@ -23,18 +23,18 @@
                 android:id="@+id/settingsBackButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="◀"
+                android:text="@string/leftArrow"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:minHeight="0dp"
                 android:minWidth="0dp"/>
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
 
-                android:text="Settings"
+                android:text="@string/settingsTitle"
                 android:textSize="20sp"
                 android:textColor="@color/textDark"
                 android:layout_weight="1"
@@ -44,7 +44,7 @@
                 android:id="@+id/resetSettingsButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="reset"
+                android:text="@string/resetbutton"
                 android:minHeight="0dp"
                 android:minWidth="0dp"/>
 
@@ -52,56 +52,13 @@
                 android:id="@+id/saveSettingsButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Save"
+                android:text="@string/save"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:minHeight="0dp"
                 android:minWidth="0dp"/>
 
         </LinearLayout>
-
-        <!--<LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/homeHelpButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Home"
-                android:layout_marginLeft="10dp"
-                android:minHeight="0dp"
-                android:minWidth="0dp"/>
-
-            <Button
-                android:id="@+id/todoHelpButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Todo"
-                android:layout_marginLeft="10dp"
-                android:minHeight="0dp"
-                android:minWidth="0dp"/>
-
-            <Button
-                android:id="@+id/notesHelpButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Notes"
-                android:layout_marginLeft="10dp"
-                android:minHeight="0dp"
-                android:minWidth="0dp"/>
-
-            <Button
-                android:id="@+id/notifsHelpButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Notifs"
-                android:layout_marginLeft="10dp"
-                android:minHeight="0dp"
-                android:minWidth="0dp"/>
-
-        </LinearLayout>-->
 
 
     </LinearLayout>

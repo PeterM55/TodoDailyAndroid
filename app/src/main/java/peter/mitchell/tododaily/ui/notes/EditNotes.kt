@@ -9,6 +9,9 @@ import kotlinx.android.synthetic.main.edit_notes.*
 import peter.mitchell.tododaily.R
 import peter.mitchell.tododaily.notesList
 
+/** Edit note activity, this activity allows the user to edit the notes and the title of the note
+ * An index and whether it is a list must be passed in with the intent
+ */
 class EditNotes : AppCompatActivity() {
 
     var isList : Boolean = true
@@ -24,7 +27,7 @@ class EditNotes : AppCompatActivity() {
 
         isList = intent.getBooleanExtra("isList", false)
         fileIndex = intent.getIntExtra("selectedFileIndex", -1)
-        Log.i("-----", "index: ${fileIndex}")
+        Log.i("tdd.editNote", "index: ${fileIndex}")
 
         if (fileIndex != -1) {
             if (isList)
@@ -60,6 +63,9 @@ class EditNotes : AppCompatActivity() {
 
     }
 
+    /** Save the note using notesList's savelist or savenote depending on what was passed in
+     * @return whether it worked
+     */
     fun saveNote() : Boolean {
 
         if (noteTitleTextBox.text.toString().isNullOrEmpty()) { // || noteTextBox.text.toString().isNullOrEmpty()
@@ -85,6 +91,7 @@ class EditNotes : AppCompatActivity() {
         return true
     }
 
+    /** Delete the note currently open *IF* confirmation is given in the dialogue */
     fun deleteNote() {
         if (!confirmedDelete) {
 

@@ -43,7 +43,7 @@
                         android:id="@+id/exportMainRemindersButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Export"
+                        android:text="@string/export"
                         android:layout_marginRight="10dp"
                         android:minHeight="0dp"
                         android:minWidth="0dp"/>
@@ -52,7 +52,7 @@
                         android:id="@+id/selectPastDateButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Pick Date"
+                        android:text="@string/pick_date"
                         android:layout_marginRight="10dp"
                         android:minHeight="0dp"
                         android:minWidth="0dp"/>
@@ -72,8 +72,8 @@
                     android:layout_marginLeft="10dp"
                     android:layout_marginBottom="10dp"
 
-                    android:text="Selected date: "
-                    android:textSize="21dp"
+                    android:text="@string/selected_date"
+                    android:textSize="21sp"
                     android:textColor="@color/textDark"
 
                     app:layout_constraintTop_toBottomOf="@+id/dailyInformationTopBar"
@@ -100,7 +100,7 @@
 
                     <Spinner
                         android:id="@+id/viewValueSelect"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_gravity="center_vertical"
@@ -116,7 +116,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
 
-                        android:text="Show"
+                        android:text="@string/show"
                         android:textSize="16sp" />
 
                 </LinearLayout>
@@ -128,7 +128,7 @@
                     android:layout_margin="5dp"
 
                     android:text=""
-                    android:textSize="20dp"
+                    android:textSize="20sp"
                     android:textColor="@color/textDark"
                     />
 
@@ -149,7 +149,7 @@
                     android:layout_gravity="center_horizontal"
                     android:minHeight="0dp"
 
-                    android:text="Hide"
+                    android:text="@string/hide"
                     android:textSize="16sp" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -159,153 +159,13 @@
                     android:orientation="vertical"
                     ><!--android:paddingBottom="47dp"-->
 
-                    <!--
-
-                                    &lt;!&ndash; Daily &ndash;&gt;
-                                    <TextView
-                                        android:id="@+id/dailyInformationTitle"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_marginLeft="10dp"
-
-                                        android:text="Daily"
-                                        android:textSize="21dp"
-                                        android:textColor="@color/textDark"
-
-                                        app:layout_constraintTop_toBottomOf="@+id/currentDateText"
-                                        app:layout_constraintLeft_toLeftOf="parent"
-                                        />
-
-                                    &lt;!&ndash;<GridView
-                                        android:id="@+id/mainReminders"
-                                        android:layout_height="200dp"
-                                        android:layout_width="wrap_content"
-                                        app:layout_constraintTop_toBottomOf="@+id/dailyInformationTopBar"
-                                        app:layout_constraintLeft_toLeftOf="parent"
-                                        android:numColumns="2"
-                                        />&ndash;&gt;
-                                    <peter.mitchell.tododaily.HelperClasses.TextGridLayout
-                                        android:id="@+id/mainGridLayout"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:columnCount="2"
-
-                                        app:layout_constraintTop_toBottomOf="@+id/dailyInformationTitle"
-                                        app:layout_constraintLeft_toLeftOf="parent"
-                                        />
-
-                                    &lt;!&ndash; Weekly &ndash;&gt;
-                                    <TextView
-                                        android:id="@+id/weeklyInformationTitle"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_marginLeft="10dp"
-                                        android:layout_marginTop="10dp"
-
-                                        android:text="Weekly"
-                                        android:textSize="21dp"
-                                        android:textColor="@color/textDark"
-
-                                        app:layout_constraintTop_toBottomOf="@+id/mainGridLayout"
-                                        app:layout_constraintLeft_toLeftOf="parent"
-                                        />
-
-                                    <peter.mitchell.tododaily.HelperClasses.TextGridLayout
-                                        android:id="@+id/weeklyGridLayout"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:columnCount="2"
-
-                                        app:layout_constraintTop_toBottomOf="@+id/weeklyInformationTitle"
-                                        app:layout_constraintLeft_toLeftOf="parent"
-                                        />
-
-                                    &lt;!&ndash; Monthly &ndash;&gt;
-                                    <TextView
-                                        android:id="@+id/monthlyInformationTitle"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_marginLeft="10dp"
-                                        android:layout_marginTop="10dp"
-
-                                        android:text="Monthly"
-                                        android:textSize="21dp"
-                                        android:textColor="@color/textDark"
-
-                                        app:layout_constraintTop_toBottomOf="@+id/weeklyGridLayout"
-                                        app:layout_constraintLeft_toLeftOf="parent"
-                                        />
-
-                                    <peter.mitchell.tododaily.HelperClasses.TextGridLayout
-                                        android:id="@+id/monthlyGridLayout"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:columnCount="2"
-
-                                        app:layout_constraintTop_toBottomOf="@+id/monthlyInformationTitle"
-                                        app:layout_constraintLeft_toLeftOf="parent"
-                                        />
-
-                                    &lt;!&ndash; Yearly &ndash;&gt;
-                                    <TextView
-                                        android:id="@+id/yearlyInformationTitle"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_marginLeft="10dp"
-                                        android:layout_marginTop="10dp"
-
-                                        android:text="Yearly"
-                                        android:textSize="21dp"
-                                        android:textColor="@color/textDark"
-
-                                        app:layout_constraintTop_toBottomOf="@+id/monthlyGridLayout"
-                                        app:layout_constraintLeft_toLeftOf="parent"
-                                        />
-
-                                    <peter.mitchell.tododaily.HelperClasses.TextGridLayout
-                                        android:id="@+id/yearlyGridLayout"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:columnCount="2"
-
-                                        app:layout_constraintTop_toBottomOf="@+id/yearlyInformationTitle"
-                                        app:layout_constraintLeft_toLeftOf="parent"
-                                        />
-
-                                    &lt;!&ndash; Never &ndash;&gt;
-                                    <TextView
-                                        android:id="@+id/neverInformationTitle"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_marginLeft="10dp"
-                                        android:layout_marginTop="10dp"
-
-                                        android:text="Never"
-                                        android:textSize="21dp"
-                                        android:textColor="@color/textDark"
-
-                                        app:layout_constraintTop_toBottomOf="@+id/yearlyGridLayout"
-                                        app:layout_constraintLeft_toLeftOf="parent"
-                                        />
-
-                                    <peter.mitchell.tododaily.HelperClasses.TextGridLayout
-                                        android:id="@+id/neverGridLayout"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:columnCount="2"
-
-                                        app:layout_constraintTop_toBottomOf="@+id/neverInformationTitle"
-                                        app:layout_constraintLeft_toLeftOf="parent"
-                                        />
-                    -->
-
                     <!-- Add new -->
 
                     <EditText
                         android:id="@+id/newReminderName"
                         android:layout_width="200dp"
                         android:layout_height="60dp"
-                        android:hint="Information Name"
+                        android:hint="@string/information_name_input_text"
                         android:textColor="@color/textDark"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintLeft_toLeftOf="parent"

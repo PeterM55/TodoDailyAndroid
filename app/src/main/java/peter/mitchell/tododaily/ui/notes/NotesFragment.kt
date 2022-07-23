@@ -18,6 +18,9 @@ import peter.mitchell.tododaily.HelperClasses.NotesList
 import peter.mitchell.tododaily.databinding.FragmentNotesBinding
 import peter.mitchell.tododaily.ui.notifications.NotificationsFragmentDirections
 
+/** The fragment for basic notes functionality, showing the list of titles of the notes and lists
+ * editing and moving the notes is handled by EditNotes and ManageNotes respectively
+ */
 class NotesFragment : Fragment() {
 
     private lateinit var _binding: FragmentNotesBinding
@@ -40,6 +43,9 @@ class NotesFragment : Fragment() {
         return root
     }
 
+    /** refreshes the notes list, using the information from notesList.notesFiles and
+     * notesList.listsFiles
+     */
     fun refreshNotes() {
         var titles : ArrayList<String> = ArrayList()
         titles.add("Notes")

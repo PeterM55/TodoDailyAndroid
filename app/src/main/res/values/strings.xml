@@ -12,6 +12,35 @@
     <string name="confirmButton">✔</string>
     <string name="cancelButton">-</string>
     <string name="manageDailyInformationButton">Manage</string>
+    <string name="homeTitle">Home</string>
+    <string name="quickTimerButton">T</string>
+    <string name="helpButton">\?</string>
+    <string name="settingsButton">⚙</string>
+    <string name="leftArrow">◀</string>
+    <string name="delete">Delete</string>
+    <string name="save">Save</string>
+    <string name="editNoteTitle">Edit Note</string>
+    <string name="titleInput">Title (Can\'t be blank)</string>
+    <string name="todo_section">Todo Section:</string>
+    <string name="todo_position">Todo Position:</string>
+    <string name="todo_title">Todo Title:</string>
+    <string name="todo_title_input_text">todo title</string>
+    <string name="submit">Submit</string>
+    <string name="add">+</string>
+    <string name="export">Export</string>
+    <string name="pick_date">Pick Date</string>
+    <string name="selected_date">Selected date:</string>
+    <string name="show">Show</string>
+    <string name="hide">Hide</string>
+    <string name="information_name_input_text">Information Name</string>
+    <string name="new_element">New</string>
+    <string name="delete_all">Delete All</string>
+    <string name="notesTitle">Notes</string>
+    <string name="notificationsTitle">Notifs</string>
+    <string name="export_all">Export All</string>
+    <string name="index">Index:</string>
+    <string name="settingsTitle">Settings</string>
+    <string name="resetbutton">Reset</string>
 
     <string-array name="informationFormats">
         <item>Check box</item>

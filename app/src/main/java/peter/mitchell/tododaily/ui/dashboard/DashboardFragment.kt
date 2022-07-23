@@ -22,6 +22,7 @@ import peter.mitchell.tododaily.databinding.FragmentDashboardBinding
 import peter.mitchell.tododaily.ui.home.ManageDailyNotifications
 import peter.mitchell.tododaily.ui.notes.NotesFragmentDirections
 
+/** The to-do fragment, handling the user presentation and input of the to-do list */
 class DashboardFragment : Fragment() {
 
     private lateinit var _binding: FragmentDashboardBinding
@@ -51,6 +52,7 @@ class DashboardFragment : Fragment() {
         return root
     }
 
+    /** Reload the to-do list, remaking it */
     private fun reloadTodoList() {
         _binding.todoListsVisual.setCustomColumnCount(todoColumns)
         _binding.todoListsVisual.setTextSize(todoTextSize)
@@ -75,6 +77,11 @@ class DashboardFragment : Fragment() {
 
     }
 
+    /** Opens an EditTodo activity with the given index
+     *
+     * @param i the section to edit
+     * @param j the index IN the section to edit
+     */
     private fun openEditTodo(i : Int, j : Int) {
         val intent = Intent(activity as Context, EditTodo::class.java)
         intent.putExtra("indexi", i)

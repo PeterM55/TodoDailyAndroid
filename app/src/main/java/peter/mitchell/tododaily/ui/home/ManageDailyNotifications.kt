@@ -26,9 +26,12 @@ import java.io.File
 import java.lang.NumberFormatException
 import java.time.LocalDate
 
+/** Manage daily notifications is an activity that handles managing the information displayed on the
+ * home page. This includes rearranging, deleting, importing, and exporting.
+ *
+ */
 class ManageDailyNotifications : AppCompatActivity() {
 
-    //var allTitles : ArrayList<String> = ArrayList()
     var datesList : ArrayList<String> = ArrayList()
     var deleteMultipleMode : Boolean = false
     private lateinit var imm: InputMethodManager
@@ -42,7 +45,7 @@ class ManageDailyNotifications : AppCompatActivity() {
     var importVisible : Boolean = false
     var exportVisible : Boolean = false
 
-    val exportPresetsFile = File("/data/data/peter.mitchell.tododaily/files/exportPresets.txt")
+    private val exportPresetsFile = File("${internalDataPath}exportPresets.txt")
     class ExportPresetFormat(nameIn : String, lineLabelsIn : Boolean, customIn : Boolean, exportStringIn : String) {
         var name : String = nameIn;
         var lineLabels : Boolean = lineLabelsIn;
@@ -192,7 +195,6 @@ class ManageDailyNotifications : AppCompatActivity() {
                 position: Int,
                 id: Long
             ) {
-                Log.i("======", "'you' selected: $position")
                 setExportPresetsInputPosition(position)
             }
 
@@ -243,6 +245,7 @@ class ManageDailyNotifications : AppCompatActivity() {
         // end of onCreateView
     }
 
+    /** Reloads the current titles sections for deleting and rearranging the main information */
     private fun reloadCurrentTitles() {
 
         var informationViewList = ArrayList<String>()
@@ -274,6 +277,7 @@ class ManageDailyNotifications : AppCompatActivity() {
         }
     }
 
+    /** Reloads what is visible and what is not, hiding closed sections */
     private fun reloadVisibilities() {
 
         if (addDatesVisible && (currentTitlesVisible || rearrangeTitlesVisible || manageDatesVisible)) {
@@ -341,9 +345,8 @@ class ManageDailyNotifications : AppCompatActivity() {
             exportOptionsExpandButton.setText("◀")
     }
 
+    /** Uses the dateslist to setup the manage dates section to delete dates*/
     private fun setupDates() {
-
-        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, datesList)
         manageDatesList.setAdapter(this,datesList)
 
         for (i in 0 until datesList.size) {
@@ -380,6 +383,12 @@ class ManageDailyNotifications : AppCompatActivity() {
         }
     }
 
+    /** Deletes the date specified, and if specified all after that date will be deleted too
+     *
+     * @param dateIndex the index to delete
+     * @param andAllAfter whether to delete the dates before this date (further in the past, or
+     * after in the list)
+     */
     private fun deleteDate(dateIndex : Int, andAllAfter : Boolean) {
 
         if (tempFile.exists()) {
@@ -415,6 +424,7 @@ class ManageDailyNotifications : AppCompatActivity() {
 
     }
 
+    /** Deletes all dates */
     private fun deleteAllDates() {
         if (dailyInformationFile.exists()) {
             dailyInformationFile.writeText(saveInformation.toString()+"\n")
@@ -461,6 +471,9 @@ class ManageDailyNotifications : AppCompatActivity() {
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
     }
 
+    /** Reloads the export presets input, collecting all of the export preset names and adding * to
+     * the default
+     */
     private fun reloadExportPresetsInput() {
         var exportPresetNames = ArrayList<String>()
         for (i in 0 until exportPresets.size) {
@@ -473,10 +486,13 @@ class ManageDailyNotifications : AppCompatActivity() {
         exportPresetsInput.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, exportPresetNames)
     }
 
+    /** Sets the position of the export preset spinner and reloads the other visibilities
+     *
+     * @param position the new position (index of the spinner)
+     */
     private fun setExportPresetsInputPosition(position : Int) {
         if (position < 0) return
         if (position >= exportPresets.size) return
-        Log.i("======", "position set to: $position")
 
         labelExportCheck.isChecked = exportPresets[position].lineLabels
         if (exportPresets[position].custom) {
@@ -494,6 +510,7 @@ class ManageDailyNotifications : AppCompatActivity() {
 
     }
 
+    /** Asks for confirmation to import, then calls importData in SaveInformation */
     private  fun importSubmit() {
 
         MaterialAlertDialogBuilder(this).setTitle("Are you sure?")
@@ -504,6 +521,9 @@ class ManageDailyNotifications : AppCompatActivity() {
             }.show()
     }
 
+    /** Exports the data using the preset specified, most of the work is done in the
+     * exportDailyInformation in MainActivity. This also saves the preset is specified.
+     */
     private fun customExportSubmit() {
         exportDailyInformation(
             this, this,
@@ -520,6 +540,7 @@ class ManageDailyNotifications : AppCompatActivity() {
         }
     }
 
+    /** Save an export preset, add it to the list, save it, and reload the view */
     private fun saveExportPresetPressed() {
         if (selectedPreset == 0) {
 
@@ -575,6 +596,9 @@ class ManageDailyNotifications : AppCompatActivity() {
         }
     }
 
+    /** Reads the list of export presets from the file exportPresetsFile, overwriting the current
+     * ones
+     */
     private fun readExportPresets() {
         exportPresets = defaultExportPresets.clone() as ArrayList<ExportPresetFormat>
 
@@ -582,7 +606,6 @@ class ManageDailyNotifications : AppCompatActivity() {
             defaultPreset = 1
             selectedPreset = defaultPreset
             reloadExportPresetsInput()
-            Log.i("======", "position set try: $selectedPreset")
             setExportPresetsInputPosition(selectedPreset)
             return
         } else {
@@ -616,6 +639,7 @@ class ManageDailyNotifications : AppCompatActivity() {
 
     }
 
+    /** Saves the export presets to the file exportPresetsFile (doesn't save the defaults) */
     private fun saveExportPresets() {
         if (!exportPresetsFile.exists()) {
             exportPresetsFile.parentFile!!.mkdirs()
@@ -633,11 +657,7 @@ class ManageDailyNotifications : AppCompatActivity() {
         reloadVisibilities()
     }
 
-    private fun backToHome() {
-        finish()
-    }
-
     override fun onBackPressed() {
-        backToHome()
+        finish()
     }
 }

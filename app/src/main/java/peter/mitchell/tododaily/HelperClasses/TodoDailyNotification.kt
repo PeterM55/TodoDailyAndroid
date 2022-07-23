@@ -1,26 +1,17 @@
 package peter.mitchell.tododaily.HelperClasses
 
-import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import androidx.core.app.NotificationCompat
 import peter.mitchell.tododaily.*
 import peter.mitchell.tododaily.ui.notifications.DailyNotifications
-import peter.mitchell.tododaily.ui.notifications.channelID
-import java.time.LocalDateTime
 
-
-//val notificationChannel : NotificationChannel;
-
-
+/** When the snooze button on a notification is pressed, onReceive of this class is called
+ * Snooze will call snoozeTimer from DailyNotifications
+ * @see DailyNotifications
+ * @see NotifWorker (calls the initial notification)
+ */
 class TodoDailyNotification : BroadcastReceiver() {
-
-    init {
-    }
-
-    //lateinit var copyDailyNotifications : DailyNotifications
 
     override fun onReceive(context : Context, intent : Intent?) {
 

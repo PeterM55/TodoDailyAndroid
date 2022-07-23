@@ -11,6 +11,9 @@ import android.widget.Toast
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import peter.mitchell.tododaily.*
 import peter.mitchell.tododaily.HelperClasses.NotifWorker
 import peter.mitchell.tododaily.HelperClasses.TodoDailyNotification
@@ -20,14 +23,16 @@ import java.util.concurrent.TimeUnit
 
 const val channelID = "todoDailyNotificationChannel"
 
+/** Daily notifications handles all of the notifications for the application, allowing for the
+ * creation, management, and deletion of one-time and daily notifications. System notifications can
+ * also be created, but those are just one time notifications the user cannot create.
+ */
 class DailyNotifications(context : Context) {
 
-    lateinit var alarmManager : AlarmManager
+    var alarmManager : AlarmManager
 
     private val channelName = "dailyNotificationChannel"
     private val channelDescription = "The channel for sending daily notifications"
-
-    private var scheduledNotificationIntent : PendingIntent? = null
 
     init {
         val channel = NotificationChannel(channelID, channelName, NotificationManager.IMPORTANCE_DEFAULT)
@@ -36,14 +41,6 @@ class DailyNotifications(context : Context) {
         notificationManager.createNotificationChannel(channel)
 
         alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-
-        /*if (alarmManager.nextAlarmClock != null) {
-            Toast.makeText(context, "Next alarm in: ${(alarmManager.nextAlarmClock.triggerTime-System.currentTimeMillis())/1000} seconds", Toast.LENGTH_SHORT).show()
-            Log.i("DailyNotifications", "Next alarm at: ${(LocalDateTime.ofEpochSecond(alarmManager.nextAlarmClock.triggerTime/1000,
-                (alarmManager.nextAlarmClock.triggerTime%1000).toInt(), ZoneId.systemDefault().rules.getOffset(Instant.now())).toString())}")
-        } else {
-            Log.i("DailyNotifications", "no alarm scheduled")
-        }*/
     }
 
     var dailyNotificationsLength = 0
@@ -60,6 +57,17 @@ class DailyNotifications(context : Context) {
 
     var isSystemNotification : ArrayList<Boolean> = ArrayList()
 
+    /** Adds a daily notification with the information given.
+     * If another notification is at the same time it is not created and it returns false
+     *
+     * @param name the name of the notification
+     * @param time the time of the notification
+     * @param title the title of the notification, shown in the notification
+     * @param desc the description of the notification, shown in the notification
+     * @param swappingIndex removes the one time notification at that index, so a one-time can be
+     * moved to daily
+     * @return whether it worked
+     */
     fun addDailyNotification(name : String, time : LocalTime, title : String, desc : String, swappingIndex : Int = -1) : Boolean {
         for (i in 0 until dailyNotificationsLength) {
             if (time == dailyNotificationTimes[i]) {
@@ -85,6 +93,17 @@ class DailyNotifications(context : Context) {
         return true
     }
 
+    /** Adds a one-time notification with the information given.
+     * If another notification is at the same time it is not created and it returns false
+     *
+     * @param name the name of the notification
+     * @param time the date and time of the notification
+     * @param title the title of the notification, shown in the notification
+     * @param desc the description of the notification, shown in the notification
+     * @param swappingIndex removes the daily notification at that index, so a daily can be
+     * moved to one-time
+     * @return whether it worked
+     */
     fun addOneTimeNotification(name : String, time : LocalDateTime, title : String, desc : String, swappingIndex : Int = -1) : Boolean {
         for (i in 0 until oneTimeNotificationsLength) {
             if (time == oneTimeNotificationTimes[i]) {
@@ -111,6 +130,16 @@ class DailyNotifications(context : Context) {
         return true
     }
 
+    /** Sets the daily notification at that index using the information given.
+     * If another notification is at the same time it will not be changed and it returns false
+     *
+     * @param iIn the index to change
+     * @param name the name of the notification
+     * @param time the time of the notification
+     * @param title the title of the notification, shown in the notification
+     * @param desc the description of the notification, shown in the notification
+     * @return whether it worked
+     */
     fun setDailyNotification(iIn : Int, name : String, time : LocalTime, title : String, desc : String) : Boolean {
         for (i in 0 until dailyNotificationsLength) {
             if (iIn == i) continue
@@ -130,6 +159,16 @@ class DailyNotifications(context : Context) {
         return true
     }
 
+    /** Sets the one-time notification at that index using the information given.
+     * If another notification is at the same time it will not be changed and it returns false
+     *
+     * @param iIn the index to change
+     * @param name the name of the notification
+     * @param time the date and time of the notification
+     * @param title the title of the notification, shown in the notification
+     * @param desc the description of the notification, shown in the notification
+     * @return whether it worked
+     */
     fun setOneTimeNotification(iIn : Int, name : String, time : LocalDateTime, title : String, desc : String) : Boolean {
         for (i in 0 until oneTimeNotificationsLength) {
             if (iIn == i) continue
@@ -149,6 +188,10 @@ class DailyNotifications(context : Context) {
         return true
     }
 
+    /** Gets the date and time of the next notification, if none returns null
+     *
+     * @return the date and time of the next notification, if none returns null
+     */
     fun getNextNotificationTime() : LocalDateTime? {
 
         var nextNotification : LocalDateTime? = null
@@ -177,10 +220,19 @@ class DailyNotifications(context : Context) {
         return nextNotification
     }
 
+    /** Changes the one time notification at the given index to be a system notification.
+     * This should never be done by the user.
+     *
+     * @param i the index to set to a system notification
+     */
     fun setSystemNotification(i : Int) {
         isSystemNotification[i] = true
     }
 
+    /** Remove the daily notification at the index and decrement the length
+     *
+     * @param i the daily index to remove
+     */
     fun removeDailyNotification(i : Int) {
         dailyNotificationNames.removeAt(i)
         dailyNotificationTimes.removeAt(i)
@@ -189,6 +241,10 @@ class DailyNotifications(context : Context) {
         dailyNotificationsLength--
     }
 
+    /** Remove the daily notification at the index and decrement the length
+     *
+     * @param i the daily index to remove
+     */
     fun removeOneTimeNotification(i : Int) {
         oneTimeNotificationNames.removeAt(i)
         oneTimeNotificationTimes.removeAt(i)
@@ -198,6 +254,11 @@ class DailyNotifications(context : Context) {
         oneTimeNotificationsLength--
     }
 
+    /** Moves the daily notification from the first index to the second
+     *
+     * @param i the first index, moved *from*
+     * @param to the second index, moved *to*
+     */
     fun dailyMoveFrom(i : Int, to : Int) {
 
         if (i == to || i >= dailyNotificationsLength || to >= dailyNotificationsLength) return
@@ -239,6 +300,11 @@ class DailyNotifications(context : Context) {
 
     }
 
+    /** Moves the one-time notification from the first index to the second
+     *
+     * @param i the first index, moved *from*
+     * @param to the second index, moved *to*
+     */
     fun oneTimeMoveFrom(i : Int, to : Int) {
 
         if (i == to || i >= oneTimeNotificationsLength || to >= oneTimeNotificationsLength) return
@@ -285,10 +351,6 @@ class DailyNotifications(context : Context) {
 
     }
 
-    fun totalLength() : Int {
-        return dailyNotificationsLength + oneTimeNotificationsLength
-    }
-
     fun resetData() {
         dailyNotificationsLength = 0
         dailyNotificationNames = ArrayList()
@@ -304,10 +366,19 @@ class DailyNotifications(context : Context) {
         isSystemNotification = ArrayList()
     }
 
+    /** Gets the formatted string for a one time notification (name: date - time)
+     *
+     * @param i the index to get
+     * @return the formatted string (name: date - time)
+     */
     public fun getOneTimeString(i : Int) : String {
         return "${oneTimeNotificationNames[i]}: ${oneTimeNotificationTimes[i].toLocalDate().toString()} - ${oneTimeNotificationTimes[i].toLocalTime().toString()}"
     }
 
+    /** Takes in the notification information from the string given,resetting the object first
+     *
+     * @param str the string to read
+     */
     public fun fromString(str : String) {
         resetData()
         Log.i("tdd.DailyNitifications.fromString", str)
@@ -316,7 +387,7 @@ class DailyNotifications(context : Context) {
         var j : Int = 0
         var lineNum : Int = 0
         var readingString = false
-        var currentString = StringBuilder()
+        val currentString = StringBuilder()
 
         while (i < str.length) {
 
@@ -378,6 +449,10 @@ class DailyNotifications(context : Context) {
         }
     }
 
+    /** outputs the notification content to a string, with a format that fromString can use
+     *
+     * @return the string representation of the object
+     */
     public override fun toString() : String {
         var returnString : StringBuilder = StringBuilder()
 
@@ -389,37 +464,47 @@ class DailyNotifications(context : Context) {
             returnString.append("\"${oneTimeNotificationNames[i]}\",${oneTimeNotificationTimes[i].toString()},\"${oneTimeNotificationTitles[i]}\",\"${oneTimeNotificationDescriptions[i]}\",${isSystemNotification[i]},")
         }
 
-        //Log.i("tdd.DailyNitifications.toString", returnString.toString())
-
         return returnString.toString()
     }
 
+    /** Snoozes the timer for the snooze time in the settings
+     *
+     * @param i the index to snooze
+     * @param isOneTime whether it is a one-time notification
+     * @param snoozeName the name of the snoozed notification
+     * @param snoozeTitle the title of the notification to be displayed in the notification
+     * @param snoozeDesc the description of the notification to be displayed in the notification
+     */
     public fun snoozeTimer(i : Int, isOneTime : Boolean, snoozeName : String, snoozeTitle : String, snoozeDesc : String) {
         if (i == -1) return
 
-        var newName = ""
-        if (isOneTime) {
-            newName = "$i-"+oneTimeNotificationNames[i]+"-Snoozed"
-        } else {
-            newName = "$i-"+dailyNotificationNames[i]+"-Snoozed"
-        }
+        val newName = "$i-$snoozeName-Snoozed"
 
-        for (i in 0 until oneTimeNotificationsLength) {
-            if (isSystemNotification[i] && oneTimeNotificationNames[i] == newName) {
-                // extend the time because it already exists
-                oneTimeNotificationTimes[i] = LocalDateTime.now().plusMinutes(snoozeTime.toLong())
-                return
+        var tempSnoozeTime = -1
+
+        if (settingsBackupFile.exists()) {
+            settingsBackupFile.forEachLine {
+                val splitTitle = it.split(" ")[0]
+                val splitValue = it.split(" ")[1]
+
+                if (splitTitle == "snoozeTime") tempSnoozeTime = splitValue.toInt()
             }
         }
 
+        if (tempSnoozeTime == -1) tempSnoozeTime = snoozeTime
+
         if (isOneTime) {
-            addOneTimeNotification("$i-"+oneTimeNotificationNames[i]+"-Snoozed", LocalDateTime.now().plusMinutes(snoozeTime.toLong()), oneTimeNotificationTitles[i], oneTimeNotificationDescriptions[i])
+            addOneTimeNotification(newName, LocalDateTime.now().plusMinutes(snoozeTime.toLong()), snoozeTitle, snoozeDesc)
         } else {
-            addOneTimeNotification("$i-"+dailyNotificationNames[i]+"-Snoozed", LocalDateTime.now().plusMinutes(snoozeTime.toLong()), dailyNotificationTitles[i], dailyNotificationDescriptions[i])
+            addOneTimeNotification(newName, LocalDateTime.now().plusMinutes(snoozeTime.toLong()), snoozeTitle, snoozeDesc)
         }
 
         setSystemNotification(oneTimeNotificationsLength-1)
 
+        // if the app is currently open, refresh the notification view
+        CoroutineScope(Dispatchers.Main).launch {
+            notifFragment?.onResume()
+        }
     }
 
     /**
@@ -475,7 +560,6 @@ class DailyNotifications(context : Context) {
         var secondsToTimer : Long = ChronoUnit.SECONDS.between(LocalDateTime.now(),nextNotification)
 
         val testWorkTag = "notificationDailyTag"
-        //Toast.makeText(context, "${nextNotification.toString()} is in $secondsToTimer seconds", Toast.LENGTH_SHORT).show()
 
         val notificationWork : OneTimeWorkRequest = OneTimeWorkRequest.Builder(NotifWorker::class.java)
             .setInitialDelay(secondsToTimer, TimeUnit.SECONDS)
@@ -490,15 +574,11 @@ class DailyNotifications(context : Context) {
         }
         nextNotificationIntentFile.writeText(notificationIndex.toString())
 
-        Log.i("tdd-refreshNotifs", "Next alarm (${nextNotification.toLocalTime().toString()}) in: ${secondsToTimer} seconds")
-        //Toast.makeText(context, "Next alarm in: ${(timeToTimer-System.currentTimeMillis())/1000} seconds", Toast.LENGTH_SHORT).show()
-
         saveNotifications(this)
     }
 
-    fun deletePastOneTimeAlarms() {
-
-        Log.i("tdd.deletePastOneTimes", "Deleting past one times")
+    /** Goes through the one-time notifications and deletes all notifications in the past */
+    private fun deletePastOneTimeAlarms() {
 
         var i : Int = 0
 
@@ -514,34 +594,3 @@ class DailyNotifications(context : Context) {
     }
 
 }
-
-
-/*
-public fun createNotification(context : Context, time : LocalTime) {
-
-        // this is the intent that is run
-        val intent = Intent(context, TodoDailyNotification::class.java)
-
-            // this sets a pending intent?
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            notificationIndex++,
-            intent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
-
-        // Set an alarm to start the intent
-        //val time = System.currentTimeMillis()+3000;
-        //val timeToTimer : Long = time.toEpochSecond(LocalDate.now(), ZoneId.systemDefault().rules.getOffset(Instant.now()))
-        val testTime : LocalDateTime = time.atDate(LocalDate.now())
-        val timeToTimer : Long = testTime.toEpochSecond(ZoneId.systemDefault().rules.getOffset(Instant.now()))*1000
-
-
-        //val timeToTimer = System.currentTimeMillis()+3000;
-        alarmManager.setAndAllowWhileIdle(//setExactAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP,
-            timeToTimer,
-            pendingIntent
-        )
-    }
- */

@@ -5,6 +5,7 @@ import peter.mitchell.tododaily.settingsFile
 import peter.mitchell.tododaily.todosFile
 import java.lang.StringBuilder
 
+/** holds an array of titles, and the contents of each section of the to-do list. */
 class TodoLists {
 
     private var sectionTitles : ArrayList<String> = ArrayList(5)
@@ -14,66 +15,133 @@ class TodoLists {
         readTodos()
     }
 
+    /** Adds a section with the provided name
+     *
+     * @param title the title of the section to add
+     */
     fun addSection(title : String) {
         sectionTitles.add(title)
         sectionTodos.add(ArrayList(10))
         saveTodos()
     }
 
-    fun addTodo(i : Int, todo : String) {
-        sectionTodos[i].add(todo)
+    /** Add the string to the section specified
+     *
+     * @param i the section index to it to
+     * @param todo1 the to-do to add to the section
+     */
+    fun addTodo(i : Int, todo1 : String) {
+        sectionTodos[i].add(todo1)
         saveTodos()
     }
 
+    /** remove the to-do at the index specified
+     *
+     * @param i the section index
+     * @param j the index in the section
+     */
     fun removeTodo(i : Int, j : Int) {
         sectionTodos[i].removeAt(j)
         saveTodos()
     }
 
-    fun setTodo(i : Int, j : Int, todo : String) {
-        sectionTodos[i][j] = todo
+    /** Set the to-do at the index specify
+     *
+     * @param i the section index
+     * @param j the index in the section
+     * @param todo1 the new text
+     */
+    fun setTodo(i : Int, j : Int, todo1 : String) {
+        sectionTodos[i][j] = todo1
         saveTodos()
     }
 
+    /** get the title section at the index
+     *
+     * @param i the section index
+     * @return the section title
+     */
     fun getSectionTitle(i : Int) : String {
         return sectionTitles[i]
     }
 
+    /** set the section title at the index
+     *
+     * @param i the section index
+     * @param str the new section title
+     */
     fun setSectionTitle(i : Int, str : String) {
         sectionTitles[i]  = str
         saveTodos()
     }
 
+    /** Remove a section
+     *
+     * @param i the section index
+     */
     fun removeSection(i : Int) {
         sectionTitles.removeAt(i)
         sectionTodos.removeAt(i)
         saveTodos()
     }
 
+    /** get all section titles
+     *
+     * @return the arraylist of section titles
+     */
     fun getSectionTitles() : ArrayList<String> {
         return sectionTitles
     }
 
+    /** Get the to-do at the given index
+     *
+     * @param i the section index
+     * @param j the index in the section
+     * @return the to-do content
+     */
     fun getTodo(i : Int, j : Int) : String {
         return sectionTodos[i][j]
     }
 
+    /** Get the to-do arraylist at the given index
+     *
+     * @param i the section index
+     * @return the to-do arraylist
+     */
     fun getTodo(i : Int) : ArrayList<String> {
         return sectionTodos[i]
     }
 
+    /** Get the full to-do arraylist of arraylists of strings
+     *
+     * @return the complete to-do arraylist
+     */
     fun getTodos() : ArrayList<ArrayList<String>> {
         return sectionTodos
     }
 
+    /** Get the number of sections
+     *
+     * @return the number of sections
+     */
     fun getSize() : Int {
         return sectionTitles.size
     }
 
+    /** Get the size of the section
+     *
+     * @return the number of to-dos in the section
+     */
     fun getSize(i : Int) : Int {
         return sectionTodos[i].size
     }
 
+    /** move a to-do from one index to another in the same section
+     *
+     * @param sectionNum the section to edit
+     * @param i the index to be moved from
+     * @param to the index to be moved to
+     */
     public fun moveFrom(sectionNum : Int, i : Int, to : Int) {
 
         if (i == to || i >= sectionTodos[sectionNum].size || to >= sectionTodos[sectionNum].size) return
@@ -101,6 +169,11 @@ class TodoLists {
         saveTodos()
     }
 
+    /** Move a section
+     *
+     * @param i the index to be moved from
+     * @param to the index to be moved to
+     */
     public fun moveSectionFrom(i : Int, to : Int) {
 
         if (i == to || i >= sectionTitles.size || to >= sectionTitles.size) return
@@ -133,6 +206,7 @@ class TodoLists {
         saveTodos()
     }
 
+    /** Reads all of the to-do information from the todosFile file */
     private fun readTodos() {
         if (!todosFile.exists()) {
             return
@@ -180,30 +254,12 @@ class TodoLists {
                     i++
                 }
 
-
-
-
-                /*val splitLine = todoLines[line].split(",")
-                if (splitLine.size <= 1) return
-
-                var splitIndex = 0
-
-                sectionTitles.add(splitLine[splitIndex++])
-                sectionTodos.add(ArrayList(10))
-
-                for (todoNum in splitIndex until splitLine.size) {
-                    if (splitLine[todoNum].isNullOrEmpty()) continue
-
-                    if (todoNum != 1 && splitLine[todoNum-1].get(splitLine[todoNum-1].length-1) == '\\') {
-                        sectionTodos[sectionTodos.size-1][sectionTitles.size-1] += ","+splitLine[splitIndex++]
-                    } else
-                        sectionTodos[sectionTodos.size-1].add(splitLine[todoNum])
-                }*/
             }
         }
     }
 
-    fun saveTodos() {
+    /** Saves all of the to-do information to the todosFile file */
+    private fun saveTodos() {
         if (sectionTitles.size != sectionTodos.size) {
             Log.e("TodoLists", "Sizes are not the same, aborting save")
             return
@@ -221,15 +277,6 @@ class TodoLists {
                 todosFile.appendText("\""+sectionTodos[sectionNum][todoNum].replace("\"","\"\"").replace("\n"," ")+"\",")
             }
             todosFile.appendText("\n")
-        }
-    }
-
-    fun debugTodos() {
-        for (sectionNum in 0 until sectionTitles.size) {
-            Log.i("TodoListsSave-$sectionNum", sectionTitles[sectionNum]+",")
-            for (todoNum in 0 until sectionTodos[sectionNum].size) {
-                Log.i("TodoListsSave-$sectionNum-$todoNum", sectionTodos[sectionNum][todoNum]+",")
-            }
         }
     }
 

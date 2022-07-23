@@ -10,6 +10,7 @@ import kotlinx.android.synthetic.main.edit_todo.*
 import peter.mitchell.tododaily.R
 import peter.mitchell.tododaily.todoLists
 
+/** Edit the to-do element at the index provided by the intent */
 class EditTodo : AppCompatActivity() {
 
     var myIndexI : Int = -1 // -1 = error

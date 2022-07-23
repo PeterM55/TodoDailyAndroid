@@ -40,7 +40,9 @@ import java.lang.StringBuilder
 import java.time.LocalDate
 import kotlin.math.round
 
-
+/** The first fragment opened by the application, used for storing/viewing/tracking the daily
+ * information and tasks to be done daily.
+ */
 class HomeFragment : Fragment() {
 
     private lateinit var _binding: FragmentHomeBinding
@@ -86,17 +88,6 @@ class HomeFragment : Fragment() {
         // --- Dynamic view width (height handled elsewhere) ---
         _binding.newReminderName.maxWidth =
             resources.displayMetrics.widthPixels - (230f * resources.displayMetrics.density).toInt()
-
-        /*binding.mainReminders.onItemClickListener =
-            AdapterView.OnItemClickListener { _, _, position, _ ->
-                if (saveInformation.formats[position] == SaveInformation.InformationFormat.checkBox) {
-                    saveInformation.toggleBox(position)
-                    saveDailyInformationFile()
-                    reloadMainReminders()
-                } else {
-                    showInputDialog(position, saveInformation.names[position] + ": ")
-                }
-            }*/
 
         _binding.newReminderInput.adapter = ArrayAdapter(
             requireContext(),
@@ -397,7 +388,6 @@ class HomeFragment : Fragment() {
                                         stop = true
                                     } else {
                                         linePosition--
-                                        //Log.i("------", "LinePosition: $linePosition")
                                     }
                                 }
                             }
@@ -413,10 +403,7 @@ class HomeFragment : Fragment() {
                 }
             }
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                /*readDailyInformationFile()
-                        reloadMainReminders()*/
-            }
+            override fun onNothingSelected(parent: AdapterView<*>?) { }
         }
     }
 

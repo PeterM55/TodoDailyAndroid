@@ -47,7 +47,7 @@
             android:screenOrientation="user" />
 
         <activity
-            android:name="peter.mitchell.tododaily.ui.notifications.NewNotification"
+            android:name="peter.mitchell.tododaily.ui.notifications.EditNotification"
             android:screenOrientation="user" />
 
         <activity

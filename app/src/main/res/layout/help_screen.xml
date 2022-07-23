@@ -20,7 +20,7 @@
                 android:id="@+id/homeHelpButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Home"
+                android:text="@string/homeTitle"
                 android:layout_marginLeft="10dp"
                 android:minHeight="0dp"
                 android:minWidth="0dp"/>
@@ -29,7 +29,7 @@
                 android:id="@+id/todoHelpButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Todo"
+                android:text="@string/titleTodo"
                 android:layout_marginLeft="10dp"
                 android:minHeight="0dp"
                 android:minWidth="0dp"/>
@@ -38,7 +38,7 @@
                 android:id="@+id/notesHelpButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Notes"
+                android:text="@string/notesTitle"
                 android:layout_marginLeft="10dp"
                 android:minHeight="0dp"
                 android:minWidth="0dp"/>
@@ -47,7 +47,7 @@
                 android:id="@+id/notifsHelpButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Notifs"
+                android:text="@string/notificationsTitle"
                 android:layout_marginLeft="10dp"
                 android:minHeight="0dp"
                 android:minWidth="0dp"/>
@@ -61,7 +61,7 @@
             android:layout_margin="10dp"
 
             android:text=""
-            android:textSize="16dp"
+            android:textSize="16sp"
             android:textColor="@color/textDark"
             />
     </LinearLayout>

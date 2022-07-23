@@ -16,7 +16,10 @@ import peter.mitchell.tododaily.ui.notifications.DailyNotifications
 import peter.mitchell.tododaily.ui.notifications.channelID
 import java.time.LocalDateTime
 
-
+/** This class is simply used as the end to a timer to send a notification
+ * @see DailyNotifications
+ * @see TodoDailyNotification (handles snooze)
+ */
 class NotifWorker(contextIn: Context, workerParams: WorkerParameters) : Worker(contextIn, workerParams) {
 
     var context : Context = contextIn
@@ -41,7 +44,6 @@ class NotifWorker(contextIn: Context, workerParams: WorkerParameters) : Worker(c
             if (fileText.isNotEmpty()) {
 
                 notificationId = fileText.toInt()
-                Log.i("tdd-sendingNotif===0", "$notificationId")
 
                 if (fileText.toInt() >= dailyNotificationsTemp.dailyNotificationsLength) {
                     notificationIndex = fileText.toInt()-dailyNotificationsTemp.dailyNotificationsLength
@@ -67,7 +69,6 @@ class NotifWorker(contextIn: Context, workerParams: WorkerParameters) : Worker(c
             notificationTitle = dailyNotificationsTemp.dailyNotificationTitles[notificationIndex]
             notificationDesc = dailyNotificationsTemp.dailyNotificationDescriptions[notificationIndex]
         }
-        Log.i("tdd-sendingNotif===1", "$notificationTitle - $notificationDesc - $notificationIndex")
 
         // --- Setup the action when the snooze button is pressed ---
         val snoozeIntent = Intent(context, TodoDailyNotification::class.java)

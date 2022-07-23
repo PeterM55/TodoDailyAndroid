@@ -51,6 +51,7 @@ class HelpActivity : AppCompatActivity() {
         reloadText()
     }
 
+    /** Reloads the text to be displayed */
     fun reloadText() {
         if (selectedHelpFragment == fragments.home) {
             mainInformation.setText(helpString)
