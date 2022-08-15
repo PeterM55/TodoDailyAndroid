@@ -41,6 +41,7 @@
     <string name="index">Index:</string>
     <string name="settingsTitle">Settings</string>
     <string name="resetbutton">Reset</string>
+    <string name="appWord">App</string>
 
     <string-array name="informationFormats">
         <item>Check box</item>
