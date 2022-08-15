@@ -137,6 +137,7 @@ class ManageNotes : AppCompatActivity() {
 
         builder.show()
 
+        input.requestFocus()
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
 
     }
@@ -172,6 +173,7 @@ class ManageNotes : AppCompatActivity() {
 
         builder.show()
 
+        input.requestFocus()
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
 
     }
