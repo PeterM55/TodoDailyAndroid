@@ -35,6 +35,12 @@ class NotesFragment : Fragment() {
         val root: View = binding.root
         mainBinding?.fragmentLabel?.setText("Notes")
 
+        if (darkMode)
+            _binding.mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundDark))
+        else
+            _binding.mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundLight))
+
+
         _binding.manageNotesButton.setOnClickListener {
             val intent = Intent(requireContext(), ManageNotes::class.java)
             startActivity(intent)
@@ -96,6 +102,11 @@ class NotesFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+
+        if (darkMode)
+            _binding.mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundDark))
+        else
+            _binding.mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundLight))
 
         if (!notesShown) {
             val action = NotesFragmentDirections.actionNavigationNotesToNavigationHome()

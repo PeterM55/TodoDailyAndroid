@@ -34,11 +34,39 @@ class ManageNotes : AppCompatActivity() {
         setContentView(R.layout.manage_notes)
         imm = this.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
+        if (darkMode)
+            mainBackgroundManageNotes.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundDark))
+        else
+            mainBackgroundManageNotes.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundLight))
+
+
         manageNotesTextGrids.setupTitles(arrayListOf(
                 "Rearrange Notes", "Rearrange Lists", "Export Note", "Export List",
             )
         )
 
+        reloadManageNotes()
+
+        exportAllNotesButton.setOnClickListener {
+
+            for (i in 0 until notesList!!.notesFiles.size) {
+                if (i == 0 && !attemptExport(exportPath+notesList!!.notesFiles[i]+".txt", notesList!!.readNote(i))) {
+                    Toast.makeText(this, "Export failed.", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                } else
+                    attemptExport(exportPath+notesList!!.notesFiles[i]+".txt", notesList!!.readNote(i))
+            }
+
+            for (i in 0 until notesList!!.listsFiles.size) {
+                attemptExport(exportPath+notesList!!.listsFiles[i]+".txt", notesList!!.readList(i))
+            }
+
+        }
+
+        // end of onCreateView
+    }
+
+    private fun reloadManageNotes() {
         manageNotesTextGrids.sectionGrids[0].setCustomColumnCount(notesColumns)
         manageNotesTextGrids.sectionGrids[1].setCustomColumnCount(listsColumns)
         manageNotesTextGrids.sectionGrids[2].setCustomColumnCount(notesColumns)
@@ -86,24 +114,6 @@ class ManageNotes : AppCompatActivity() {
                 exportListDialog(i)
             }
         }
-
-        exportAllNotesButton.setOnClickListener {
-
-            for (i in 0 until notesList!!.notesFiles.size) {
-                if (i == 0 && !attemptExport(exportPath+notesList!!.notesFiles[i]+".txt", notesList!!.readNote(i))) {
-                    Toast.makeText(this, "Export failed.", Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                } else
-                    attemptExport(exportPath+notesList!!.notesFiles[i]+".txt", notesList!!.readNote(i))
-            }
-
-            for (i in 0 until notesList!!.listsFiles.size) {
-                attemptExport(exportPath+notesList!!.listsFiles[i]+".txt", notesList!!.readList(i))
-            }
-
-        }
-
-        // end of onCreateView
     }
 
     /** Allows a note to be moved from one index to another, a dialogue will be shown to take the
@@ -162,6 +172,7 @@ class ManageNotes : AppCompatActivity() {
 
             try {
                 notesList!!.moveListFrom(i, input.text.toString().toInt()-1)
+
             } catch (e : Exception) {
                 Toast.makeText(this, "Out of range.", Toast.LENGTH_SHORT).show()
             }

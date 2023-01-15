@@ -41,6 +41,12 @@ class NotificationsFragment : Fragment() {
         val root: View = binding.root
         mainBinding?.fragmentLabel?.setText("Notifications")
 
+        if (darkMode)
+            _binding.mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundDark))
+        else
+            _binding.mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundLight))
+
+
         // ----- Setup Buttons -----
         _binding.oneTimeNotificationsButton.setOnClickListener {
             val intent = Intent(activity as Context, EditNotification::class.java)

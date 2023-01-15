@@ -9,7 +9,7 @@ class HelpActivity : AppCompatActivity() {
 
     val appString : String =
 """
-Creator: Peter Mitchell - Petergmitchell55@gmail.com
+Creator: Peter Mitchell - tododaily55@gmail.com
 
 Main Information:
 	"TodoDaily" was created as a way for me to track daily information and remind me of daily events with notifications, as I could not find an app fitting the description that worked for my uses. In development, I also decided to add the ability to store a to-do list and notes in the app, as they are simple additions that I find helpful to have all in one place. These sections can be disabled if desired. 
@@ -90,6 +90,12 @@ Quick notifications and snoozing:
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.help_screen)
+
+        if (darkMode)
+            mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundDark))
+        else
+            mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundLight))
+
 
         //oneTimeNotification = intent.getBooleanExtra("oneTimeNotification", false)
 

@@ -64,6 +64,8 @@ var selectHoldText = true
 var exportLabelLine = true
 var exportOrderDefault = "v"
 var exportCustomDefault = ""
+var checkedString = "1"
+var unCheckedString = "0"
 // --- to-do ---
 var todoShown = true
 var todoColumns = 3
@@ -241,7 +243,9 @@ fun readTodaysDailyInformationFile() {
         return
     } else {
 
-        var latestLine: String = dailyInformationFile.inputStream().bufferedReader().readLine()
+        var testBuffer = dailyInformationFile.inputStream().bufferedReader()
+        if (!testBuffer.ready()) return
+        var latestLine: String = testBuffer.readLine()
 
         if (latestLine.isNullOrEmpty())
             return
@@ -249,11 +253,11 @@ fun readTodaysDailyInformationFile() {
 
         if (latestDate != LocalDate.now()) {
             saveInformation.copySetup(
-                dailyInformationFile.inputStream().bufferedReader().readLine()
+                latestLine
             )
         } else {
             saveInformation.fromString(
-                dailyInformationFile.inputStream().bufferedReader().readLine()
+                latestLine
             )
         }
 
@@ -404,6 +408,8 @@ fun readSettings() {
             exportLabelLine = splitSettings[inputNum++].toBoolean()
             exportOrderDefault = splitSettings[inputNum++]
             exportCustomDefault = splitSettings[inputNum++]
+            checkedString = splitSettings[inputNum++]
+            unCheckedString = splitSettings[inputNum++]
             // -- To-do --
             todoShown = splitSettings[inputNum++].toBoolean()
             todoColumns = splitSettings[inputNum++].toInt()
@@ -451,6 +457,8 @@ fun saveSettings() {
     settingsFile.appendText("$exportLabelLine\n")
     settingsFile.appendText("$exportOrderDefault\n")
     settingsFile.appendText("$exportCustomDefault\n")
+    settingsFile.appendText("$checkedString\n")
+    settingsFile.appendText("$unCheckedString\n")
     // -- To-do --
     settingsFile.appendText("$todoShown\n")
     settingsFile.appendText("$todoColumns\n")
@@ -503,6 +511,8 @@ fun readBackupSettings() {
                 else if (splitTitle == "exportLabelLine") exportLabelLine = splitValue.toBoolean()
                 else if (splitTitle == "exportOrderDefault") exportOrderDefault = splitValue
                 else if (splitTitle == "exportCustomDefault") exportCustomDefault = splitValue
+                else if (splitTitle == "checkedString") checkedString = splitValue
+                else if (splitTitle == "unCheckedString") unCheckedString = splitValue
                 // -- To-do --
                 else if (splitTitle == "todoShown") todoShown = splitValue.toBoolean()
                 else if (splitTitle == "todoColumns") todoColumns = splitValue.toInt()
@@ -551,6 +561,8 @@ fun saveBackupSettings() {
     settingsBackupFile.appendText("exportLabelLine $exportLabelLine\n")
     settingsBackupFile.appendText("exportOrderDefault $exportOrderDefault\n")
     settingsBackupFile.appendText("exportCustomDefault $exportCustomDefault\n")
+    settingsBackupFile.appendText("checkedString $checkedString\n")
+    settingsBackupFile.appendText("unCheckedString $unCheckedString\n")
     // -- To-do --
     settingsBackupFile.appendText("todoShown $todoShown\n")
     settingsBackupFile.appendText("todoColumns $todoColumns\n")

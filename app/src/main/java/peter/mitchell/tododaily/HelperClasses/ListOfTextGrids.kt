@@ -132,7 +132,7 @@ class ListOfTextGrids @JvmOverloads constructor(
             this.addView(relativeLayout)
 
             val sectionGrid : TextGridLayout = TextGridLayout(context)
-            sectionGrid.setCustomColumnCount(sectionsColumnCount)
+            sectionGrid.setCustomColumnCount(sectionsColumnCount, 20)
             this.addView(sectionGrid)
 
             sectionButton.setOnClickListener {
@@ -206,7 +206,7 @@ class ListOfTextGrids @JvmOverloads constructor(
     fun setCustomColumnCount(count : Int) {
         sectionsColumnCount = count
         for (i in 0 until sectionGrids.size) {
-            sectionGrids[i].setCustomColumnCount(count)
+            sectionGrids[i].setCustomColumnCount(count, 20)
         }
         columnCount = count
     }

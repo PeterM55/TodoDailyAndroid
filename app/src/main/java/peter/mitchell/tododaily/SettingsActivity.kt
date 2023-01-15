@@ -54,12 +54,13 @@ var snoozeTime = 5
         TextSize,
         DayOfWeek,
         Integer,
+        String,
     }
 
     var settingsNameList = arrayOf(
         // -- All --
-        "All",
-        "Dark Mode",
+        //"All",
+        //"Dark Mode",
         // button colors?
 
         // -- Home --
@@ -69,6 +70,8 @@ var snoozeTime = 5
         "Start of Week",
         "Select Hold Text",
         "Export Line Label",
+        "Checked",
+        "Un-Checked",
         // export location?
 
         // -- To-do --
@@ -98,8 +101,8 @@ var snoozeTime = 5
     )
     var settingsTypeList = arrayOf(
         // -- All --
-        SettingType.Title,
-        SettingType.Toggle,
+        //SettingType.Title,
+        //SettingType.Toggle,
         // button colors?
 
         // -- Home --
@@ -109,6 +112,8 @@ var snoozeTime = 5
         SettingType.DayOfWeek,
         SettingType.Toggle,
         SettingType.Toggle,
+        SettingType.String,
+        SettingType.String,
         // export location?
 
         // -- To-do --
@@ -150,6 +155,11 @@ var snoozeTime = 5
         super.onCreate(savedInstanceState)
         setContentView(R.layout.settings_screen)
         supportActionBar?.hide();
+
+        if (darkMode)
+            mainScrollView.setBackgroundColor(resources.getColor(R.color.backgroundDark))
+        else
+            mainScrollView.setBackgroundColor(resources.getColor(R.color.backgroundLight))
 
         settingsBackButton.setOnClickListener {
             saveSettingsScreen()
@@ -196,6 +206,10 @@ var snoozeTime = 5
             } else if (settingsTypeList[i] == SettingType.Toggle) {
                 var settingInput : TextView = TextView(this)
                 settingInput.setText("Enabled")
+                if (darkMode)
+                    settingInput.setTextColor(resources.getColor(R.color.textDark))
+                else
+                    settingInput.setTextColor(resources.getColor(R.color.textLight))
                 settingInput.id = View.generateViewId()
                 settingInput.minWidth = (100 * resources.displayMetrics.density).toInt()
 
@@ -242,6 +256,10 @@ var snoozeTime = 5
                 var settingInput = EditText(this)
                 settingInput.id = View.generateViewId()
                 settingInput.minWidth = (100 * resources.displayMetrics.density).toInt()
+                if (darkMode)
+                    settingInput.setTextColor(resources.getColor(R.color.textDark))
+                else
+                    settingInput.setTextColor(resources.getColor(R.color.textLight))
 
                 settingInput.inputType =
                     InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED or InputType.TYPE_NUMBER_FLAG_DECIMAL
@@ -278,8 +296,31 @@ var snoozeTime = 5
                 var settingInput = EditText(this)
                 settingInput.id = View.generateViewId()
                 settingInput.minWidth = (100 * resources.displayMetrics.density).toInt()
+                if (darkMode)
+                    settingInput.setTextColor(resources.getColor(R.color.textDark))
+                else
+                    settingInput.setTextColor(resources.getColor(R.color.textLight))
 
                 settingInput.inputType = InputType.TYPE_CLASS_NUMBER
+
+                val inputLayoutParams: LinearLayout.LayoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    (43 * resources.displayMetrics.density).toInt(),
+                )
+                settingInput.layoutParams = inputLayoutParams
+
+                linearLayout.addView(settingInput)
+                settingsList.add(settingInput)
+            } else if (settingsTypeList[i] == SettingType.String) {
+                var settingInput = EditText(this)
+                settingInput.id = View.generateViewId()
+                settingInput.minWidth = (100 * resources.displayMetrics.density).toInt()
+                if (darkMode)
+                    settingInput.setTextColor(resources.getColor(R.color.textDark))
+                else
+                    settingInput.setTextColor(resources.getColor(R.color.textLight))
+
+                settingInput.inputType = InputType.TYPE_CLASS_TEXT
 
                 val inputLayoutParams: LinearLayout.LayoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -315,7 +356,7 @@ var snoozeTime = 5
 
         // "All",
         // "Dark Mode",
-        (settingsList[countingIndex++] as TextView).text = getBooleanString(darkMode)
+        //(settingsList[countingIndex++] as TextView).text = getBooleanString(darkMode)
         // button colors?
 
         // -- Home --
@@ -330,6 +371,10 @@ var snoozeTime = 5
         (settingsList[countingIndex++] as TextView).text = getBooleanString(selectHoldText)
         // "Export Line Label",
         (settingsList[countingIndex++] as TextView).text = getBooleanString(exportLabelLine)
+        // "Checked",
+        (settingsList[countingIndex++] as TextView).text = checkedString
+        // "UnChecked",
+        (settingsList[countingIndex++] as TextView).text = unCheckedString
         // export location?
 
         // -- To-do --
@@ -380,7 +425,7 @@ var snoozeTime = 5
 
         // "All",
         // "Dark Mode",
-        darkMode = getStringBoolean((settingsList[countingIndex++] as TextView).text.toString())
+        //darkMode = getStringBoolean((settingsList[countingIndex++] as TextView).text.toString())
         // button colors?
 
         // -- Home --
@@ -395,6 +440,10 @@ var snoozeTime = 5
         selectHoldText = getStringBoolean((settingsList[countingIndex++] as TextView).text.toString())
         // "Export Line Label",
         exportLabelLine = getStringBoolean((settingsList[countingIndex++] as TextView).text.toString())
+        // "Checked",
+        checkedString = (settingsList[countingIndex++] as TextView).text.toString().replace("\n","")
+        // "UnChecked",
+        unCheckedString = (settingsList[countingIndex++] as TextView).text.toString().replace("\n","")
         // export location?
 
         // -- To-do --

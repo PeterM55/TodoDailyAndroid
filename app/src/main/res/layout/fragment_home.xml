@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainBackground"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.home.HomeFragment"
@@ -86,6 +87,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
 
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
                     />
 
                 <!-- View Value -->
@@ -167,6 +170,7 @@
                         android:layout_height="60dp"
                         android:hint="@string/information_name_input_text"
                         android:textColor="@color/textDark"
+                        android:textColorHint="@color/hintDark"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintLeft_toLeftOf="parent"
                         android:paddingStart="15dp"

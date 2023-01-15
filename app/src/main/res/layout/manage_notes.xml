@@ -5,6 +5,7 @@
     android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="5dp"
+    android:id="@+id/mainBackgroundManageNotes"
     android:background="@color/backgroundDark">
 
     <ScrollView

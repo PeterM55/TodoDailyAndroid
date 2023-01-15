@@ -23,8 +23,8 @@
     <string name="titleInput">Title (Can\'t be blank)</string>
     <string name="todo_section">Todo Section:</string>
     <string name="todo_position">Todo Position:</string>
-    <string name="todo_title">Todo Title:</string>
-    <string name="todo_title_input_text">todo title</string>
+    <string name="todo_title">Todo Text:</string>
+    <string name="todo_title_input_text">Todo Text</string>
     <string name="submit">Submit</string>
     <string name="add">+</string>
     <string name="export">Export</string>

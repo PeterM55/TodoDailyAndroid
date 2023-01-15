@@ -10,6 +10,7 @@
 
     <color name="backgroundDark">#FF373737</color>
     <color name="textDark">#FFF0F0F0</color>
+    <color name="hintDark">#FFC8C8C8</color>
     <color name="bottomNavViewDark">#FF414141</color>
     <color name="backgroundDarkAppHeader">#FF212121</color>
 

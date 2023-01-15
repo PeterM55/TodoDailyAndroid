@@ -109,10 +109,10 @@ class TextGridLayout @JvmOverloads constructor(
      *
      * @param count the number of columns
      */
-    fun setCustomColumnCount(count : Int) {
+    fun setCustomColumnCount(count : Int, padding : Int = 8) {
         if (count == columnCount) return
 
-        textLayoutParams.width = resources.displayMetrics.widthPixels/count-8
+        textLayoutParams.width = resources.displayMetrics.widthPixels/count-padding
 
         var tempTextArrayList : ArrayList<String> = ArrayList(textGrid.size)
         for (i in 0 until textGrid.size) {

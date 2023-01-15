@@ -66,6 +66,12 @@ class ManageDailyNotifications : AppCompatActivity() {
         setContentView(R.layout.manage_daily_information)
         imm = this.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
+        if (darkMode)
+            mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundDark))
+        else
+            mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundLight))
+
+
         manageMainReminders.setCustomColumnCount(homeColumns)
         manageMainReminders.setTextSize(homeTextSize)
         manageAllTitles.setCustomColumnCount(homeColumns)
@@ -350,7 +356,7 @@ class ManageDailyNotifications : AppCompatActivity() {
         manageDatesList.setAdapter(this,datesList)
 
         for (i in 0 until datesList.size) {
-            manageDatesList.setOnClickListener {
+            manageDatesList.textGrid[i].setOnClickListener {
                 val title : String
                 val desc : String
                 if (i == 0) {

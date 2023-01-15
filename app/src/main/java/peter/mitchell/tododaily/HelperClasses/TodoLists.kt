@@ -206,6 +206,26 @@ class TodoLists {
         saveTodos()
     }
 
+    /** Move a to-do from a section to another
+     *
+     * @param iSection the section to be moved from
+     * @param toSection the section to be moved to
+     * @param fromIndex the index to be moved from
+     * @param toIndex the index to be moved to
+     */
+    public fun moveFromSection(iSection : Int, toSection : Int, fromIndex : Int, toIndex : Int) {
+
+        if (iSection == toSection || fromIndex >= sectionTodos[iSection].size || toIndex > sectionTodos[toSection].size) return
+
+        var tempName = sectionTodos[iSection][fromIndex]
+
+        removeTodo(iSection, fromIndex)
+
+        addTodo(toSection, tempName)
+
+        moveFrom(toSection, sectionTodos[toSection].size-1, toIndex)
+    }
+
     /** Reads all of the to-do information from the todosFile file */
     private fun readTodos() {
         if (!todosFile.exists()) {

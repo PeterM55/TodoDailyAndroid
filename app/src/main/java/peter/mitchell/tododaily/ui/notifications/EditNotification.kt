@@ -3,16 +3,14 @@ package peter.mitchell.tododaily.ui.notifications
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.util.Log
+import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.view.isVisible
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.new_notification.*
-import peter.mitchell.tododaily.R
-import peter.mitchell.tododaily.dailyNotifications
-import peter.mitchell.tododaily.saveInformation
-import peter.mitchell.tododaily.saveNotifications
+import peter.mitchell.tododaily.*
 import java.lang.StringBuilder
 import java.time.*
 import java.time.temporal.TemporalField
@@ -31,6 +29,12 @@ class EditNotification : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.new_notification)
+
+        if (darkMode)
+            mainBackgroundNewNotifs.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundDark))
+        else
+            mainBackgroundNewNotifs.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundLight))
+
 
         oneTimeNotification = intent.getBooleanExtra("oneTimeNotification", false)
         editNotificationIndex = intent.getIntExtra("index", -1)
@@ -53,7 +57,7 @@ class EditNotification : AppCompatActivity() {
                 notificationDescInput.setText(dailyNotifications.oneTimeNotificationDescriptions[editNotificationIndex])
                 datePicker.updateDate(
                     dailyNotifications.oneTimeNotificationTimes[editNotificationIndex].year,
-                    dailyNotifications.oneTimeNotificationTimes[editNotificationIndex].monthValue,
+                    dailyNotifications.oneTimeNotificationTimes[editNotificationIndex].monthValue-1,
                     dailyNotifications.oneTimeNotificationTimes[editNotificationIndex].dayOfMonth
                 )
                 timePicker.hour = dailyNotifications.oneTimeNotificationTimes[editNotificationIndex].hour
@@ -105,6 +109,21 @@ class EditNotification : AppCompatActivity() {
             notificationIndexInput.setSelection(editNotificationIndex)
         else
             notificationIndexInput.setSelection(indexArray.size-1)
+
+        copyNotifNameButton.setOnClickListener {
+
+            if (notificationTitleInput.text.toString() != "") {
+                MaterialAlertDialogBuilder(this).setTitle("Overwrite Name?")
+                    .setMessage("The notification name field is not blank, this will overwrite it. Are you sure?")
+                    .setNegativeButton("Cancel") { dialog, which ->
+                    }.setPositiveButton("Overwrite") { dialog, which ->
+                        notificationTitleInput.text = notificationNameInput.text
+                    }.show()
+            } else {
+                notificationTitleInput.text = notificationNameInput.text
+            }
+
+        }
     }
 
     /** takes the information from the inputs and saves them, moving the element if needed */

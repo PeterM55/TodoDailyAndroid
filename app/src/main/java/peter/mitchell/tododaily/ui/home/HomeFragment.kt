@@ -29,6 +29,7 @@ import androidx.work.WorkManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_home.*
+import kotlinx.android.synthetic.main.settings_screen.*
 import peter.mitchell.tododaily.*
 import peter.mitchell.tododaily.MainActivity
 import peter.mitchell.tododaily.HelperClasses.SaveInformation
@@ -80,6 +81,11 @@ class HomeFragment : Fragment() {
 
         readSettings()
         updateBottomNavVisibilities()
+
+        if (darkMode)
+            _binding.mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundDark))
+        else
+            _binding.mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundLight))
 
         if (saveInformation.length == 0) {
             readTodaysDailyInformationFile()
@@ -246,6 +252,12 @@ class HomeFragment : Fragment() {
                         if (!done && tempSaveInformation.fromString(it) && tempSaveInformation.date == selectedValueDates[i]) {
 
                             saveInformation.fromString(it)
+                            if (!selectPastDateSpinner.isVisible) reloadDateSpinner();
+                            for (j in 0 until dateList.size) {
+                                if (LocalDate.parse(dateList[j]) == saveInformation.date) {
+                                    selectPastDateSpinner.setSelection(j)
+                                }
+                            }
 
                             done = true
                             return@forEachLine
@@ -267,6 +279,13 @@ class HomeFragment : Fragment() {
                         if (!done && tempSaveInformation.fromString(it) && tempSaveInformation.date == selectedValueDates[i]) {
 
                             saveInformation.fromString(it)
+                            if (!selectPastDateSpinner.isVisible) reloadDateSpinner();
+                            for (j in 0 until dateList.size) {
+                                if (LocalDate.parse(dateList[j]) == saveInformation.date) {
+                                    selectPastDateSpinner.setSelection(j)
+                                }
+                            }
+
                             var newI = saveInformation.getValueIndex(selectedViewValue!!.valueIndex, selectedViewValue!!.valueName, selectedViewValue!!.valueType, )
 
                             // now click the thing they clicked
@@ -541,6 +560,11 @@ class HomeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+
+        if (darkMode)
+            _binding.mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundDark))
+        else
+            _binding.mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundLight))
 
         _binding.selectPastDateButton.isVisible = true
         _binding.selectPastDateSpinner.isVisible = false

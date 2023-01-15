@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="5dp"
+    android:id="@+id/mainBackgroundNewNotifs"
     android:background="@color/backgroundDark">
 
     <!--<androidx.constraintlayout.widget.ConstraintLayout
@@ -94,6 +95,13 @@
 
         </LinearLayout>
 
+        <Button
+            android:id="@+id/copyNotifNameButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Copy Name To Title"
+            />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="40dp">
@@ -168,6 +176,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
+            android:paddingStart="40dp"
+            android:paddingEnd="40dp"
             android:numbersTextColor="@color/textDark"
             android:background="@color/backgroundDark"/>
 

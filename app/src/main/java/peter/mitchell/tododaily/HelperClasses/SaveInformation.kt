@@ -123,9 +123,9 @@ class SaveInformation {
 
         if (formats[i] == InformationFormat.checkBox) {
             if (values[i] == "1") {
-                return "✔"
+                return checkedString
             } else {
-                return "X"
+                return unCheckedString
             }
         } else if (formats[i] == InformationFormat.onePointDecimal) {
             return String.format("%.1f", values[i].toDouble())

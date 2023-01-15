@@ -50,18 +50,28 @@ class NotesList {
 
     /** Delete a list
      * @param i The index of the list
+     * @param leaveIndex (default false), whether to remove the index after deleting the note
      */
-    fun deleteList(i : Int) {
+    fun deleteList(i : Int, leaveIndex : Boolean = false) {
         if (i == -1) return
 
         val delFile : File = File("$notesPath${listsFiles[i]}.txt")
 
         if (!delFile.exists()) {
+            if (leaveIndex)
+                listsFiles[i] = ""
+            else
+                listsFiles.removeAt(i)
+            saveNotesList()
             return
         }
 
         delFile.delete()
-        listsFiles.removeAt(i)
+        if (leaveIndex)
+            listsFiles[i] = ""
+        else
+            listsFiles.removeAt(i)
+
         saveNotesList()
     }
 
@@ -106,7 +116,6 @@ class NotesList {
         }
 
         for (i in 0 until notesFiles.size) {
-            Log.i("tdd-saveNotesList", "Saving: ${notesFiles[i]}")
             if (notesFiles[i].isNotEmpty())
                 stringBuilder.append(notesFiles[i]+"|")
         }
@@ -234,7 +243,7 @@ class NotesList {
         } else if (title != listsFiles[i]) {
             if (!createFile(title))
                 return -1
-            deleteNote(i, true)
+            deleteList(i, true)
             listsFiles[i] = title
             saveNotesList()
     }

@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.edit_notes.*
 import peter.mitchell.tododaily.R
+import peter.mitchell.tododaily.darkMode
 import peter.mitchell.tododaily.notesList
 
 /** Edit note activity, this activity allows the user to edit the notes and the title of the note
@@ -22,6 +23,11 @@ class EditNotes : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.edit_notes)
+
+        if (darkMode)
+            mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundDark))
+        else
+            mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundLight))
 
         supportActionBar?.hide();
 
@@ -114,6 +120,10 @@ class EditNotes : AppCompatActivity() {
 
     override fun onBackPressed() {
         super.onBackPressed()
-        saveNote()
+        if (saveNote()) {
+            Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, "Unable to save file", Toast.LENGTH_SHORT).show()
+        }
     }
 }

@@ -42,6 +42,12 @@ class DashboardFragment : Fragment() {
         imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         mainBinding?.fragmentLabel?.setText("Todo")
 
+        if (darkMode)
+            _binding.mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundDark))
+        else
+            _binding.mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundLight))
+
+
         if (todoLists == null)
             todoLists = TodoLists()
 
@@ -119,6 +125,12 @@ class DashboardFragment : Fragment() {
     }
 
     override fun onResume() {
+
+        if (darkMode)
+            _binding.mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundDark))
+        else
+            _binding.mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundLight))
+
 
         if (!notesShown) {
             super.onResume()
