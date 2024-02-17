@@ -27,9 +27,6 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.work.WorkManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.fragment_home.*
-import kotlinx.android.synthetic.main.settings_screen.*
 import peter.mitchell.tododaily.*
 import peter.mitchell.tododaily.MainActivity
 import peter.mitchell.tododaily.HelperClasses.SaveInformation
@@ -88,7 +85,31 @@ class HomeFragment : Fragment() {
             _binding.mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundLight))
 
         if (saveInformation.length == 0) {
-            readTodaysDailyInformationFile()
+            try {
+                readTodaysDailyInformationFile()
+            } catch (e : Exception) {
+                Log.e("tdd-homeReadInfo", "Failed to read todays daily information")
+
+                MaterialAlertDialogBuilder(requireContext()).setTitle("Could not read daily information. Attempt to export then Wipe?")
+                    .setMessage("This will attempt to move the data to the downloads folder (will delete either way). not doing this will let you access the app, but could crash at any time.")
+                    .setNegativeButton("Cancel") { dialog, which ->
+
+                    }.setPositiveButton("Delete") { dialog, which ->
+
+                        if (!dailyInformationFile.exists()) {
+                            dailyInformationFile.parentFile!!.mkdirs()
+                            dailyInformationFile.createNewFile()
+                        } else {
+                            // add copy file to export folder option here
+                            if (canExport(requireActivity(), requireContext())) {
+                                getExportFile(exportFileName)?.writeText(String(dailyInformationFile.readBytes()))
+                            }
+                        }
+                        dailyInformationFile.writeText("")
+                        readTodaysDailyInformationFile()
+
+                    }.show()
+            }
         }
 
         // --- Dynamic view width (height handled elsewhere) ---
@@ -108,6 +129,7 @@ class HomeFragment : Fragment() {
         )
 
         _binding.newReminderButton.setOnClickListener {
+            //Log.i("tdd-enqueue", "Work enqueued: ${WorkManager.getInstance(debugContext).getWorkInfosByTag("notificationDailyTag").get()[0].tags.contains("notificationDailyTag") }")
             addingNew = true
             reloadReminderInput()
         }
@@ -119,6 +141,7 @@ class HomeFragment : Fragment() {
             saveInformation.addValue(
                 _binding.newReminderName.text.toString(),
                 saveInformation.informationFormatStringToEnum(_binding.newReminderInput.selectedItem.toString()),
+                "",
                 saveInformation.repeatTimeStringToEnum(_binding.newReminderTime.selectedItem.toString())
             )
             addingNew = false
@@ -148,7 +171,7 @@ class HomeFragment : Fragment() {
             if (!dailyInformationFile.exists())
                 return@setOnClickListener
 
-            val i = viewValueSelect.selectedItemPosition
+            val i = _binding.viewValueSelect.selectedItemPosition
             selectedViewValue = SelectedViewValue(i, saveInformation.names[i], saveInformation.formats[i])
 
             reloadViewValue()
@@ -172,7 +195,7 @@ class HomeFragment : Fragment() {
     /** Reloads the main reminders grid */
     private fun reloadMainReminders() {
 
-        viewValueSelect.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, saveInformation.names)
+        _binding.viewValueSelect.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, saveInformation.names)
 
         _binding.dailyInformationGrid.setupTitles(
             arrayListOf("Daily", "Weekly", "Monthly", "Yearly", "Never",)
@@ -229,12 +252,12 @@ class HomeFragment : Fragment() {
             _binding.dailyInformationGrid.setSectionVisible(i, eachCount[i] > 0)
         }
 
-        currentDateText.setText("Selected date: ${saveInformation.date.toString()}")
+        _binding.currentDateText.setText("Selected date: ${saveInformation.date.toString()}")
 
         if (selectedViewValue != null) {
             _binding.hideViewValue.isVisible = true
 
-            viewValueSelect.setSelection(selectedViewValue!!.valueIndex)
+            _binding.viewValueSelect.setSelection(selectedViewValue!!.valueIndex)
 
             _binding.viewValueGrid.reset()
             _binding.viewValueGrid.setCustomColumnCount(maxOf(2, homeColumns- homeColumns%2))
@@ -252,10 +275,10 @@ class HomeFragment : Fragment() {
                         if (!done && tempSaveInformation.fromString(it) && tempSaveInformation.date == selectedValueDates[i]) {
 
                             saveInformation.fromString(it)
-                            if (!selectPastDateSpinner.isVisible) reloadDateSpinner();
+                            if (!_binding.selectPastDateSpinner.isVisible) reloadDateSpinner();
                             for (j in 0 until dateList.size) {
                                 if (LocalDate.parse(dateList[j]) == saveInformation.date) {
-                                    selectPastDateSpinner.setSelection(j)
+                                    _binding.selectPastDateSpinner.setSelection(j)
                                 }
                             }
 
@@ -279,10 +302,10 @@ class HomeFragment : Fragment() {
                         if (!done && tempSaveInformation.fromString(it) && tempSaveInformation.date == selectedValueDates[i]) {
 
                             saveInformation.fromString(it)
-                            if (!selectPastDateSpinner.isVisible) reloadDateSpinner();
+                            if (!_binding.selectPastDateSpinner.isVisible) reloadDateSpinner();
                             for (j in 0 until dateList.size) {
                                 if (LocalDate.parse(dateList[j]) == saveInformation.date) {
-                                    selectPastDateSpinner.setSelection(j)
+                                    _binding.selectPastDateSpinner.setSelection(j)
                                 }
                             }
 
@@ -581,7 +604,7 @@ class HomeFragment : Fragment() {
 
         reloadMainReminders()
         if (!initialSetupDone) {
-            homeScrollView.smoothScrollTo(0, 0)
+            _binding.homeScrollView.smoothScrollTo(0, 0)
             initialSetupDone = true
         }
 

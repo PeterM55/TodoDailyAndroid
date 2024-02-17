@@ -1,14 +1,21 @@
 package peter.mitchell.tododaily.ui.notes
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.text.SpannableStringBuilder
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.text.bold
+import androidx.core.widget.addTextChangedListener
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.android.synthetic.main.edit_notes.*
 import peter.mitchell.tododaily.R
 import peter.mitchell.tododaily.darkMode
+import peter.mitchell.tododaily.databinding.EditNotesBinding
+import peter.mitchell.tododaily.databinding.HelpScreenBinding
+import peter.mitchell.tododaily.databinding.ManageNotesBinding
 import peter.mitchell.tododaily.notesList
+import java.time.LocalDateTime
 
 /** Edit note activity, this activity allows the user to edit the notes and the title of the note
  * An index and whether it is a list must be passed in with the intent
@@ -20,14 +27,26 @@ class EditNotes : AppCompatActivity() {
 
     var confirmedDelete = false
 
+    /*val closeActivity = Thread {
+        try {
+            Thread.sleep(60000)
+            saveNote()
+        } catch (e: Exception) {
+            e.localizedMessage
+        }
+    }*/
+
+    private lateinit var binding: EditNotesBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.edit_notes)
+        binding = EditNotesBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
         if (darkMode)
-            mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundDark))
+            binding.mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundDark))
         else
-            mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundLight))
+            binding.mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundLight))
 
         supportActionBar?.hide();
 
@@ -37,55 +56,71 @@ class EditNotes : AppCompatActivity() {
 
         if (fileIndex != -1) {
             if (isList)
-                noteTitleTextBox.setText(notesList!!.listsFiles[fileIndex])
+                binding.noteTitleTextBox.setText(notesList!!.listsFiles[fileIndex])
             else
-                noteTitleTextBox.setText(notesList!!.notesFiles[fileIndex])
+                binding.noteTitleTextBox.setText(notesList!!.notesFiles[fileIndex])
         }
         if (isList)
-            noteTextBox.setText(notesList!!.readList(fileIndex))
+            binding.noteTextBox.setText(notesList!!.readList(fileIndex))
         else
-            noteTextBox.setText(notesList!!.readNote(fileIndex))
+            binding.noteTextBox.setText(notesList!!.readNote(fileIndex))
 
-        noteTitleTextBox.setOnKeyListener { view, i, keyEvent ->
-            if (noteTitleTextBox.text.contains("\n")) {
-                noteTitleTextBox.setText(noteTitleTextBox.text.toString().replace('\n', ' ', true))
+        // how to do bold etc: https://stackoverflow.com/questions/14371092/how-to-make-a-specific-text-on-textview-bold/50243835#50243835
+        // how to add select text option: https://stackoverflow.com/questions/51632908/how-to-add-an-item-to-the-text-selection-popup-menu
+
+        // noteTextBox.setText(  SpannableStringBuilder().bold { append("this is a test bold") }.append(noteTextBox.text)  )
+
+        binding.noteTitleTextBox.setOnKeyListener { view, i, keyEvent ->
+            if (binding.noteTitleTextBox.text.contains("\n")) {
+                binding.noteTitleTextBox.setText(binding.noteTitleTextBox.text.toString().replace('\n', ' ', true))
                 return@setOnKeyListener true
             }
             false
         }
 
-        editNoteBackButton.setOnClickListener {
+        binding.editNoteBackButton.setOnClickListener {
             if (saveNote())
                 finish()
         }
 
-        saveNoteButton.setOnClickListener {
+        binding.saveNoteButton.setOnClickListener {
             saveNote()
         }
 
-        deleteNoteButton.setOnClickListener {
+        binding.deleteNoteButton.setOnClickListener {
             deleteNote()
         }
 
+        binding.noteTextBox.addTextChangedListener {
+            binding.saveNoteButton.text = "Save"
+        }
+
     }
+
+
 
     /** Save the note using notesList's savelist or savenote depending on what was passed in
      * @return whether it worked
      */
     fun saveNote() : Boolean {
 
-        if (noteTitleTextBox.text.toString().isNullOrEmpty()) { // || noteTextBox.text.toString().isNullOrEmpty()
+        var titleString = binding.noteTitleTextBox.text.toString()
+
+        if (titleString.isNullOrEmpty()) { // || noteTextBox.text.toString().isNullOrEmpty()
             if (fileIndex == -1)
                 return true
             return false
         }
 
+        while (titleString.isNotEmpty() && titleString.last() == ' ') {
+            titleString = titleString.substring(0, titleString.length-1)
+        }
+
         var tempIndex : Int
         if (isList)
-            tempIndex = notesList!!.saveList(fileIndex, noteTitleTextBox.text.toString(), noteTextBox.text.toString())
+            tempIndex = notesList!!.saveList(fileIndex, titleString, binding.noteTextBox.text.toString())
         else
-            tempIndex = notesList!!.saveNote(fileIndex, noteTitleTextBox.text.toString(), noteTextBox.text.toString())
-
+            tempIndex = notesList!!.saveNote(fileIndex, titleString, binding.noteTextBox.text.toString())
 
         if (tempIndex == -1) {
             Toast.makeText(this, "Unable to save file, file name invalid", Toast.LENGTH_SHORT)
@@ -93,6 +128,8 @@ class EditNotes : AppCompatActivity() {
             return false
         } else
             fileIndex = tempIndex
+
+        binding.saveNoteButton.text = "Saved"
 
         return true
     }
@@ -118,6 +155,17 @@ class EditNotes : AppCompatActivity() {
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        if (!confirmedDelete)
+            saveNote()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (!confirmedDelete)
+            saveNote()
+    }
     override fun onBackPressed() {
         super.onBackPressed()
         if (saveNote()) {

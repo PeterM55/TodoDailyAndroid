@@ -2,6 +2,7 @@ package peter.mitchell.tododaily
 
 import android.Manifest
 import android.app.Activity
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -12,6 +13,7 @@ import android.widget.Toast
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -19,15 +21,21 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
 import peter.mitchell.tododaily.HelperClasses.NotesList
+import peter.mitchell.tododaily.HelperClasses.NotifWorker
 import peter.mitchell.tododaily.databinding.ActivityMainBinding
 import peter.mitchell.tododaily.HelperClasses.SaveInformation
 import peter.mitchell.tododaily.HelperClasses.TodoLists
 import peter.mitchell.tododaily.ui.notifications.DailyNotifications
+import peter.mitchell.tododaily.ui.notifications.channelID
 import java.io.File
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.concurrent.TimeUnit
 
 var saveInformation : SaveInformation = SaveInformation()
 lateinit var dailyNotifications : DailyNotifications
@@ -46,7 +54,7 @@ val settingsFile = File("${internalDataPath}settings.txt")
 val settingsBackupFile = File("${internalDataPath}settingsBackup.txt")
 val todosFile = File("${internalDataPath}todos.txt")
 val exportFileName = "${exportPath}dailyInformationExport.csv"
-val importFileName = "${exportPath}todoDailyImport.txt"
+//val importFileName = "${exportPath}todoDailyImport.txt"
 
 var notifFragment : Fragment? = null
 enum class fragments { home, todo, notes, notifs }
@@ -68,6 +76,7 @@ var checkedString = "1"
 var unCheckedString = "0"
 // --- to-do ---
 var todoShown = true
+var todoConfirmDelete = true
 var todoColumns = 3
 var todoTextSize = 18f
 // --- notes ---
@@ -90,11 +99,36 @@ var navigationView : BottomNavigationView? = null
 
 var mainBinding: ActivityMainBinding? = null
 
+lateinit var debugContext : Context;
+
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.i("tdd-MainActivity", "onCreate run in MainActivity")
         super.onCreate(savedInstanceState)
+
+        /*WorkManager.getInstance(this).cancelAllWork()
+
+        debugContext = this
+
+        val testWorkTag = "111111111111111111111111"
+        val notificationWork : OneTimeWorkRequest = OneTimeWorkRequest.Builder(NotifWorker::class.java)
+            //.setInitialDelay(1, TimeUnit.SECONDS)
+            .addTag(testWorkTag)
+            .build()
+
+        var operation = WorkManager.getInstance(this).enqueue(notificationWork)
+
+        //Log.i("tdd-enqueue", "Work enqueued: ${operation.state.observe()}")
+        //Log.i("tdd-enqueue", "Work enqueued: ${WorkManager.getInstance(this).getWorkInfosByTag(testWorkTag).get()[0].tags.contains(testWorkTag) }")
+        //Log.i("tdd-enqueue", "Work enqueued: ${WorkManager.getInstance(this).getWorkInfosByTag(testWorkTag).isDone}")
+
+        Toast.makeText(this, "Work enqueued 1", Toast.LENGTH_SHORT).show()
+        Log.i("tdd-enqueue", "Work enqueued for 1 seconds from now")*/
+
+        //deleteFile(dailyInformationFile.name)
+        /*dailyInformationFile.writeText("")
+*/
 
         mainBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(mainBinding!!.root)
@@ -127,10 +161,14 @@ class MainActivity : AppCompatActivity() {
             val notificationDateTime : LocalDateTime = LocalDateTime.now().plusMinutes(
                 mainQuickTimerTime.toLong()
             )
+
+            //Toast.makeText(this, "main quick timer: ${mainQuickTimerTime.toLong()}", Toast.LENGTH_SHORT).show()
+
             notificationDateTime.minusSeconds(notificationDateTime.second.toLong())
             notificationDateTime.minusNanos(notificationDateTime.nano.toLong())
             dailyNotifications.addOneTimeNotification(
                 "Main Quick Timer",
+                0,
                 notificationDateTime,
                 "Main Quick Timer",
                 "Your Main quick timer has expired"
@@ -153,7 +191,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-    }
+    } // end of on-create
 
 }
 
@@ -332,9 +370,9 @@ fun exportDailyInformation(activity: Activity, context: Context,
             tempSaveInformation.fromString(it)
 
             if (exportCustom.isNotEmpty()) {
-                exportFile.appendText(tempSaveInformation.exportToCustomString(exportCustom)+"\n")
+                exportFile.appendText(tempSaveInformation.exportToCustomString(exportCustom) + "\n")
             } else {
-                exportFile.appendText(tempSaveInformation.exportToCustomOrder(exportOrder)+"\n")
+                exportFile.appendText(tempSaveInformation.exportToCustomOrder(exportOrder) + "\n")
             }
         }
     }
@@ -412,6 +450,7 @@ fun readSettings() {
             unCheckedString = splitSettings[inputNum++]
             // -- To-do --
             todoShown = splitSettings[inputNum++].toBoolean()
+            todoConfirmDelete = splitSettings[inputNum++].toBoolean()
             todoColumns = splitSettings[inputNum++].toInt()
             todoTextSize = splitSettings[inputNum++].toFloat()
             // -- Notes --
@@ -461,6 +500,7 @@ fun saveSettings() {
     settingsFile.appendText("$unCheckedString\n")
     // -- To-do --
     settingsFile.appendText("$todoShown\n")
+    settingsFile.appendText("$todoConfirmDelete\n")
     settingsFile.appendText("$todoColumns\n")
     settingsFile.appendText("$todoTextSize\n")
     // -- Notes --
@@ -515,6 +555,7 @@ fun readBackupSettings() {
                 else if (splitTitle == "unCheckedString") unCheckedString = splitValue
                 // -- To-do --
                 else if (splitTitle == "todoShown") todoShown = splitValue.toBoolean()
+                else if (splitTitle == "todoConfirmDelete") todoConfirmDelete = splitValue.toBoolean()
                 else if (splitTitle == "todoColumns") todoColumns = splitValue.toInt()
                 else if (splitTitle == "todoTextSize") todoTextSize = splitValue.toFloat()
                 // -- Notes --
@@ -565,6 +606,7 @@ fun saveBackupSettings() {
     settingsBackupFile.appendText("unCheckedString $unCheckedString\n")
     // -- To-do --
     settingsBackupFile.appendText("todoShown $todoShown\n")
+    settingsBackupFile.appendText("todoConfirmDelete $todoConfirmDelete\n")
     settingsBackupFile.appendText("todoColumns $todoColumns\n")
     settingsBackupFile.appendText("todoTextSize $todoTextSize\n")
     // -- Notes --

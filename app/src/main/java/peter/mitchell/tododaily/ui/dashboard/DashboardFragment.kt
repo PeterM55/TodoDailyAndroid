@@ -14,8 +14,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.fragment_dashboard.*
 import peter.mitchell.tododaily.*
 import peter.mitchell.tododaily.HelperClasses.TodoLists
 import peter.mitchell.tododaily.databinding.FragmentDashboardBinding

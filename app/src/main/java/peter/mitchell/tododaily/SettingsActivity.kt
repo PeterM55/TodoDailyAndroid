@@ -7,9 +7,8 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.work.WorkManager
-import kotlinx.android.synthetic.main.edit_notes.*
-import kotlinx.android.synthetic.main.new_notification.*
-import kotlinx.android.synthetic.main.settings_screen.*
+import peter.mitchell.tododaily.databinding.HelpScreenBinding
+import peter.mitchell.tododaily.databinding.SettingsScreenBinding
 import java.time.DayOfWeek
 
 class SettingsActivity : AppCompatActivity() {
@@ -77,6 +76,7 @@ var snoozeTime = 5
         // -- To-do --
         "Todo",
         "Todo Shown",
+        "Todo Confirm Delete",
         "Todo Columns",
         "Todo Text Size",
 
@@ -119,6 +119,7 @@ var snoozeTime = 5
         // -- To-do --
         SettingType.Title,
         SettingType.Toggle,
+        SettingType.Toggle,
         SettingType.ColumnCount,
         SettingType.TextSize,
 
@@ -151,22 +152,25 @@ var snoozeTime = 5
         LinearLayout.LayoutParams.WRAP_CONTENT,
     )
 
+    private lateinit var binding: SettingsScreenBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.settings_screen)
+        binding = SettingsScreenBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
         supportActionBar?.hide();
 
         if (darkMode)
-            mainScrollView.setBackgroundColor(resources.getColor(R.color.backgroundDark))
+            binding.mainScrollView.setBackgroundColor(resources.getColor(R.color.backgroundDark))
         else
-            mainScrollView.setBackgroundColor(resources.getColor(R.color.backgroundLight))
+            binding.mainScrollView.setBackgroundColor(resources.getColor(R.color.backgroundLight))
 
-        settingsBackButton.setOnClickListener {
+        binding.settingsBackButton.setOnClickListener {
             saveSettingsScreen()
             finish()
         }
 
-        saveSettingsButton.setOnClickListener {
+        binding.saveSettingsButton.setOnClickListener {
             saveSettingsScreen()
         }
 
@@ -348,7 +352,7 @@ var snoozeTime = 5
                 settingsList.add(settingInput)
             }
 
-            overallLinearLayout.addView(linearLayout)
+            binding.overallLinearLayout.addView(linearLayout)
 
         }
 
@@ -381,6 +385,8 @@ var snoozeTime = 5
         // "To-do",
         //"To-do Shown",
         (settingsList[countingIndex++] as TextView).text = getBooleanString(todoShown)
+        //"To-do Confirm Delete",
+        (settingsList[countingIndex++] as TextView).text = getBooleanString(todoConfirmDelete)
         // "To-do Columns",
         (settingsList[countingIndex++] as Spinner).setSelection(todoColumns-1)
         // "To-do Text Size",
@@ -450,6 +456,8 @@ var snoozeTime = 5
         // "To-do",
         //"To-do Shown",
         todoShown = getStringBoolean((settingsList[countingIndex++] as TextView).text.toString())
+        //"To-do Confirm Delete",
+        todoConfirmDelete = getStringBoolean((settingsList[countingIndex++] as TextView).text.toString())
         // "To-do Columns",
         todoColumns = (settingsList[countingIndex++] as Spinner).selectedItem.toString().toInt()
         // "To-do Text Size",
@@ -494,6 +502,8 @@ var snoozeTime = 5
         snoozeTime = (settingsList[countingIndex++] as EditText).text.toString().toInt()
 
         saveSettings()
+
+        Toast.makeText(this, "Settings Saved", Toast.LENGTH_SHORT).show()
     }
 
     fun getBooleanString(bool : Boolean) : String {

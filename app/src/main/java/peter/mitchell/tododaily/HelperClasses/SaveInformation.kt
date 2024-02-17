@@ -2,14 +2,19 @@ package peter.mitchell.tododaily.HelperClasses
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.provider.DocumentsContract
 import android.text.InputType
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat.startActivityForResult
 import peter.mitchell.tododaily.*
 import java.io.File
-import java.lang.StringBuilder
 import java.time.LocalDate
-import kotlin.collections.ArrayList
 
 /** SaveInformation handles the daily information to be saved, This class stores the main purpose of
  * this application. Values can be saved, exported, and of viewed in the HomeFragment
@@ -42,6 +47,7 @@ class SaveInformation {
     var date : LocalDate = LocalDate.now()
     var length : Int = 0
     var names : ArrayList<String> = ArrayList(10)
+    var categoryNames : ArrayList<String> = ArrayList(10)
     private var values : ArrayList<String> = ArrayList(10)
     var formats : ArrayList<InformationFormat> = ArrayList(10)
     private var timeRead : ArrayList<Long> = ArrayList(10)
@@ -52,16 +58,18 @@ class SaveInformation {
      *
      * @param name The name of the element
      * @param infoFormat The format of the element
+     * @param categoryName The name of the category
      * @param repeat How often the element should reset
      * @param value The name of the element
      * @return Whether it worked (only fails if format invalid)
      */
-    public fun addValue(name : String, infoFormat : InformationFormat, repeat : RepeatFormat = RepeatFormat.Daily, value : String = "") : Boolean {
+    public fun addValue(name : String, infoFormat : InformationFormat, categoryName : String = "", repeat : RepeatFormat = RepeatFormat.Daily, value : String = "") : Boolean {
         if (!verifyFormat(value, infoFormat)) return false
 
         names.add(name)
         values.add(value)
         formats.add(infoFormat)
+        categoryNames.add(categoryName)
         timeRead.add(0)
         repeatTime.add(repeat)
         length++
@@ -327,6 +335,7 @@ class SaveInformation {
         names = ArrayList(10)
         values = ArrayList(10)
         formats = ArrayList(10)
+        categoryNames = ArrayList(10)
         timeRead = ArrayList(10)
         repeatTime = ArrayList(10)
     }
@@ -359,6 +368,7 @@ class SaveInformation {
         names.removeAt(i)
         values.removeAt(i)
         formats.removeAt(i)
+        categoryNames.removeAt(i)
         timeRead.removeAt(i)
         repeatTime.removeAt(i)
         length -= 1
@@ -392,6 +402,7 @@ class SaveInformation {
         if (i == to || i >= length || to >= length) return
 
         var tempName = names[i]
+        var tempCategoryName = categoryNames[i]
         var tempValue = values[i]
         var tempFormat = formats[i]
         var tempTimeRead = timeRead[i]
@@ -401,12 +412,14 @@ class SaveInformation {
             for (j in i .. to) {
                 if (j < to) {
                     names[j] = names[j+1]
+                    categoryNames[j] = categoryNames[j+1]
                     values[j] = values[j+1]
                     formats[j] = formats[j+1]
                     timeRead[j] = timeRead[j+1]
                     repeatTime[j] = repeatTime[j+1]
                 } else if (j == to) {
                     names[j] = tempName
+                    categoryNames[j] = tempCategoryName
                     values[j] = tempValue
                     formats[j] = tempFormat
                     timeRead[j] = tempTimeRead
@@ -417,12 +430,14 @@ class SaveInformation {
             for (j in i downTo to) {
                 if (j > to) {
                     names[j] = names[j-1]
+                    categoryNames[j] = categoryNames[j-1]
                     values[j] = values[j-1]
                     formats[j] = formats[j-1]
                     timeRead[j] = timeRead[j-1]
                     repeatTime[j] = repeatTime[j-1]
                 } else if (j == to) {
                     names[j] = tempName
+                    categoryNames[j] = tempCategoryName
                     values[j] = tempValue
                     formats[j] = tempFormat
                     timeRead[j] = tempTimeRead
@@ -440,6 +455,8 @@ class SaveInformation {
     public fun moveToEnd(i : Int) {
         var tempName = names[i]
         names.removeAt(i)
+        var tempCategoryName = categoryNames[i]
+        categoryNames.removeAt(i)
         var tempValue = values[i]
         values.removeAt(i)
         var tempFormat = formats[i]
@@ -450,6 +467,7 @@ class SaveInformation {
         repeatTime.removeAt(i)
 
         names.add(tempName)
+        categoryNames.add(tempCategoryName)
         values.add(tempValue)
         formats.add(tempFormat)
         timeRead.add(tempTimeRead)
@@ -468,12 +486,23 @@ class SaveInformation {
         if (!canExport(activity, context))
             return false
 
-        var importFile = File(importFileName)
-        if (!importFile.exists()) {
-            Toast.makeText(context, "Could not find import file", Toast.LENGTH_SHORT).show()
-            return false
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "text/*" // remove space
+
+            // Optionally, specify a URI for the file that should appear in the
+            // system file picker when it loads.
+            putExtra(DocumentsContract.EXTRA_INITIAL_URI, Uri.EMPTY)
         }
 
+        startActivityForResult(activity, intent, 0, android.os.Bundle.EMPTY)
+
+        return true
+    }
+
+    // frankly this is just some spaghetti code. But android updated and I don't want to fix it all
+    // right now
+    fun importDataSelected(context : Context, str : String) : Boolean {
         if (!tempFile.exists()) {
             tempFile.parentFile!!.mkdirs()
             tempFile.createNewFile()
@@ -482,20 +511,25 @@ class SaveInformation {
 
         if (dailyInformationFile.exists()) {
             dailyInformationFile.forEachLine {
-                tempFile.appendText(it)
+                tempFile.appendText(it+"\n")
             }
         }
 
         var malformedFile = false
 
-        importFile.forEachLine {
-            if (malformedFile) return@forEachLine
+        for (it in str.lines()) {
+            if (it.isNullOrEmpty()) continue
+
+            if (malformedFile) {
+                tempFile.delete()
+                return false
+            }
 
             var tempSaveInformation : SaveInformation = SaveInformation()
             if (!tempSaveInformation.fromString(it)) {
                 Toast.makeText(context, "Could not import file, malformed. It MUST be raw data export format", Toast.LENGTH_SHORT).show()
-                malformedFile = true
-                return@forEachLine
+                tempFile.delete()
+                return false
             }
 
             if (!tempFile2.exists()) {
@@ -517,18 +551,21 @@ class SaveInformation {
                     } else if (tempSaveInformation.date == lineDate) {
                         var tempSaveInformation2 : SaveInformation = SaveInformation()
                         if (!tempSaveInformation2.fromString(it)) {
-                            malformedFile = true
+                            Log.e("tdd-Importing: ", "Unknown error.")
                             Toast.makeText(context, "Unknown error.", Toast.LENGTH_SHORT).show()
+                            malformedFile = true
                             return@forEachLine
                         }
 
                         for (i in 0 until tempSaveInformation.length) {
                             if (!tempSaveInformation2.names.contains(tempSaveInformation.names[i])) {
                                 if (!tempSaveInformation2.addValue(
-                                    tempSaveInformation.names[i],
-                                    tempSaveInformation.formats[i],
-                                    tempSaveInformation.repeatTime[i],
-                                )) {
+                                        tempSaveInformation.names[i],
+                                        tempSaveInformation.formats[i],
+                                        tempSaveInformation.categoryNames[i],
+                                        tempSaveInformation.repeatTime[i],
+                                    )) {
+                                    Log.e("tdd-Importing: ", "Could not import file, malformed. value contains wrong format")
                                     Toast.makeText(context, "Could not import file, malformed. value contains wrong format", Toast.LENGTH_SHORT).show()
                                     malformedFile = true
                                     return@forEachLine
@@ -556,8 +593,8 @@ class SaveInformation {
                 Log.e("tdd-Importing: ", "Failed to save, permission denied")
                 Toast.makeText(context, "Could not import file, could not delete a temporary file", Toast.LENGTH_SHORT).show()
                 tempFile2.delete()
-                malformedFile = true
-                return@forEachLine
+                tempFile.delete()
+                return false
             }
 
             tempFile2.renameTo(tempFile)
@@ -566,6 +603,8 @@ class SaveInformation {
         if (malformedFile) {
             tempFile.delete()
             return false
+        } else {
+            Toast.makeText(context, "Import successful", Toast.LENGTH_SHORT).show()
         }
 
         // rename the temp file to dailyInformation file and return true
@@ -606,21 +645,18 @@ class SaveInformation {
 
             } else {
 
+                Log.i("delete me","${j%6} - ${currentString.toString()}")
 
                 if (j == 0) {
                     date = LocalDate.parse(currentString.toString())
-                } else if (j%5 == 1) {
+                } else if (j%6 == 1) {
                     names.add(currentString.toString())
-                } else if (j%5 == 2) {
-
-                    /*if (currentString.length > 1 && currentString[0] == '\"' && currentString[currentString.length-1] == '\"') {
-                        currentString.removeRange(0,1)
-                        currentString.removeRange(currentString.length-1,currentString.length)
-                    }*/
-
+                } else if (j%6 == 2) {
+                    categoryNames.add(currentString.toString())
+                } else if (j%6 == 3) {
                     values.add(currentString.toString().replace("\"\"", "\""))
 
-                } else if (j%5 == 3) {
+                } else if (j%6 == 4) {
 
                     var splitString = currentString.toString().split("-")
                     if (splitString.size > 1) {
@@ -631,7 +667,7 @@ class SaveInformation {
                         formats.add(informationFormatStringToEnum(currentString.toString()))
                     }
 
-                } else if (j%5 == 4) {
+                } else if (j%6 == 5) {
                     timeRead.add(currentString.toString().toLong())
                     j++
                     length++
@@ -655,18 +691,24 @@ class SaveInformation {
 
         for (i in 0 until length) {
             if (formats[i] == InformationFormat.text) {
-                returnStr.append("${names[i]},\"${values[i].replace("\"","\"\"").replace("\n"," ")}\",${informationFormatEnumToString(formats[i])}-${repeatTimeEnumToString(repeatTime[i])},${timeRead[i]},")
+                returnStr.append("${names[i]},${categoryNames[i]},\"${values[i].replace("\"","\"\"").replace("\n"," ")}\",${informationFormatEnumToString(formats[i])}-${repeatTimeEnumToString(repeatTime[i])},${timeRead[i]},")
             } else {
-                returnStr.append("${names[i]},${values[i]},${informationFormatEnumToString(formats[i])}-${repeatTimeEnumToString(repeatTime[i])},${timeRead[i]},")
+                returnStr.append("${names[i]},${categoryNames[i]},${values[i]},${informationFormatEnumToString(formats[i])}-${repeatTimeEnumToString(repeatTime[i])},${timeRead[i]},")
             }
         }
 
         return returnStr.toString()
     }
 
-    class ValueInfo(valueName : String, valueFormat : InformationFormat?) {
-        val name : String = valueName
+    class ValueInfo(valueName : String, valueCategoryName : String, valueFormat : InformationFormat?) {
+        var name : String = valueName
         val format : InformationFormat? = valueFormat
+
+        init {
+            if (valueCategoryName != "") {
+                name += " - $valueCategoryName"
+            }
+        }
     }
 
     /** Loops through daily information file setting up colInfo. This is used because you cannot re-
@@ -693,7 +735,7 @@ class SaveInformation {
                     }
                 }
                 if (!containsName)
-                    colInfo.add(ValueInfo(tempSaveInformation.names[i], tempSaveInformation.formats[i]))
+                    colInfo.add(ValueInfo(tempSaveInformation.names[i], tempSaveInformation.categoryNames[i], tempSaveInformation.formats[i]))
             }
 
         }
@@ -721,7 +763,7 @@ class SaveInformation {
     public fun exportToOrderByNames(strFormat : String, colInfo : ArrayList<ValueInfo>) : String {
 
         // remove invalid characters in strFormat
-        val validChars = arrayOf('n', 'v', 'i', 't', ',', )
+        val validChars = arrayOf('n', 'v', 'i', 't', ',')
         var remIndex = 0
         while (remIndex < strFormat.length) {
             if (!validChars.contains(strFormat[remIndex]))
@@ -744,6 +786,8 @@ class SaveInformation {
                 for (j in strFormat.indices) {
                     if (strFormat[j] == 'n') {
                         returnStr.append("${names[newI]},")
+                    } else if (strFormat[j] == 'c') {
+                        returnStr.append("${categoryNames[newI]},")
                     } else if (strFormat[j] == 'v') {
                         if (formats[newI] == InformationFormat.text) {
                             returnStr.append("\"${values[newI].replace("\"","\"\"").replace("\n"," ")}\",")
@@ -804,7 +848,7 @@ class SaveInformation {
                 var strRead : Char = ' '
                 var i : Int = -1
 
-                if (strFormat[j] == 'n' || strFormat[j] == 'v' || strFormat[j] == 'i' || strFormat[j] == 't') {
+                if (strFormat[j] == 'n' || strFormat[j] == 'c' || strFormat[j] == 'v' || strFormat[j] == 'i' || strFormat[j] == 't') {
                     i = 0
                     strRead = strFormat[j]
                     var currentIndex = j+1
@@ -824,22 +868,27 @@ class SaveInformation {
 
                 if (strFormat[j] == ',') {
                     returnStr.append(',')
-                    colInfo.add(ValueInfo(",", null))
+                    colInfo.add(ValueInfo(",", "", null))
                 } else if (i == -1) {
                     // do nothing
+                } else if (i >= names.size) {
+                    returnStr.append("out of bounds value: $i / ${names.size},")
+                    colInfo.add(ValueInfo("out of bounds value,", "", valueFormat = null))
                 } else if (strRead == 'n') {
                     returnStr.append("${names[i]} Name,")
-                    colInfo.add(ValueInfo(names[i], formats[i]))
-                    //colOffsets[i] = colInfo.size-1
+                    colInfo.add(ValueInfo(names[i], categoryNames[i], formats[i]))
+                } else if (strRead == 'c') {
+                    returnStr.append("${categoryNames[i]} Category Name,")
+                    colInfo.add(ValueInfo(names[i], categoryNames[i], formats[i]))
                 } else if (strRead == 'v') {
                     returnStr.append("${names[i]},")
-                    colInfo.add(ValueInfo(names[i], formats[i]))
+                    colInfo.add(ValueInfo(names[i], categoryNames[i], formats[i]))
                 } else if (strRead == 'i') {
                     returnStr.append("${names[i]} Save Format,")
-                    colInfo.add(ValueInfo(names[i], formats[i]))
+                    colInfo.add(ValueInfo(names[i], categoryNames[i], formats[i]))
                 } else if (strRead == 't') {
                     returnStr.append("${names[i]} Time Read,")
-                    colInfo.add(ValueInfo(names[i], formats[i]))
+                    colInfo.add(ValueInfo(names[i], categoryNames[i], formats[i]))
                 }
 
                 j++
@@ -873,6 +922,8 @@ class SaveInformation {
                     returnStr.append(",")
                 } else if (strFormat[j] == 'n') {
                     returnStr.append("${names[newI]},")
+                } else if (strFormat[j] == 'c') {
+                    returnStr.append("${categoryNames[newI]},")
                 } else if (strFormat[j] == 'v') {
                     if (formats[newI] == InformationFormat.text) {
                         returnStr.append("\"${values[newI].replace("\"","\"\"").replace("\n"," ")}\",")
@@ -922,6 +973,8 @@ class SaveInformation {
 
                     if (strFormat[j] == 'n') {
                         returnStr.append("${names[i]} Name,")
+                    } else if (strFormat[j] == 'c') {
+                        returnStr.append("${names[i]} Category Name,")
                     } else if (strFormat[j] == 'v') {
                         returnStr.append("${names[i]},")
                     } else if (strFormat[j] == 'i') {
@@ -944,6 +997,8 @@ class SaveInformation {
             for (j in strFormat.indices) {
                 if (strFormat[j] == 'n') {
                     returnStr.append("${names[i]},")
+                } else if (strFormat[j] == 'c') {
+                    returnStr.append("${categoryNames[i]},")
                 } else if (strFormat[j] == 'v') {
                     if (formats[i] == InformationFormat.text) {
                         returnStr.append("\"${values[i].replace("\"","\"\"").replace("\n"," ")}\",")
@@ -992,7 +1047,7 @@ class SaveInformation {
                 var strRead : Char = ' '
                 var i : Int = -1
 
-                if (strFormat[j] == 'n' || strFormat[j] == 'v' || strFormat[j] == 'i' || strFormat[j] == 't') {
+                if (strFormat[j] == 'n' || strFormat[j] == 'c' || strFormat[j] == 'v' || strFormat[j] == 'i' || strFormat[j] == 't') {
                     i = 0
                     strRead = strFormat[j]
                     var currentIndex = j+1
@@ -1016,6 +1071,8 @@ class SaveInformation {
                     // do nothing
                 } else if (strRead == 'n') {
                     returnStr.append("${names[i]} Name,")
+                } else if (strRead == 'c') {
+                    returnStr.append("${categoryNames[i]} Category Name,")
                 } else if (strRead == 'v') {
                     returnStr.append("${names[i]},")
                 } else if (strRead == 'i') {
@@ -1038,7 +1095,7 @@ class SaveInformation {
             var strRead : Char = ' '
             var i : Int = -1
 
-            if (strFormat[j] == 'n' || strFormat[j] == 'v' || strFormat[j] == 'i' || strFormat[j] == 't') {
+            if (strFormat[j] == 'n' || strFormat[j] == 'c' || strFormat[j] == 'v' || strFormat[j] == 'i' || strFormat[j] == 't') {
                 i = 0
                 strRead = strFormat[j]
                 var currentIndex = j+1
@@ -1063,6 +1120,8 @@ class SaveInformation {
                     // do nothing
                 } else if (strRead == 'n') {
                     returnStr.append("${names[i]},")
+                } else if (strRead == 'c') {
+                    returnStr.append("${categoryNames[i]},")
                 } else if (strRead == 'v') {
                     if (formats[i] == InformationFormat.text) {
                         returnStr.append("\"${values[i].replace("\"","\"\"").replace("\n"," ")}\",")

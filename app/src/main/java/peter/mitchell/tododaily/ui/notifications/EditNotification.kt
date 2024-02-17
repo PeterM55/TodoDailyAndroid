@@ -9,8 +9,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.android.synthetic.main.new_notification.*
 import peter.mitchell.tododaily.*
+import peter.mitchell.tododaily.databinding.EditNotesBinding
+import peter.mitchell.tododaily.databinding.HelpScreenBinding
+import peter.mitchell.tododaily.databinding.NewNotificationBinding
 import java.lang.StringBuilder
 import java.time.*
 import java.time.temporal.TemporalField
@@ -26,57 +28,69 @@ class EditNotification : AppCompatActivity() {
     var systemOffsetIndex : Int = -1
     var editingSystemNotification : Boolean = false
 
+    private lateinit var binding: NewNotificationBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.new_notification)
+        binding = NewNotificationBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
         if (darkMode)
-            mainBackgroundNewNotifs.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundDark))
+            binding.mainBackgroundNewNotifs.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundDark))
         else
-            mainBackgroundNewNotifs.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundLight))
+            binding.mainBackgroundNewNotifs.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundLight))
 
 
         oneTimeNotification = intent.getBooleanExtra("oneTimeNotification", false)
+        binding.notificationRepeatWeeklyInput.isChecked = intent.getBooleanExtra("weeklyNotification", false)
         editNotificationIndex = intent.getIntExtra("index", -1)
 
-        datePicker.minDate = LocalDateTime.now().toEpochSecond(ZoneId.systemDefault().rules.getOffset(
+        binding.datePicker.minDate = LocalDateTime.now().toEpochSecond(ZoneId.systemDefault().rules.getOffset(
             Instant.now()))
 
         if (!oneTimeNotification)
-            datePicker.isVisible = false
+            binding.datePicker.isVisible = false
 
-        notificationRepeatInput.isChecked = !oneTimeNotification
-        notificationRepeatInput.setOnClickListener {
-            datePicker.isVisible = notificationRepeatInput.isChecked
+        binding.notificationRepeatInput.isChecked = !oneTimeNotification
+        binding.notificationRepeatInput.setOnClickListener {
+            binding.datePicker.isVisible = !binding.notificationRepeatInput.isChecked
+            binding.notificationRepeatWeeklyInput.isChecked = false
+        }
+
+        if (editNotificationIndex != -1 && oneTimeNotification)
+            binding.notificationRepeatWeeklyInput.isChecked = dailyNotifications.datedNotificationDaysBetween[editNotificationIndex] == 7
+        binding.notificationRepeatWeeklyInput.setOnClickListener {
+            binding.datePicker.isVisible = binding.notificationRepeatWeeklyInput.isChecked || !binding.notificationRepeatInput.isChecked
+            binding.notificationRepeatInput.isChecked = false
         }
 
         if (editNotificationIndex != -1) {
             if (oneTimeNotification) {
-                notificationNameInput.setText(dailyNotifications.oneTimeNotificationNames[editNotificationIndex])
-                notificationTitleInput.setText(dailyNotifications.oneTimeNotificationTitles[editNotificationIndex])
-                notificationDescInput.setText(dailyNotifications.oneTimeNotificationDescriptions[editNotificationIndex])
-                datePicker.updateDate(
+                binding.notificationNameInput.setText(dailyNotifications.oneTimeNotificationNames[editNotificationIndex])
+                binding.notificationTitleInput.setText(dailyNotifications.oneTimeNotificationTitles[editNotificationIndex])
+                binding.notificationDescInput.setText(dailyNotifications.oneTimeNotificationDescriptions[editNotificationIndex])
+                binding.datePicker.updateDate(
                     dailyNotifications.oneTimeNotificationTimes[editNotificationIndex].year,
                     dailyNotifications.oneTimeNotificationTimes[editNotificationIndex].monthValue-1,
                     dailyNotifications.oneTimeNotificationTimes[editNotificationIndex].dayOfMonth
                 )
-                timePicker.hour = dailyNotifications.oneTimeNotificationTimes[editNotificationIndex].hour
-                timePicker.minute = dailyNotifications.oneTimeNotificationTimes[editNotificationIndex].minute
+                binding.timePicker.hour = dailyNotifications.oneTimeNotificationTimes[editNotificationIndex].hour
+                binding.timePicker.minute = dailyNotifications.oneTimeNotificationTimes[editNotificationIndex].minute
                 editingSystemNotification = dailyNotifications.isSystemNotification[editNotificationIndex]
             } else {
-                notificationNameInput.setText(dailyNotifications.dailyNotificationNames[editNotificationIndex])
-                notificationTitleInput.setText(dailyNotifications.dailyNotificationTitles[editNotificationIndex])
-                notificationDescInput.setText(dailyNotifications.dailyNotificationDescriptions[editNotificationIndex])
-                timePicker.hour = dailyNotifications.dailyNotificationTimes[editNotificationIndex].hour
-                timePicker.minute = dailyNotifications.dailyNotificationTimes[editNotificationIndex].minute
+                binding.notificationNameInput.setText(dailyNotifications.dailyNotificationNames[editNotificationIndex])
+                binding.notificationTitleInput.setText(dailyNotifications.dailyNotificationTitles[editNotificationIndex])
+                binding.notificationDescInput.setText(dailyNotifications.dailyNotificationDescriptions[editNotificationIndex])
+                binding.timePicker.hour = dailyNotifications.dailyNotificationTimes[editNotificationIndex].hour
+                binding.timePicker.minute = dailyNotifications.dailyNotificationTimes[editNotificationIndex].minute
             }
         }
 
-        newNotificationSubmitButton.setOnClickListener {
+        binding.newNotificationSubmitButton.setOnClickListener {
             submitButton()
         }
 
-        newNotificationDeleteButton.setOnClickListener { deleteButton() }
+        binding.newNotificationDeleteButton.setOnClickListener { deleteButton() }
 
         var indexArray : ArrayList<String> = ArrayList()
         if (oneTimeNotification) {
@@ -97,30 +111,30 @@ class EditNotification : AppCompatActivity() {
                 indexArray.add("End: new")
         }
 
-        notificationIndexInput.adapter = ArrayAdapter(
+        binding.notificationIndexInput.adapter = ArrayAdapter(
             this,
             android.R.layout.simple_list_item_1,
             indexArray.toArray()
         )
 
         if (systemOffsetIndex != -1)
-            notificationIndexInput.setSelection(systemOffsetIndex)
+            binding.notificationIndexInput.setSelection(systemOffsetIndex)
         else if (editNotificationIndex != -1)
-            notificationIndexInput.setSelection(editNotificationIndex)
+            binding.notificationIndexInput.setSelection(editNotificationIndex)
         else
-            notificationIndexInput.setSelection(indexArray.size-1)
+            binding.notificationIndexInput.setSelection(indexArray.size-1)
 
-        copyNotifNameButton.setOnClickListener {
+        binding.copyNotifNameButton.setOnClickListener {
 
-            if (notificationTitleInput.text.toString() != "") {
+            if (binding.notificationTitleInput.text.toString() != "") {
                 MaterialAlertDialogBuilder(this).setTitle("Overwrite Name?")
                     .setMessage("The notification name field is not blank, this will overwrite it. Are you sure?")
                     .setNegativeButton("Cancel") { dialog, which ->
                     }.setPositiveButton("Overwrite") { dialog, which ->
-                        notificationTitleInput.text = notificationNameInput.text
+                        binding.notificationTitleInput.text = binding.notificationNameInput.text
                     }.show()
             } else {
-                notificationTitleInput.text = notificationNameInput.text
+                binding.notificationTitleInput.text = binding.notificationNameInput.text
             }
 
         }
@@ -128,75 +142,67 @@ class EditNotification : AppCompatActivity() {
 
     /** takes the information from the inputs and saves them, moving the element if needed */
     private fun submitButton() {
-        var notificationTime : LocalTime = LocalTime.of(timePicker.hour, timePicker.minute)
 
-        if (!notificationRepeatInput.isChecked) {
+        // if NOT editing (== -1) or one time notification status has changed, then make a new one
+        val new = editNotificationIndex == -1 || oneTimeNotification == binding.notificationRepeatInput.isChecked
+        val datedNotification = binding.notificationRepeatWeeklyInput.isChecked || !binding.notificationRepeatInput.isChecked
 
-            val notificationDateTime : LocalDateTime = LocalDateTime.of(LocalDate.of(datePicker.year, datePicker.month+1, datePicker.dayOfMonth),notificationTime)
+        val notifName = binding.notificationNameInput.text.toString()
+        var repeatTime = 0
+        if (binding.notificationRepeatWeeklyInput.isChecked) repeatTime = 7;
+        val notificationTime : LocalTime = LocalTime.of(binding.timePicker.hour, binding.timePicker.minute)
 
+        val notifTitle = binding.notificationTitleInput.text.toString()
+        val notifDesc = binding.notificationDescInput.text.toString()
+
+        var succeeded = false
+
+        if (datedNotification) {
+
+            val notificationDateTime : LocalDateTime = LocalDateTime.of(LocalDate.of(binding.datePicker.year, binding.datePicker.month+1, binding.datePicker.dayOfMonth),notificationTime)
             if (notificationDateTime.isBefore(LocalDateTime.now())) {
                 Toast.makeText(this, "Date/time is in the past", Toast.LENGTH_SHORT).show()
                 Log.i("tdd.newNotificationSubmitButton", "${notificationDateTime} is before: ${LocalDateTime.now()}")
                 return
             }
 
-            if (editNotificationIndex == -1 || oneTimeNotification == notificationRepeatInput.isChecked) {
-                if (!dailyNotifications.addOneTimeNotification(
-                        notificationNameInput.text.toString(),
-                        notificationDateTime,
-                        notificationTitleInput.text.toString(),
-                        notificationDescInput.text.toString(),
-                        editNotificationIndex // is either -1, or needs to be used.
-                    )) {
-                    Toast.makeText(this, "Date/time already exists", Toast.LENGTH_SHORT).show()
-                    return
-                }
+            if (new) {
+                succeeded = dailyNotifications.addOneTimeNotification(
+                    notifName, repeatTime, notificationDateTime, notifTitle, notifDesc,
+                    editNotificationIndex // is either -1, or needs to be used.
+                )
             } else {
-                if (!dailyNotifications.setOneTimeNotification(
-                        editNotificationIndex,
-                        notificationNameInput.text.toString(),
-                        notificationDateTime,
-                        notificationTitleInput.text.toString(),
-                        notificationDescInput.text.toString()
-                    )) {
-                    Toast.makeText(this, "Date/time already exists", Toast.LENGTH_SHORT).show()
-                    return
-                }
+                succeeded = dailyNotifications.setOneTimeNotification(
+                    editNotificationIndex,
+                    notifName, repeatTime, notificationDateTime, notifTitle, notifDesc
+                )
             }
-
         } else {
-            if (editNotificationIndex == -1 || oneTimeNotification == notificationRepeatInput.isChecked) {
-                if (!dailyNotifications.addDailyNotification(
-                        notificationNameInput.text.toString(),
-                        notificationTime,
-                        notificationTitleInput.text.toString(),
-                        notificationDescInput.text.toString(),
-                        editNotificationIndex
-                    )) {
-                    Toast.makeText(this, "Time already exists", Toast.LENGTH_SHORT).show()
-                    return
-                }
+            if (new) {
+                succeeded = dailyNotifications.addDailyNotification(
+                    notifName, notificationTime, notifTitle, notifDesc,
+                    editNotificationIndex
+                )
             } else {
-                if (!dailyNotifications.setDailyNotification(
-                        editNotificationIndex,
-                        notificationNameInput.text.toString(),
-                        notificationTime,
-                        notificationTitleInput.text.toString(),
-                        notificationDescInput.text.toString()
-                    )) {
-                    Toast.makeText(this, "Date/time already exists", Toast.LENGTH_SHORT).show()
-                    return
-                }
+                succeeded = dailyNotifications.setDailyNotification(
+                    editNotificationIndex,
+                    notifName, notificationTime, notifTitle, notifDesc
+                )
             }
         }
 
+        if (!succeeded) {
+            Toast.makeText(this, "Date/time already exists", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         // --- If notification index is set, then set the position ---
-        if (!notificationRepeatInput.isChecked) {
+        if (!binding.notificationRepeatInput.isChecked) {
             if (editNotificationIndex == -1)
                 editNotificationIndex = dailyNotifications.oneTimeNotificationsLength-1
 
-            var newIndex = notificationIndexInput.selectedItemPosition
-            for (i in 0 until notificationIndexInput.selectedItemPosition+1) {
+            var newIndex = binding.notificationIndexInput.selectedItemPosition
+            for (i in 0 until binding.notificationIndexInput.selectedItemPosition+1) {
                 if (i >= dailyNotifications.isSystemNotification.size) break
 
                 if (editingSystemNotification != dailyNotifications.isSystemNotification[i]) {
@@ -208,7 +214,7 @@ class EditNotification : AppCompatActivity() {
         } else {
             if (editNotificationIndex == -1)
                 editNotificationIndex = dailyNotifications.dailyNotificationsLength-1
-            dailyNotifications.dailyMoveFrom(editNotificationIndex, notificationIndexInput.selectedItemPosition)
+            dailyNotifications.dailyMoveFrom(editNotificationIndex, binding.notificationIndexInput.selectedItemPosition)
         }
 
 

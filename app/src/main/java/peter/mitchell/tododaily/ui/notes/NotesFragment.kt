@@ -11,8 +11,6 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.work.WorkManager
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.fragment_notes.*
 import peter.mitchell.tododaily.*
 import peter.mitchell.tododaily.HelperClasses.NotesList
 import peter.mitchell.tododaily.databinding.FragmentNotesBinding

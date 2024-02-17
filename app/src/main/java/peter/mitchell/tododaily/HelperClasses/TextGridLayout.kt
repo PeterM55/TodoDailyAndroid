@@ -13,7 +13,6 @@ import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.view.children
-import kotlinx.android.synthetic.main.fragment_home.*
 import org.w3c.dom.Text
 import org.xmlpull.v1.XmlPullParser
 import peter.mitchell.tododaily.R

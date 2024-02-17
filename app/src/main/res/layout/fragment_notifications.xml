@@ -49,7 +49,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:text="One Time Notifs"
+                    android:text="Dated Notifications"
                     android:textSize="20dp"
                     android:textColor="@color/textDark"
                     android:textStyle="bold"

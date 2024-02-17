@@ -1,89 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/mainBackground"
+    android:orientation="vertical"
     android:background="@color/backgroundDark">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+    <!-- Top bar -->
 
-        <!-- Top bar -->
+    <LinearLayout
+        android:background="@color/backgroundDarkAppHeader"
+        android:layout_width="match_parent"
+        android:layout_height="40dp">
+
+        <Button
+            android:id="@+id/editNoteBackButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/leftArrow"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+
+            android:text="@string/editNoteTitle"
+            android:textSize="20sp"
+            android:textColor="@color/textDark"
+            android:layout_weight="1"
+            />
+
+        <Button
+            android:id="@+id/deleteNoteButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/delete"
+            android:minHeight="0dp"
+            android:minWidth="0dp"/>
+
+        <Button
+            android:id="@+id/saveNoteButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/save"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp"/>
+
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/backgroundDark">
 
         <LinearLayout
-            android:background="@color/backgroundDarkAppHeader"
             android:layout_width="match_parent"
-            android:layout_height="40dp">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <Button
-                android:id="@+id/editNoteBackButton"
-                android:layout_width="wrap_content"
+
+
+            <!-- Main text box -->
+
+            <EditText
+                android:id="@+id/noteTitleTextBox"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/leftArrow"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:minHeight="0dp"
-                android:minWidth="0dp"/>
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-
-                android:text="@string/editNoteTitle"
+                android:text=""
                 android:textSize="20sp"
+                android:hint="@string/titleInput"
                 android:textColor="@color/textDark"
-                android:layout_weight="1"
+                android:layout_margin="5dp"
                 />
 
-            <Button
-                android:id="@+id/deleteNoteButton"
-                android:layout_width="wrap_content"
+            <EditText
+                android:id="@+id/noteTextBox"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/delete"
-                android:minHeight="0dp"
-                android:minWidth="0dp"/>
 
-            <Button
-                android:id="@+id/saveNoteButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/save"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:minHeight="0dp"
-                android:minWidth="0dp"/>
+                android:text=""
+                android:textSize="20sp"
+                android:textColor="@color/textDark"
 
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="5dp"
+                />
         </LinearLayout>
-
-        <!-- Main text box -->
-
-        <EditText
-            android:id="@+id/noteTitleTextBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-            android:text=""
-            android:textSize="20sp"
-            android:hint="@string/titleInput"
-            android:textColor="@color/textDark"
-            android:layout_margin="5dp"
-            />
-
-        <EditText
-            android:id="@+id/noteTextBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-
-            android:text=""
-            android:textSize="20sp"
-            android:textColor="@color/textDark"
-
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_marginBottom="5dp"
-            />
-    </LinearLayout>
-</ScrollView>
+    </ScrollView>
+</LinearLayout>

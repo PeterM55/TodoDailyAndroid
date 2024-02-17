@@ -3,11 +3,11 @@ package peter.mitchell.tododaily.ui.home
 import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
 import android.view.View
-import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -17,13 +17,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.android.synthetic.main.manage_daily_information.*
-import kotlinx.coroutines.selects.select
 import peter.mitchell.tododaily.*
-import peter.mitchell.tododaily.HelperClasses.SaveInformation
-import peter.mitchell.tododaily.ui.notifications.NotificationsFragment
+import peter.mitchell.tododaily.databinding.EditTodoBinding
+import peter.mitchell.tododaily.databinding.HelpScreenBinding
+import peter.mitchell.tododaily.databinding.ManageDailyInformationBinding
 import java.io.File
-import java.lang.NumberFormatException
 import java.time.LocalDate
 
 /** Manage daily notifications is an activity that handles managing the information displayed on the
@@ -56,57 +54,55 @@ class ManageDailyNotifications : AppCompatActivity() {
     var defaultExportPresets : ArrayList<ExportPresetFormat> = arrayListOf(
         ExportPresetFormat("New", true, false, ""),
         ExportPresetFormat("Standard", true, false, "v"),
-        ExportPresetFormat("Raw Data", false, false, "nvit"),
+        ExportPresetFormat("Raw Data", false, false, "ncvit"),
     )
     var defaultPreset : Int = 1
     var selectedPreset : Int = 0
 
+    private lateinit var binding: ManageDailyInformationBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.manage_daily_information)
+        binding = ManageDailyInformationBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
         imm = this.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
         if (darkMode)
-            mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundDark))
+            binding.mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundDark))
         else
-            mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundLight))
+            binding.mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundLight))
 
 
-        manageMainReminders.setCustomColumnCount(homeColumns)
-        manageMainReminders.setTextSize(homeTextSize)
-        manageAllTitles.setCustomColumnCount(homeColumns)
-        manageAllTitles.setTextSize(homeTextSize)
+        binding.manageMainReminders.setCustomColumnCount(homeColumns)
+        binding.manageMainReminders.setTextSize(homeTextSize)
+        binding.manageAllTitles.setCustomColumnCount(homeColumns)
+        binding.manageAllTitles.setTextSize(homeTextSize)
 
-        manageDatesList.setCustomColumnCount(3)
+        binding.manageDatesList.setCustomColumnCount(3)
 
-        manageMainReminders.isVisible = currentTitlesVisible
-        manageAllTitles.isVisible = rearrangeTitlesVisible
-        manageDatesList.isVisible = manageDatesVisible
-        toggleManageDatesText.isVisible = manageDatesVisible
+        binding.manageMainReminders.isVisible = currentTitlesVisible
+        binding.manageAllTitles.isVisible = rearrangeTitlesVisible
+        binding.manageDatesList.isVisible = manageDatesVisible
+        binding.toggleManageDatesText.isVisible = manageDatesVisible
 
         readExportPresets()
-        if (dailyInformationFile.exists()) {
-            dailyInformationFile.forEachLine {
-                datesList.add(it.split(",")[0]) //LocalDate.parse
-            }
-        }
 
         reloadCurrentTitles()
         setupDates()
 
-        toggleMainReminders.setOnClickListener {
+        binding.toggleMainReminders.setOnClickListener {
             currentTitlesVisible = !currentTitlesVisible
             reloadVisibilities()
         }
-        toggleRearrangeTitles.setOnClickListener {
+        binding.toggleRearrangeTitles.setOnClickListener {
             rearrangeTitlesVisible = !rearrangeTitlesVisible
             reloadVisibilities()
         }
-        toggleManageDatesVisibilityButton.setOnClickListener {
+        binding.toggleManageDatesVisibilityButton.setOnClickListener {
             manageDatesVisible = !manageDatesVisible
             reloadVisibilities()
         }
-        addDateVisibilityButton.setOnClickListener {
+        binding.addDateVisibilityButton.setOnClickListener {
             addDatesVisible = !addDatesVisible
 
             if (addDatesVisible) {
@@ -118,7 +114,7 @@ class ManageDailyNotifications : AppCompatActivity() {
         }
 
 
-        deleteAllMainRemindersButton.setOnClickListener {
+        binding.deleteAllMainRemindersButton.setOnClickListener {
 
             MaterialAlertDialogBuilder(this).setTitle("delete all titles?")
                 .setMessage("Would you like to delete all of today's items? (this will not remove the titles from any date but today)")
@@ -131,16 +127,16 @@ class ManageDailyNotifications : AppCompatActivity() {
                 }.show()
         }
 
-        toggleManageDatesButton.setOnClickListener {
+        binding.toggleManageDatesButton.setOnClickListener {
             deleteMultipleMode = !deleteMultipleMode
             if (deleteMultipleMode) {
-                toggleManageDatesText.setText("Delete all before date")
+                binding.toggleManageDatesText.setText("Delete all before date")
             } else {
-                toggleManageDatesText.setText("Single delete")
+                binding.toggleManageDatesText.setText("Single delete")
             }
         }
 
-        deleteAllDatesButton.setOnClickListener {
+        binding.deleteAllDatesButton.setOnClickListener {
             MaterialAlertDialogBuilder(this).setTitle("delete all data?")
                 .setMessage("This will delete all saved data, except today.")
                 .setNegativeButton("Cancel") { dialog, which ->
@@ -152,14 +148,14 @@ class ManageDailyNotifications : AppCompatActivity() {
                 }.show()
         }
 
-        addDateButton.setOnClickListener {
+        binding.addDateButton.setOnClickListener {
 
             if (!dailyInformationFile.exists()) {
                 dailyInformationFile.parentFile!!.mkdirs()
                 dailyInformationFile.createNewFile()
             }
 
-            var newDate = LocalDate.of(addDateInput.year,addDateInput.month+1,addDateInput.dayOfMonth)
+            var newDate = LocalDate.of(binding.addDateInput.year,binding.addDateInput.month+1,binding.addDateInput.dayOfMonth)
 
             var done = false
             dailyInformationFile.forEachLine {
@@ -177,7 +173,7 @@ class ManageDailyNotifications : AppCompatActivity() {
             }
         }
 
-        exportOptionsExpandButton.setOnClickListener {
+        binding.exportOptionsExpandButton.setOnClickListener {
             exportVisible = !exportVisible
             reloadVisibilities()
             setExportPresetsInputPosition(selectedPreset)
@@ -185,15 +181,15 @@ class ManageDailyNotifications : AppCompatActivity() {
 
         reloadExportPresetsInput()
 
-        importOptionsExpandButton.setOnClickListener {
+        binding.importOptionsExpandButton.setOnClickListener {
             importVisible = !importVisible
             reloadVisibilities()
         }
-        importButton.setOnClickListener {
+        binding.importButton.setOnClickListener {
             importSubmit()
         }
 
-        exportPresetsInput.onItemSelectedListener = object :
+        binding.exportPresetsInput.onItemSelectedListener = object :
             AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
@@ -210,27 +206,27 @@ class ManageDailyNotifications : AppCompatActivity() {
             }
         }
 
-        labelExportCheck.setOnClickListener {
+        binding.labelExportCheck.setOnClickListener {
             exportLabelLine = !exportLabelLine
             saveSettings()
         }
-        labelExportCheck.isChecked = exportLabelLine
+        binding.labelExportCheck.isChecked = exportLabelLine
 
-        customExportInput.addTextChangedListener {
-            if (customExportInput.text.isNotEmpty()) {
+        binding.customExportInput.addTextChangedListener {
+            if (binding.customExportInput.text.isNotEmpty()) {
                 //exportExplanation1.isVisible = false
-                customOrderTitle.isVisible = false
-                customOrderInput.isVisible = false
+                binding.customOrderTitle.isVisible = false
+                binding.customOrderInput.isVisible = false
             } else {
                 //exportExplanation1.isVisible = true
-                customOrderTitle.isVisible = true
-                customOrderInput.isVisible = true
+                binding.customOrderTitle.isVisible = true
+                binding.customOrderInput.isVisible = true
             }
         }
-        customOrderInput.setText(exportOrderDefault)
-        customExportInput.setText(exportCustomDefault)
+        binding.customOrderInput.setText(exportOrderDefault)
+        binding.customExportInput.setText(exportCustomDefault)
 
-        deleteExportPreset.setOnClickListener {
+        binding.deleteExportPreset.setOnClickListener {
             if (selectedPreset > 2) {
                 exportPresets.removeAt(selectedPreset)
                 if (selectedPreset == defaultPreset)
@@ -243,11 +239,11 @@ class ManageDailyNotifications : AppCompatActivity() {
             }
         }
 
-        saveExportPreset.setOnClickListener {
+        binding.saveExportPreset.setOnClickListener {
             saveExportPresetPressed()
         }
 
-        exportButton.setOnClickListener { customExportSubmit() }
+        binding.exportButton.setOnClickListener { customExportSubmit() }
         // end of onCreateView
     }
 
@@ -261,11 +257,11 @@ class ManageDailyNotifications : AppCompatActivity() {
 
         }
 
-        manageMainReminders.setAdapter(this, informationViewList)
-        manageAllTitles.setAdapter(this, informationViewList)
+        binding.manageMainReminders.setAdapter(this, informationViewList)
+        binding.manageAllTitles.setAdapter(this, informationViewList)
 
         for (i in 0 until informationViewList.size) {
-            manageMainReminders.textGrid[i].setOnClickListener {
+            binding.manageMainReminders.textGrid[i].setOnClickListener {
                 MaterialAlertDialogBuilder(this).setTitle("delete entry from today?")
                     .setMessage("Would you like to delete this item? (this will not remove the title from any date but today)")
                     .setNegativeButton("Cancel") { dialog, which ->
@@ -277,7 +273,7 @@ class ManageDailyNotifications : AppCompatActivity() {
                     }.show()
             }
 
-            manageAllTitles.textGrid[i].setOnClickListener {
+            binding.manageAllTitles.textGrid[i].setOnClickListener {
                 showSortInputDialog(i)
             }
         }
@@ -290,73 +286,81 @@ class ManageDailyNotifications : AppCompatActivity() {
             addDatesVisible = false
         }
 
-        manageMainReminders.isVisible = currentTitlesVisible
-        manageAllTitles.isVisible = rearrangeTitlesVisible
-        manageDatesList.isVisible = manageDatesVisible
-        toggleManageDatesText.isVisible = manageDatesVisible
-        addDateInput.isVisible = addDatesVisible
-        addDateButton.isVisible = addDatesVisible
+        binding.manageMainReminders.isVisible = currentTitlesVisible
+        binding.manageAllTitles.isVisible = rearrangeTitlesVisible
+        binding.manageDatesList.isVisible = manageDatesVisible
+        binding.toggleManageDatesText.isVisible = manageDatesVisible
+        binding.addDateInput.isVisible = addDatesVisible
+        binding.addDateButton.isVisible = addDatesVisible
 
-        importText.isVisible = importVisible
-        importButton.isVisible = importVisible
+        binding.importText.isVisible = importVisible
+        binding.importButton.isVisible = importVisible
 
-        exportPresetsTitle.isVisible = exportVisible
-        exportPresetsInput.isVisible = exportVisible
-        val exportPresetNew = exportPresetsInput.selectedItemPosition == 0 || exportPresetsInput.selectedItemPosition > 2
+        binding.exportPresetsTitle.isVisible = exportVisible
+        binding.exportPresetsInput.isVisible = exportVisible
+        val exportPresetNew = binding.exportPresetsInput.selectedItemPosition == 0 || binding.exportPresetsInput.selectedItemPosition > 2
 
-        labelExportCheck.isVisible = exportVisible
-        exportExplanation1.isVisible = exportVisible && exportPresetNew
-        if (exportPresetNew && exportVisible && customExportInput.text.isEmpty()) {
-            customOrderTitle.isVisible = true
-            customOrderInput.isVisible = true
+        binding.labelExportCheck.isVisible = exportVisible
+        binding.exportExplanation1.isVisible = exportVisible && exportPresetNew
+        if (exportPresetNew && exportVisible && binding.customExportInput.text.isEmpty()) {
+            binding.customOrderTitle.isVisible = true
+            binding.customOrderInput.isVisible = true
         } else {
-            customOrderTitle.isVisible = false
-            customOrderInput.isVisible = false
+            binding.customOrderTitle.isVisible = false
+            binding.customOrderInput.isVisible = false
         }
-        customExportTitle.isVisible = exportVisible && exportPresetNew
-        customExportInput.isVisible = exportVisible && exportPresetNew
-        deleteExportPreset.isVisible = exportVisible && selectedPreset != 1 && selectedPreset != 2
-        saveExportPreset.isVisible = exportVisible && selectedPreset != 1 && selectedPreset != 2
-        defaultExportCheck.isVisible = exportVisible
-        exportButton.isVisible =  exportVisible
+        binding.customExportTitle.isVisible = exportVisible && exportPresetNew
+        binding.customExportInput.isVisible = exportVisible && exportPresetNew
+        binding.deleteExportPreset.isVisible = exportVisible && selectedPreset != 1 && selectedPreset != 2
+        binding.saveExportPreset.isVisible = exportVisible && selectedPreset != 1 && selectedPreset != 2
+        binding.defaultExportCheck.isVisible = exportVisible
+        binding.exportButton.isVisible =  exportVisible
 
         if (currentTitlesVisible)
-            toggleMainReminders.setText("▼")
+            binding.toggleMainReminders.setText("▼")
         else
-            toggleMainReminders.setText("◀")
+            binding.toggleMainReminders.setText("◀")
 
         if (rearrangeTitlesVisible)
-            toggleRearrangeTitles.setText("▼")
+            binding.toggleRearrangeTitles.setText("▼")
         else
-            toggleRearrangeTitles.setText("◀")
+            binding.toggleRearrangeTitles.setText("◀")
 
         if (manageDatesVisible)
-            toggleManageDatesVisibilityButton.setText("▼")
+            binding.toggleManageDatesVisibilityButton.setText("▼")
         else
-            toggleManageDatesVisibilityButton.setText("◀")
+            binding.toggleManageDatesVisibilityButton.setText("◀")
 
         if (addDatesVisible)
-            addDateVisibilityButton.setText("▼")
+            binding.addDateVisibilityButton.setText("▼")
         else
-            addDateVisibilityButton.setText("◀")
+            binding.addDateVisibilityButton.setText("◀")
 
         if (importVisible)
-            importOptionsExpandButton.setText("▼")
+            binding.importOptionsExpandButton.setText("▼")
         else
-            importOptionsExpandButton.setText("◀")
+            binding.importOptionsExpandButton.setText("◀")
 
         if (exportVisible)
-            exportOptionsExpandButton.setText("▼")
+            binding.exportOptionsExpandButton.setText("▼")
         else
-            exportOptionsExpandButton.setText("◀")
+            binding.exportOptionsExpandButton.setText("◀")
     }
 
     /** Uses the dateslist to setup the manage dates section to delete dates*/
     private fun setupDates() {
-        manageDatesList.setAdapter(this,datesList)
+        datesList.clear()
+        if (dailyInformationFile.exists()) {
+            dailyInformationFile.forEachLine {
+                datesList.add(it.split(",")[0]) //LocalDate.parse
+            }
+        }
+
+        binding.manageDatesList.reset()
+        binding.manageDatesList.setAdapter(this,datesList)
 
         for (i in 0 until datesList.size) {
-            manageDatesList.textGrid[i].setOnClickListener {
+            binding.manageDatesList.textGrid[i].setOnClickListener {
                 val title : String
                 val desc : String
                 if (i == 0) {
@@ -427,7 +431,7 @@ class ManageDailyNotifications : AppCompatActivity() {
         }
 
         tempFile.renameTo(dailyInformationFile)
-
+        setupDates()
     }
 
     /** Deletes all dates */
@@ -435,6 +439,7 @@ class ManageDailyNotifications : AppCompatActivity() {
         if (dailyInformationFile.exists()) {
             dailyInformationFile.writeText(saveInformation.toString()+"\n")
         }
+        setupDates()
     }
 
     /** Shows the dialog to input the value
@@ -490,7 +495,7 @@ class ManageDailyNotifications : AppCompatActivity() {
                 exportPresetNames.add(exportPresets[i].name)
         }
 
-        exportPresetsInput.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, exportPresetNames)
+        binding.exportPresetsInput.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, exportPresetNames)
     }
 
     /** Sets the position of the export preset spinner and reloads the other visibilities
@@ -501,18 +506,18 @@ class ManageDailyNotifications : AppCompatActivity() {
         if (position < 0) return
         if (position >= exportPresets.size) return
 
-        labelExportCheck.isChecked = exportPresets[position].lineLabels
+        binding.labelExportCheck.isChecked = exportPresets[position].lineLabels
         if (exportPresets[position].custom) {
-            customOrderInput.setText("")
-            customExportInput.setText(exportPresets[position].exportString)
+            binding.customOrderInput.setText("")
+            binding.customExportInput.setText(exportPresets[position].exportString)
         } else {
-            customOrderInput.setText(exportPresets[position].exportString)
-            customExportInput.setText("")
+            binding.customOrderInput.setText(exportPresets[position].exportString)
+            binding.customExportInput.setText("")
         }
-        defaultExportCheck.isChecked = position == defaultPreset
+        binding.defaultExportCheck.isChecked = position == defaultPreset
 
         selectedPreset = position
-        exportPresetsInput.setSelection(position)
+        binding.exportPresetsInput.setSelection(position)
         reloadVisibilities()
 
     }
@@ -528,21 +533,38 @@ class ManageDailyNotifications : AppCompatActivity() {
             }.show()
     }
 
+    // spaghetti code due to android updating way after I made all this
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (data == null || data.data == null) return
+
+        Log.i("tdd-onActivityResult", "On activity result called: $requestCode $resultCode ${data.data}}")
+
+        val inputStream = contentResolver.openInputStream(data.data!!)
+        var text = String(inputStream!!.readBytes())
+        inputStream.close()
+
+        saveInformation.importDataSelected(this, text)
+
+        setupDates()
+    }
+
     /** Exports the data using the preset specified, most of the work is done in the
      * exportDailyInformation in MainActivity. This also saves the preset is specified.
      */
     private fun customExportSubmit() {
         exportDailyInformation(
             this, this,
-            labelExportCheck.isChecked, customOrderInput.text.toString(),
-            customExportInput.text.toString(), defaultExportCheck.isChecked
+            binding.labelExportCheck.isChecked, binding.customOrderInput.text.toString(),
+            binding.customExportInput.text.toString(), binding.defaultExportCheck.isChecked
         )
 
         // set to default if all worked
-        if (defaultExportCheck.isChecked) {
+        if (binding.defaultExportCheck.isChecked) {
             // default is done in exportDailyInformation, presets need to be done here
             saveExportPresetPressed()
-            defaultPreset = exportPresetsInput.selectedItemPosition
+            defaultPreset = binding.exportPresetsInput.selectedItemPosition
             saveSettings()
         }
     }
@@ -551,28 +573,28 @@ class ManageDailyNotifications : AppCompatActivity() {
     private fun saveExportPresetPressed() {
         if (selectedPreset == 0) {
 
-            if (customExportInput.text.toString().isNotEmpty()) {
+            if (binding.customExportInput.text.toString().isNotEmpty()) {
                 exportPresets.add(
                     ExportPresetFormat(
                         "User Preset ${exportPresets.size - 2}",
-                        labelExportCheck.isChecked,
+                        binding.labelExportCheck.isChecked,
                         true,
-                        customExportInput.text.toString(),
+                        binding.customExportInput.text.toString(),
                     )
                 )
             } else {
                 exportPresets.add(
                     ExportPresetFormat(
                         "User Preset ${exportPresets.size - 2}",
-                        labelExportCheck.isChecked,
+                        binding.labelExportCheck.isChecked,
                         false,
-                        customOrderInput.text.toString(),
+                        binding.customOrderInput.text.toString(),
                     )
                 )
             }
 
-            if (defaultExportCheck.isChecked) {
-                setDefaultExport(labelExportCheck.isChecked, customOrderInput.text.toString(), customExportInput.text.toString())
+            if (binding.defaultExportCheck.isChecked) {
+                setDefaultExport(binding.labelExportCheck.isChecked, binding.customOrderInput.text.toString(), binding.customExportInput.text.toString())
                 saveSettings()
 
                 defaultPreset = exportPresets.size-1
@@ -584,18 +606,18 @@ class ManageDailyNotifications : AppCompatActivity() {
 
         } else if (selectedPreset > 2) {
 
-            exportPresets[selectedPreset].lineLabels = labelExportCheck.isChecked
-            if (customExportInput.text.toString().isNotEmpty()) {
+            exportPresets[selectedPreset].lineLabels = binding.labelExportCheck.isChecked
+            if (binding.customExportInput.text.toString().isNotEmpty()) {
                 exportPresets[selectedPreset].custom = true
-                exportPresets[selectedPreset].exportString = customExportInput.text.toString()
+                exportPresets[selectedPreset].exportString = binding.customExportInput.text.toString()
             } else {
                 exportPresets[selectedPreset].custom = false
-                exportPresets[selectedPreset].exportString = customOrderInput.text.toString()
+                exportPresets[selectedPreset].exportString = binding.customOrderInput.text.toString()
             }
 
-            if (defaultExportCheck.isChecked) {
-                setDefaultExport(labelExportCheck.isChecked, customOrderInput.text.toString(), customExportInput.text.toString())
-                defaultPreset = exportPresetsInput.selectedItemPosition
+            if (binding.defaultExportCheck.isChecked) {
+                setDefaultExport(binding.labelExportCheck.isChecked, binding.customOrderInput.text.toString(), binding.customExportInput.text.toString())
+                defaultPreset = binding.exportPresetsInput.selectedItemPosition
                 saveSettings()
             }
 

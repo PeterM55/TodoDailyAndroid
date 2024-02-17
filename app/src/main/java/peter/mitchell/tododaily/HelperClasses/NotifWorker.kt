@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
@@ -24,7 +25,10 @@ class NotifWorker(contextIn: Context, workerParams: WorkerParameters) : Worker(c
 
     var context : Context = contextIn
 
-    override fun doWork(): Result {
+    override fun doWork(): Result { // DO !!!!!NOT!!!!! CALL TOAST FROM THIS METHOD
+
+        Log.i("tdd-doWork", "Do work called from notifworker")
+        //Toast.makeText(context, "AAAAAAAAAAAAAAAAAAAAAAAAAAA", Toast.LENGTH_LONG).show()
 
         // --- setup the notifications class to be used ---
         var dailyNotificationsTemp : DailyNotifications = DailyNotifications(context)

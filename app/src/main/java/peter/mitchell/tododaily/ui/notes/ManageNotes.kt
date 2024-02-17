@@ -15,9 +15,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.android.synthetic.main.manage_daily_information.*
-import kotlinx.android.synthetic.main.manage_notes.*
 import peter.mitchell.tododaily.*
+import peter.mitchell.tododaily.databinding.HelpScreenBinding
+import peter.mitchell.tododaily.databinding.ManageDailyInformationBinding
+import peter.mitchell.tododaily.databinding.ManageNotesBinding
 import java.io.File
 import java.lang.NumberFormatException
 import java.time.LocalDate
@@ -29,25 +30,28 @@ class ManageNotes : AppCompatActivity() {
 
     private lateinit var imm: InputMethodManager
 
+    private lateinit var binding: ManageNotesBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.manage_notes)
+        binding = ManageNotesBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
         imm = this.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
         if (darkMode)
-            mainBackgroundManageNotes.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundDark))
+            binding.mainBackgroundManageNotes.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundDark))
         else
-            mainBackgroundManageNotes.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundLight))
+            binding.mainBackgroundManageNotes.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundLight))
 
 
-        manageNotesTextGrids.setupTitles(arrayListOf(
+        binding.manageNotesTextGrids.setupTitles(arrayListOf(
                 "Rearrange Notes", "Rearrange Lists", "Export Note", "Export List",
             )
         )
 
         reloadManageNotes()
 
-        exportAllNotesButton.setOnClickListener {
+        binding.exportAllNotesButton.setOnClickListener {
 
             for (i in 0 until notesList!!.notesFiles.size) {
                 if (i == 0 && !attemptExport(exportPath+notesList!!.notesFiles[i]+".txt", notesList!!.readNote(i))) {
@@ -67,10 +71,10 @@ class ManageNotes : AppCompatActivity() {
     }
 
     private fun reloadManageNotes() {
-        manageNotesTextGrids.sectionGrids[0].setCustomColumnCount(notesColumns)
-        manageNotesTextGrids.sectionGrids[1].setCustomColumnCount(listsColumns)
-        manageNotesTextGrids.sectionGrids[2].setCustomColumnCount(notesColumns)
-        manageNotesTextGrids.sectionGrids[3].setCustomColumnCount(listsColumns)
+        binding.manageNotesTextGrids.sectionGrids[0].setCustomColumnCount(notesColumns)
+        binding.manageNotesTextGrids.sectionGrids[1].setCustomColumnCount(listsColumns)
+        binding.manageNotesTextGrids.sectionGrids[2].setCustomColumnCount(notesColumns)
+        binding.manageNotesTextGrids.sectionGrids[3].setCustomColumnCount(listsColumns)
 
         var manageNotesContent = ArrayList<ArrayList<String>>(4)
         manageNotesContent.add(ArrayList<String>())
@@ -88,29 +92,29 @@ class ManageNotes : AppCompatActivity() {
             manageNotesContent[3].add(notesList!!.listsFiles[i])
         }
 
-        manageNotesTextGrids.setupContent(manageNotesContent)
+        binding.manageNotesTextGrids.setupContent(manageNotesContent)
 
         for (i in 0 until manageNotesContent[0].size) {
 
             // rearrange
-            manageNotesTextGrids.sectionGrids[0].textGrid[i].setOnClickListener {
+            binding.manageNotesTextGrids.sectionGrids[0].textGrid[i].setOnClickListener {
                 rearrangeNoteDialog(i)
             }
 
             // export
-            manageNotesTextGrids.sectionGrids[2].textGrid[i].setOnClickListener {
+            binding.manageNotesTextGrids.sectionGrids[2].textGrid[i].setOnClickListener {
                 exportNoteDialog(i)
             }
         }
 
         for (i in 0 until manageNotesContent[1].size) {
             // rearrange
-            manageNotesTextGrids.sectionGrids[1].textGrid[i].setOnClickListener {
+            binding.manageNotesTextGrids.sectionGrids[1].textGrid[i].setOnClickListener {
                 rearrangeListDialog(i)
             }
 
             // export
-            manageNotesTextGrids.sectionGrids[3].textGrid[i].setOnClickListener {
+            binding.manageNotesTextGrids.sectionGrids[3].textGrid[i].setOnClickListener {
                 exportListDialog(i)
             }
         }

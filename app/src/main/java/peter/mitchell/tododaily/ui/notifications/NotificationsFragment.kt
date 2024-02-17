@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.work.WorkManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.android.synthetic.main.fragment_notifications.*
+import android.util.Log
 import peter.mitchell.tododaily.*
 import peter.mitchell.tododaily.databinding.FragmentNotificationsBinding
 import java.time.*
@@ -90,9 +90,9 @@ class NotificationsFragment : Fragment() {
         val nextNotification = dailyNotifications.getNextNotificationTime()
 
         if (nextNotification == null) {
-            nextNotificationText.text = "No notifications found"
+            _binding.nextNotificationText.text = "No notifications found"
         } else {
-            nextNotificationText.text = "Next Notification: ${nextNotification.toLocalDate().toString()} at ${nextNotification.toLocalTime().toString()}"
+            _binding.nextNotificationText.text = "Next Notification: ${nextNotification.toLocalDate().toString()} at ${nextNotification.toLocalTime().toString()}"
         }
 
     }
@@ -207,6 +207,7 @@ class NotificationsFragment : Fragment() {
             notificationDateTime = notificationDateTime.minusNanos(notificationDateTime.nano.toLong())
             dailyNotifications.addOneTimeNotification(
                 "5m Quick Timer",
+                0,
                 notificationDateTime,
                 "5m Quick Timer",
                 "Your 5m quick timer has expired"
@@ -227,6 +228,7 @@ class NotificationsFragment : Fragment() {
             notificationDateTime = notificationDateTime.minusNanos(notificationDateTime.nano.toLong())
             dailyNotifications.addOneTimeNotification(
                 "10m Quick Timer",
+                0,
                 notificationDateTime,
                 "10m Quick Timer",
                 "Your 10m quick timer has expired"
@@ -247,6 +249,7 @@ class NotificationsFragment : Fragment() {
             notificationDateTime = notificationDateTime.minusNanos(notificationDateTime.nano.toLong())
             dailyNotifications.addOneTimeNotification(
                 "20m Quick Timer",
+                0,
                 notificationDateTime,
                 "20m Quick Timer",
                 "Your 20m quick timer has expired"
@@ -267,6 +270,7 @@ class NotificationsFragment : Fragment() {
             notificationDateTime = notificationDateTime.minusNanos(notificationDateTime.nano.toLong())
             dailyNotifications.addOneTimeNotification(
                 "30m Quick Timer",
+                0,
                 notificationDateTime,
                 "30m Quick Timer",
                 "Your 30m quick timer has expired"
@@ -287,6 +291,7 @@ class NotificationsFragment : Fragment() {
             notificationDateTime = notificationDateTime.minusNanos(notificationDateTime.nano.toLong())
             dailyNotifications.addOneTimeNotification(
                 "60m Quick Timer",
+                0,
                 notificationDateTime,
                 "60m Quick Timer",
                 "Your 60m quick timer has expired"
@@ -303,26 +308,31 @@ class NotificationsFragment : Fragment() {
     }
 
     override fun onResume() {
-        super.onResume()
+        try {
+            super.onResume()
 
-        if (!notificationsShown) {
+            if (!notificationsShown) {
+                updateBottomNavVisibilities()
+
+                WorkManager.getInstance(requireContext()).cancelAllWork()
+
+                val action =
+                    NotificationsFragmentDirections.actionNavigationNotificationsToNavigationHome()
+                view?.findNavController()?.navigate(action)
+            }
+
+            readNotifications()
+
+            dailyNotifications.refreshNotifications(requireContext())
+
+            reloadNextNotification()
+            reloadOneTimeNotifications()
+            reloadDailyNotifications()
+
             updateBottomNavVisibilities()
-
-            WorkManager.getInstance(requireContext()).cancelAllWork()
-
-            val action = NotificationsFragmentDirections.actionNavigationNotificationsToNavigationHome()
-            view?.findNavController()?.navigate(action)
+        } catch (e : Exception) {
+            Log.i("tdd-notif on resume: ", "on resume error fount. non-error if done through quick timer.")
         }
-
-        readNotifications()
-
-        dailyNotifications.refreshNotifications(requireContext())
-
-        reloadNextNotification()
-        reloadOneTimeNotifications()
-        reloadDailyNotifications()
-
-        updateBottomNavVisibilities()
     }
 
     override fun onDestroyView() {

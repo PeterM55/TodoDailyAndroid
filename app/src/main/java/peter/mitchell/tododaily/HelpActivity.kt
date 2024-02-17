@@ -3,7 +3,10 @@ package peter.mitchell.tododaily
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import kotlinx.android.synthetic.main.help_screen.*
+import peter.mitchell.tododaily.databinding.ActivityMainBinding
+import peter.mitchell.tododaily.databinding.HelpScreenBinding
+
+//import kotlinx.android.synthetic.main.help_screen.*
 
 class HelpActivity : AppCompatActivity() {
 
@@ -87,35 +90,38 @@ Quick notifications and snoozing:
 
     var selectedHelpFragment : fragments? = null
 
+    private lateinit var binding: HelpScreenBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.help_screen)
+        binding = HelpScreenBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
         if (darkMode)
-            mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundDark))
+            binding.mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundDark))
         else
-            mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundLight))
+            binding.mainBackground.setBackgroundColor(resources.getColor(peter.mitchell.tododaily.R.color.backgroundLight))
 
 
         //oneTimeNotification = intent.getBooleanExtra("oneTimeNotification", false)
 
-        appHelpButton.setOnClickListener {
+        binding.appHelpButton.setOnClickListener {
             selectedHelpFragment = null
             reloadText()
         }
-        homeHelpButton.setOnClickListener {
+        binding.homeHelpButton.setOnClickListener {
             selectedHelpFragment = fragments.home
             reloadText()
         }
-        todoHelpButton.setOnClickListener {
+        binding.todoHelpButton.setOnClickListener {
             selectedHelpFragment = fragments.todo
             reloadText()
         }
-        notesHelpButton.setOnClickListener {
+        binding.notesHelpButton.setOnClickListener {
             selectedHelpFragment = fragments.notes
             reloadText()
         }
-        notifsHelpButton.setOnClickListener {
+        binding.notifsHelpButton.setOnClickListener {
             selectedHelpFragment = fragments.notifs
             reloadText()
         }
@@ -126,15 +132,15 @@ Quick notifications and snoozing:
     /** Reloads the text to be displayed */
     fun reloadText() {
         if (selectedHelpFragment == null) {
-            mainInformation.setText(appString)
+            binding.mainInformation.setText(appString)
         } else if (selectedHelpFragment == fragments.home) {
-            mainInformation.setText(homeString)
+            binding.mainInformation.setText(homeString)
         } else if (selectedHelpFragment == fragments.todo) {
-            mainInformation.setText(todoString)
+            binding.mainInformation.setText(todoString)
         } else if (selectedHelpFragment == fragments.notes) {
-            mainInformation.setText(notesString)
+            binding.mainInformation.setText(notesString)
         } else if (selectedHelpFragment == fragments.notifs) {
-            mainInformation.setText(notifsString)
+            binding.mainInformation.setText(notifsString)
         }
     }
 
